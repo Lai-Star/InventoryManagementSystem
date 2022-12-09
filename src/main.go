@@ -5,19 +5,23 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/libs"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	// define routes
+	http.HandleFunc("/login", api.Login);
+	http.HandleFunc("/logout", api.Logout);
 
 	// Loading the .env file in the config folder
 	err := godotenv.Load("../config/.env");
-	libs.CheckError(err);
+	utils.CheckError(err);
 
 	// Connecting to localhost
 	port := fmt.Sprintf(":%v", os.Getenv("SERVER_PORT"))
 	fmt.Println("Server is running on port", port)
 	err = http.ListenAndServe(port, nil)
-	libs.CheckError(err);	
+	utils.CheckError(err);
 }

@@ -16,6 +16,8 @@
 
   - This folder is typically used to store configuration files for a project. Configuration files contain settings and parameters that control the behavior of the project.
 
+  what should be in source folder
+
   api: This folder is typically used to store the code that defines the endpoints and routes of the project's API. The API is the interface through which clients (such as web or mobile apps) can access the project's data and functionality.
   models: This folder is typically used to store the code that defines the data models used by the project. A data model is a representation of the data and relationships in a database, and is used to create and manage the database schema.
   controllers: This folder is typically used to store the code that defines the controllers for the project. A controller is a function or method that handles requests to the project's API, and is responsible for performing the required actions and returning a response.
