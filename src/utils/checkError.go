@@ -6,6 +6,6 @@ import (
 
 func CheckError(err error) {
 	if err != nil {
-		log.Fatalln("Internal server error: ", err);
+		log.Fatalln("Internal Server Error: ", err);
 	}
 }

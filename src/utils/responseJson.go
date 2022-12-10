@@ -20,6 +20,13 @@ func ResponseJson(w http.ResponseWriter, Code int, Message string) {
 	if err != nil {
 		log.Fatalln("Error in ResponseJson utils folder: ", err)
 	}
+
+	// privateKey := keys.LoadPrivateKey();
+	// hashed := sha256.Sum256(bs)
+	// signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashed[:])
+	// CheckError(err)
+	// io.WriteString(w, string(signature));
+
 	io.WriteString(w, string(bs));
 }
 
