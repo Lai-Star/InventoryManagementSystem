@@ -9,4 +9,5 @@ import (
 func Routes() {
 	http.HandleFunc("/login", controller.Login);
 	http.HandleFunc("/logout", controller.Logout);
+	http.HandleFunc("/signup", controller.SignUp)
 }

@@ -28,7 +28,7 @@ func ConnectToPostgreSQL() *sql.DB {
 	pgsqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 	host, port, user, password, dbname)
 
-	db, err := sql.Open("postgres", pgsqlInfo)
+	db, err = sql.Open("postgres", pgsqlInfo)
 	utils.CheckError(err)
 	
 	// Test the connection to the database
@@ -38,4 +38,14 @@ func ConnectToPostgreSQL() *sql.DB {
 	fmt.Println("Successfully connected to PostgreSQL database!")
 
 	return db
+}
+
+var (
+	InsertIntoUser = "INSERT INTO users (username, password, email, isActive, added_date, updated_date) VALUES ($1, $2, $3, $4, now(), now());"
+)
+
+func CreateNewUser(username string, password string, email string, isActive int) error {
+	_, err := db.Exec(InsertIntoUser, username, password, email, isActive)
+	utils.CheckError(err)
+	return err
 }

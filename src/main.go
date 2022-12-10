@@ -20,7 +20,7 @@ func main() {
 	defer db.Close()
 
 	// Generating & validating the public and private keys for signed Json
-	keys.GenerateKeys()
+	// keys.GenerateKeys()
 	keys.CheckKeys()
 
 	// define routes
@@ -35,4 +35,5 @@ func main() {
 	fmt.Println("Server is running on port", port, "!")
 	err = http.ListenAndServe(port, nil)
 	utils.CheckError(err);
+
 }

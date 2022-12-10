@@ -67,7 +67,7 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	// Setting a cookie with the signed jwt-token
 	http.SetCookie(w, c)
 
-	utils.ResponseJson(w, 200, "Successfully Logged In!");
+	utils.ResponseJson(w, http.StatusOK, "Successfully Logged In!");
 }
 
 func Logout(w http.ResponseWriter, req *http.Request) {
@@ -94,7 +94,7 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 
 	http.SetCookie(w, cookie)
 
-	utils.ResponseJson(w, 200, "Successfully Logged Out!")
+	utils.ResponseJson(w, http.StatusOK, "Successfully Logged Out!")
 }
 
 func RetrieveIssuer(w http.ResponseWriter, req *http.Request) {
