@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/route"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/keys"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
@@ -24,8 +24,7 @@ func main() {
 	keys.CheckKeys()
 
 	// define routes
-	http.HandleFunc("/login", api.Login);
-	http.HandleFunc("/logout", api.Logout);
+	route.Routes()
 
 	// Loading the .env file in the config folder
 	err := godotenv.Load("../config/.env");
