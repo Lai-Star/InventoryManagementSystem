@@ -17,7 +17,7 @@ var db *sql.DB
 func ConnectToPostgreSQL() *sql.DB {
 	// Loading the .env file in the config folder
 	err := godotenv.Load("../config/.env");
-	utils.CheckError(err);
+	utils.CheckErrorDatabase(err);
 
 	host := os.Getenv("POSTGRESQL_HOST")
 	port := os.Getenv("POSTGRESQL_PORT")
@@ -29,23 +29,13 @@ func ConnectToPostgreSQL() *sql.DB {
 	host, port, user, password, dbname)
 
 	db, err = sql.Open("postgres", pgsqlInfo)
-	utils.CheckError(err)
+	utils.CheckErrorDatabase(err)
 	
 	// Test the connection to the database
 	err = db.Ping()
-	utils.CheckError(err)
+	utils.CheckErrorDatabase(err)
 
 	fmt.Println("Successfully connected to PostgreSQL database!")
 
 	return db
-}
-
-var (
-	InsertIntoUser = "INSERT INTO users (username, password, email, isActive, added_date, updated_date) VALUES ($1, $2, $3, $4, now(), now());"
-)
-
-func CreateNewUser(username string, password string, email string, isActive int) error {
-	_, err := db.Exec(InsertIntoUser, username, password, email, isActive)
-	utils.CheckError(err)
-	return err
 }

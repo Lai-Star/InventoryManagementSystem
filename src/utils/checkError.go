@@ -9,3 +9,9 @@ func CheckError(err error) {
 		log.Fatalln("Internal Server Error: ", err);
 	}
 }
+
+func CheckErrorDatabase(err error) {
+	if err != nil {
+		log.Fatalln("PostgreSQL Internal Error: ", err)
+	}
+}

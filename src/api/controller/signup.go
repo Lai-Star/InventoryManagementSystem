@@ -34,8 +34,42 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	email := newUser.Email
 	isActive := newUser.IsActive
 
-	err := database.CreateNewUser(username, hashedPassword, email, isActive)
+	isValidUsername := CheckUsernameFormat(w, username)
+	if (!isValidUsername) {return}
+
+	// Check if username already exists in database (duplicates not allowed)
+	isDuplicateUsername := database.CheckUsernameDuplicates(username)
+	if (isDuplicateUsername) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Username already exists. Please try again.")
+		return
+	}
+
+	err := database.InsertNewUser(username, hashedPassword, email, isActive)
 	utils.CheckError(err)
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully Created User!");
+}
+
+func CheckUsernameFormat(w http.ResponseWriter, username string) bool {
+	// Check if username has a length <8 or >50
+	isValidUsernameLength := utils.CheckLength(username, 8, 50)
+	if (!isValidUsernameLength) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Username must have a length between 8 and 50 characters")
+		return false
+	}
+
+	// Check if username contains white spaces
+	isValidUsernameSpaces := utils.CheckWhiteSpaces(username)
+	if (!isValidUsernameSpaces) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Username cannot contain white spaces.")
+		return false
+	}
+
+	// Check if username contains special characters (other than underscore _)
+	isValidUsernameCharacters := utils.CheckSpecialChar(username)
+	if (!isValidUsernameCharacters) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Username cannot contain special characters other than underscore ('_').")
+		return false
+	}
+	return true
 }
