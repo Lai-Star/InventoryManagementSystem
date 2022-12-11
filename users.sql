@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 SELECT * FROM users;
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO leon;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO leon;
 
 INSERT INTO users (username, password, email, isActive, added_date, updated_date) VALUES ("lowjiewei","password","test",1,now(),now());

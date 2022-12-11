@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -30,7 +31,6 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	// New User sign up details
 	username := newUser.Username
 	password := newUser.Password
-	hashedPassword := utils.GenerateHash(password);
 	email := newUser.Email
 	isActive := newUser.IsActive
 
@@ -44,6 +44,21 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	isValidPassword := CheckPasswordFormat(w, password);
+	if (!isValidPassword) {return}
+	hashedPassword := utils.GenerateHash(password)
+
+	isValidEmail := CheckEmailFormat(w, email);
+	if (!isValidEmail) {return}
+
+	// Check is email already exists in database (duplicates not allowed)
+	isDuplicatedEmail := database.CheckEmailDuplicates(email)
+	fmt.Println("isDuplicatedEmail: ", isDuplicatedEmail)
+	if (isDuplicatedEmail) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Email address already exists. Please try again.")
+		return
+	}
+
 	err := database.InsertNewUser(username, hashedPassword, email, isActive)
 	utils.CheckError(err)
 
@@ -51,10 +66,10 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 }
 
 func CheckUsernameFormat(w http.ResponseWriter, username string) bool {
-	// Check if username has a length <8 or >50
+	// Check if username has a length >=8 or <=50
 	isValidUsernameLength := utils.CheckLength(username, 8, 50)
 	if (!isValidUsernameLength) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Username must have a length between 8 and 50 characters")
+		utils.ResponseJson(w, http.StatusBadRequest, "Username must have a length between 8 and 50 characters.")
 		return false
 	}
 
@@ -69,6 +84,26 @@ func CheckUsernameFormat(w http.ResponseWriter, username string) bool {
 	isValidUsernameCharacters := utils.CheckSpecialChar(username)
 	if (!isValidUsernameCharacters) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username cannot contain special characters other than underscore ('_').")
+		return false
+	}
+	return true
+}
+
+func CheckPasswordFormat(w http.ResponseWriter, password string) bool {
+	// Check if password has a length >=8 and <=20
+	isValidPasswordLength := utils.CheckLength(password, 8, 20)
+	if (!isValidPasswordLength) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Password must have a length between 8 and 20 characters.")
+		return false;
+	}
+	return true
+}
+
+func CheckEmailFormat(w http.ResponseWriter, email string) bool {
+	// Check if email address is in the correct format
+	isValidEmailAddress := utils.CheckEmailAddress(email)
+	if (!isValidEmailAddress) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Email address is not in the correct format. Please try again.")
 		return false
 	}
 	return true

@@ -5,14 +5,17 @@ import (
 )
 
 var (
-	SelectFromUser = "SELECT $1 FROM users WHERE username = $2;"
+	SelectFromUser = "SELECT username FROM users WHERE username = $1"
+	SelectEmailFromUser = "SELECT email FROM users WHERE email = $2;"
 )
 
 func CheckUsernameDuplicates(username string) bool {
-	row := db.QueryRow(SelectFromUser, "username", username)
-	
-	if row.Scan() != sql.ErrNoRows {
-		return true
-	} 
-	return false
+	row := db.QueryRow(SelectFromUser, username)
+	return row.Scan() != sql.ErrNoRows
 }
+
+func CheckEmailDuplicates(email string) bool {
+	row := db.QueryRow(SelectEmailFromUser, email)
+	return row.Scan() != sql.ErrNoRows
+}
+
