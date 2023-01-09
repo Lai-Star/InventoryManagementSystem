@@ -35,7 +35,18 @@
 - As a user, I want to be able to add a new product to the IMS.
 - As a user, I want to be able to view, edit and delete the products in my IMS account.
 
-## Test Driven Development (TDD)
+## Unit Testing - Test Driven Development (TDD)
 
+- The main purpose of unit testing is to test the functionality of individual units of code to ensure that they are working as intended.
+- Unit testing can also be used to establish a foundation for automated testing and continuous integration, which helps to maintain the quality and reliability of the software over time.
+- The following steps were implemented in the process of TDD:
+  1. Plan your test cases: Write down the different scenarios you want to test, and write down the expected input and output for each test case.
+  2. Write the function: Write the function you want to test in code. At this point, the function should have any actual implementation. It should just have the correct function signature and return type.
+  3. Write the unit test function: Write a unit test function that tests the function in step 2. The unit test function should take in the expected input and output for each test case, and use assertions to check that the function produces the correct output when given the expected input.
+  4. Run the tests and refactor (if necessary).
+-----
 - `coverage`
   - `alias coverage='go test -coverprofile=coverage.out && go tool cover -html=coverage.out'`
+- Running ALL tests on /src directory
+  - `go test -v ./...`
+  - `go test ./...`
