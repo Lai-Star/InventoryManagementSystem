@@ -12,7 +12,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-
 func main() {
 
 	db := database.ConnectToPostgreSQL();
@@ -25,7 +24,7 @@ func main() {
 	keys.CheckKeys()
 
 	// get application routes
-	routes.Routes()
+	mux := routes.Routes()
 
 	// Loading the .env file in the config folder
 	err := godotenv.Load("../config/.env");
@@ -34,7 +33,7 @@ func main() {
 	// Connecting to localhost
 	port := fmt.Sprintf(":%v", os.Getenv("SERVER_PORT"))
 	fmt.Println("Server is running on port", port, "!")
-	err = http.ListenAndServe(port, nil)
+	err = http.ListenAndServe(port, mux)
 	utils.CheckError(err);
 
 }

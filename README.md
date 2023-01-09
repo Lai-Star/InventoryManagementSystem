@@ -34,3 +34,8 @@
 - As an admin, I want to able to view, edit and delete the accounts in the IMS.
 - As a user, I want to be able to add a new product to the IMS.
 - As a user, I want to be able to view, edit and delete the products in my IMS account.
+
+## Test Driven Development (TDD)
+
+- `coverage`
+  - `alias coverage='go test -coverprofile=coverage.out && go tool cover -html=coverage.out'`
