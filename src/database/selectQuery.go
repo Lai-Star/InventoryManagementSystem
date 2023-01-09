@@ -2,20 +2,30 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
+
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
 var (
-	SelectFromUser = "SELECT username FROM users WHERE username = $1"
-	SelectEmailFromUser = "SELECT email FROM users WHERE email = $2;"
+	querySelectFromUsers = "SELECT %s FROM users WHERE %s = $1;"
 )
 
-func CheckUsernameDuplicates(username string) bool {
-	row := db.QueryRow(SelectFromUser, username)
+func UsernameExists(username string) bool {
+	row := db.QueryRow(fmt.Sprintf(querySelectFromUsers, "username", "username"), username)
 	return row.Scan() != sql.ErrNoRows
 }
 
-func CheckEmailDuplicates(email string) bool {
-	row := db.QueryRow(SelectEmailFromUser, email)
+func EmailExists(email string) bool {
+	row := db.QueryRow(fmt.Sprintf(querySelectFromUsers, "email", "email"), email)
 	return row.Scan() != sql.ErrNoRows
+}
+
+func GetPasswordFromDB(username string) (string, error) {
+	var password string
+	row := db.QueryRow(fmt.Sprintf(querySelectFromUsers, "password", "username"), username)
+	err := row.Scan(&password)
+	utils.CheckErrorDatabase(err)
+	return password, nil
 }
 

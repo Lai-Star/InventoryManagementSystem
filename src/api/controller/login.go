@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -19,10 +20,7 @@ type LoginJson struct {
 }
 
 func Login(w http.ResponseWriter, req *http.Request) {
-	// Extract username and password from database
-	dbUsername := "Leon"
-	dbPassword := "$2a$10$YIofk.GOJ0jBlpjw1YzSKOQxcbN3bpyMRx82F4EDj/sBRpRkQlgDu"
-
+	
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json");
 	var user LoginJson
@@ -33,9 +31,17 @@ func Login(w http.ResponseWriter, req *http.Request) {
 		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in Login route", err)
 		return;
 	}
+	
+	// Check if username exists in database
+	if (!database.UsernameExists(user.Username)) {
+		utils.ResponseJson(w, http.StatusUnauthorized, "You have entered an incorrect username and/or password. Please try again.")
+		return;
+	}
 
+	// Compare password with hashed password in database
+	dbPassword, _ := database.GetPasswordFromDB(user.Username)
 	isValidPassword := utils.CompareHash(dbPassword, user.Password);
-	if (!isValidPassword || dbUsername != user.Username) {
+	if (!isValidPassword) {
 		utils.ResponseJson(w, http.StatusUnauthorized, "You have entered an incorrect username and/or password. Please try again.")
 		return;
 	}
@@ -43,7 +49,7 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	// Generate Token with Claims
 	tokenExpireTime := time.Now().Add(1 * time.Hour)
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims {
-		Issuer: dbUsername,
+		Issuer: user.Username,
 		ExpiresAt: jwt.NewNumericDate(tokenExpireTime), // 1 hour
 	})
 

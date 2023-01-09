@@ -6,12 +6,12 @@ import (
 
 func CheckError(err error) {
 	if err != nil {
-		log.Fatalln("Internal Server Error: ", err);
+		log.Println("Internal Server Error: ", err);
 	}
 }
 
 func CheckErrorDatabase(err error) {
 	if err != nil {
-		log.Fatalln("PostgreSQL Internal Error: ", err)
+		log.Println("PostgreSQL Internal Error: ", err)
 	}
 }

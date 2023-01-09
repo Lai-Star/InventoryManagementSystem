@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -38,7 +37,7 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	if (!isValidUsername) {return}
 
 	// Check if username already exists in database (duplicates not allowed)
-	isDuplicateUsername := database.CheckUsernameDuplicates(username)
+	isDuplicateUsername := database.UsernameExists(username)
 	if (isDuplicateUsername) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username already exists. Please try again.")
 		return
@@ -52,8 +51,7 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	if (!isValidEmail) {return}
 
 	// Check is email already exists in database (duplicates not allowed)
-	isDuplicatedEmail := database.CheckEmailDuplicates(email)
-	fmt.Println("isDuplicatedEmail: ", isDuplicatedEmail)
+	isDuplicatedEmail := database.EmailExists(email)
 	if (isDuplicatedEmail) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Email address already exists. Please try again.")
 		return

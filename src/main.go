@@ -5,12 +5,13 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/route"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/routes"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/keys"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/joho/godotenv"
 )
+
 
 func main() {
 
@@ -23,8 +24,8 @@ func main() {
 	// keys.GenerateKeys()
 	keys.CheckKeys()
 
-	// define routes
-	route.Routes()
+	// get application routes
+	routes.Routes()
 
 	// Loading the .env file in the config folder
 	err := godotenv.Load("../config/.env");
