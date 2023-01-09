@@ -1,17 +1,15 @@
 package utils
 
-import (
-	"log"
-)
+import "fmt"
 
 func CheckError(err error) {
 	if err != nil {
-		log.Println("Internal Server Error: ", err);
+		fmt.Println("Internal Server Error:", err);
 	}
 }
 
 func CheckErrorDatabase(err error) {
 	if err != nil {
-		log.Println("PostgreSQL Internal Error: ", err)
+		fmt.Println("PostgreSQL Internal Server Error:", err)
 	}
 }
