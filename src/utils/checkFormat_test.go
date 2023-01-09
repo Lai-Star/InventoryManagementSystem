@@ -69,3 +69,23 @@ func Test_CheckSpecialChar(t *testing.T) {
 	}
 }
 
+func Test_CheckEmailAddress(t *testing.T) {
+	emailAddressTests := []struct {
+		testName string
+		email string
+		expected bool
+	} {
+		{"Correct Email Format", "myself@email.com", true},
+		{"Correct Email Format", "myself_123_haha@email.com", true},
+		{"Missing @ symbol", "nosymbolemail.com", false},
+		{"Missing email domain", "nodomain@email", false},
+		{"Missing email domain", "nodomain@", false},
+	}
+
+	for _, e := range emailAddressTests {
+		result := CheckEmailAddress(e.email)
+		if e.expected && !result {
+			t.Errorf("%s: expected true but got %v", e.testName, result)
+		}
+	}
+}
