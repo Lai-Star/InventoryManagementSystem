@@ -35,6 +35,13 @@
 - As a user, I want to be able to add a new product to the IMS.
 - As a user, I want to be able to view, edit and delete the products in my IMS account.
 
+## 2FA Authentication
+
+- 2FA provides an additional layer of security as it mitigates the risks associated with weak or stolen passwords.
+- By requiring the user to provide 2 different authentication factors, 2FA helps to protect against unauthorized access to an account or system.
+- Cryptographically secure pseudorandom number generators (CSPRNG) were used to generate one-time passwords (OTPs) for two-factor authentication (2FA) over Psedorandom Number Generators (PRNG) due to the **increased security, enhanced randomness, and improved reliability**.
+- In the **Generate2FA()** function, the OTP was generated in the format of 5 alphabets (lower and upper case) and 6 numbers separated by a hyphen "-" to provide a high level of randomness.
+
 ## Unit Testing - Test Driven Development (TDD)
 
 - The main purpose of unit testing is to test the functionality of individual units of code to ensure that they are working as intended.
@@ -44,7 +51,9 @@
   2. Write the function: Write the function you want to test in code. At this point, the function should have any actual implementation. It should just have the correct function signature and return type.
   3. Write the unit test function: Write a unit test function that tests the function in step 2. The unit test function should take in the expected input and output for each test case, and use assertions to check that the function produces the correct output when given the expected input.
   4. Run the tests and refactor (if necessary).
------
+
+---
+
 - `coverage`
   - `alias coverage='go test -coverprofile=coverage.out && go tool cover -html=coverage.out'`
 - Running ALL tests on /src directory

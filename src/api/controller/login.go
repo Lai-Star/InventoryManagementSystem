@@ -73,6 +73,11 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	http.SetCookie(w, c)
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully Logged In!");
+
+	// Retrieve user's email to send OTP
+	dbEmail, _ := database.GetEmailFromDB(user.Username)
+	go utils.SMTP(user.Username, dbEmail, utils.Generate2FA())
+
 }
 
 func Logout(w http.ResponseWriter, req *http.Request) {

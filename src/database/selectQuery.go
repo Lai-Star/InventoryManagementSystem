@@ -29,3 +29,11 @@ func GetPasswordFromDB(username string) (string, error) {
 	return password, nil
 }
 
+func GetEmailFromDB(username string) (string, error) {
+    var email string
+    row := db.QueryRow(fmt.Sprintf(querySelectFromAccounts, "email", "username"), username)
+    err := row.Scan(&email)
+    utils.CheckErrorDatabase(err)
+    return email, nil
+}
+
