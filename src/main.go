@@ -26,6 +26,8 @@ func main() {
 	// get application routes
 	mux := routes.Routes()
 
+	fmt.Println(utils.Generate2FA())
+
 	// Loading the .env file in the config folder
 	err := godotenv.Load("../config/.env");
 	utils.CheckError(err);
@@ -35,5 +37,4 @@ func main() {
 	fmt.Println("Server is running on port", port, "!")
 	err = http.ListenAndServe(port, mux)
 	utils.CheckError(err);
-
 }

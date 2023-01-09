@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -78,7 +77,7 @@ func Login(w http.ResponseWriter, req *http.Request) {
 
 func Logout(w http.ResponseWriter, req *http.Request) {
 	RetrieveIssuer(w, req)
-	fmt.Println("Retrieved Issuer", w.Header().Get("username"))
+	// fmt.Println("Retrieved Issuer", w.Header().Get("username"))
 
 	w.Header().Set("Content-Type", "application/json")
 	cookie, err := req.Cookie("leon-jwt-token")
@@ -122,7 +121,7 @@ func RetrieveIssuer(w http.ResponseWriter, req *http.Request) {
 	// To access the issuer, we need the token claims to be type RegisteredClaims
 	claims := token.Claims.(*jwt.RegisteredClaims)
 
-	fmt.Println("Retrieved Issuer using claims.Issuer: ", claims.Issuer)
+	// fmt.Println("Retrieved Issuer using claims.Issuer: ", claims.Issuer)
 	w.Header().Set("username", claims.Issuer)
-	fmt.Println("Retrieved Issuer using w.Header().Get():" , w.Header().Get("username"))
+	// fmt.Println("Retrieved Issuer using w.Header().Get():" , w.Header().Get("username"))
 }
