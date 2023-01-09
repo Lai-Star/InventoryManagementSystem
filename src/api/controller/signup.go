@@ -57,7 +57,10 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err := database.InsertNewUser(username, hashedPassword, email, isActive)
+	// For new users, userGroup is default to "Retail Business Owner"
+	userGroup := "Retail Business Owner"
+
+	err := database.InsertNewUser(username, hashedPassword, email, userGroup, isActive)
 	if err != nil {
 		utils.DatabaseServerError(w, "Error inserting new user into database at /signup route", err)
 	}
