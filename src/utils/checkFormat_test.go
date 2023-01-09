@@ -25,5 +25,22 @@ func Test_Length(t *testing.T) {
 }
 
 func Test_CheckWhiteSpaces(t *testing.T) {
-	
+	whiteSpacesTest := []struct {
+		testName string
+		str string
+		expected bool
+	} {
+		{"Left whitespace", "    Hello", false},
+		{"No whitespace", "Daniel", true},
+		{"Right whitespace", "Whatever     ", false},
+		{"Middle whitespace", "Good Morning", false},
+		{"Combination", "   Good Afternoon     ", false},
+	}
+
+	for _, e := range whiteSpacesTest {
+		result := CheckWhiteSpaces(e.str)
+		if e.expected && !result {
+			t.Errorf("%s: expected true but got %v", e.testName, result)
+		}
+	}
 }
