@@ -66,6 +66,12 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 }
 
 func CheckUsernameFormat(w http.ResponseWriter, username string) bool {
+	// Check if username is blank
+	if username == "" {
+		utils.ResponseJson(w, http.StatusBadRequest, "Username cannot be empty.")
+		return false
+	}
+
 	// Check if username has a length >=8 or <=50
 	isValidUsernameLength := utils.CheckLength(username, 8, 50)
 	if (!isValidUsernameLength) {
@@ -90,6 +96,12 @@ func CheckUsernameFormat(w http.ResponseWriter, username string) bool {
 }
 
 func CheckPasswordFormat(w http.ResponseWriter, password string) bool {
+	// Check if password is blank
+	if password == "" {
+		utils.ResponseJson(w, http.StatusBadRequest, "Password cannot be empty.")
+		return false
+	}
+
 	// Check if password has a length >=8 and <=20
 	isValidPasswordLength := utils.CheckLength(password, 8, 20)
 	if (!isValidPasswordLength) {
@@ -100,6 +112,12 @@ func CheckPasswordFormat(w http.ResponseWriter, password string) bool {
 }
 
 func CheckEmailFormat(w http.ResponseWriter, email string) bool {
+	// Check if email is blank
+	if email == "" {
+		utils.ResponseJson(w, http.StatusBadRequest, "Email cannot be empty.")
+		return false
+	}
+
 	// Check if email address is in the correct format
 	isValidEmailAddress := utils.CheckEmailAddress(email)
 	if (!isValidEmailAddress) {
