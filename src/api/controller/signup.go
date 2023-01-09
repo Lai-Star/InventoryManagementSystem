@@ -58,7 +58,9 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	}
 
 	err := database.InsertNewUser(username, hashedPassword, email, isActive)
-	utils.CheckError(err)
+	if err != nil {
+		utils.DatabaseServerError(w, "Error inserting new user into database at /signup route", err)
+	}
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully Created User!");
 }

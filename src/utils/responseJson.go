@@ -33,3 +33,7 @@ func InternalServerError(w http.ResponseWriter, message string, err error) {
 	ResponseJson(w, http.StatusInternalServerError, "Internal Server Error");
 }
 
+func DatabaseServerError(w http.ResponseWriter, message string, err error) {
+	log.Println(message, err)
+	ResponseJson(w, http.StatusInternalServerError, "PostgreSQL Server Error");
+}
