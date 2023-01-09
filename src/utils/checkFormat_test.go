@@ -1,6 +1,8 @@
 package utils
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_Length(t *testing.T) {
 	lengthTests := []struct {
@@ -25,7 +27,7 @@ func Test_Length(t *testing.T) {
 }
 
 func Test_CheckWhiteSpaces(t *testing.T) {
-	whiteSpacesTest := []struct {
+	whiteSpacesTests := []struct {
 		testName string
 		str string
 		expected bool
@@ -37,10 +39,33 @@ func Test_CheckWhiteSpaces(t *testing.T) {
 		{"Combination", "   Good Afternoon     ", false},
 	}
 
-	for _, e := range whiteSpacesTest {
+	for _, e := range whiteSpacesTests {
 		result := CheckWhiteSpaces(e.str)
 		if e.expected && !result {
 			t.Errorf("%s: expected true but got %v", e.testName, result)
 		}
 	}
 }
+
+func Test_CheckSpecialChar(t *testing.T) {
+	specialCharTests := []struct {
+		testName string
+		str string
+		expected bool
+	} {
+		{"only lowercase", "abcdefg!", false},
+		{"only uppercase", "ABCDEF!@#G", false},
+		{"only numerical", "1234567", true},
+		{"only underscore", "abcd_", true},
+		{"all except underscore", "abcABC123", true},
+		{"correct format", "abcABC1234_", true},
+	}
+
+	for _, e := range specialCharTests {
+		result := CheckSpecialChar(e.str)
+		if e.expected && !result {
+			t.Errorf("%s: expected true but got %v", e.testName, result)
+		}
+	}
+}
+
