@@ -17,9 +17,7 @@ func ResponseJson(w http.ResponseWriter, Code int, Message string) {
 	}
 
 	bs, err := json.Marshal(jsonStatus);
-	if err != nil {
-		log.Fatalln("Error in ResponseJson utils folder: ", err)
-	}
+	CheckError(err)
 
 	// privateKey := keys.LoadPrivateKey();
 	// hashed := sha256.Sum256(bs)
@@ -31,6 +29,7 @@ func ResponseJson(w http.ResponseWriter, Code int, Message string) {
 }
 
 func InternalServerError(w http.ResponseWriter, message string, err error) {
-	log.Fatalln(message, err)
+	log.Println(message, err)
 	ResponseJson(w, http.StatusInternalServerError, "Internal Server Error");
 }
+
