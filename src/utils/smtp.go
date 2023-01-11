@@ -6,7 +6,16 @@ import (
 	"os"
 )
 
+type Email struct {
+    From    string
+    To      string
+    Subject string
+    Body    string
+}
+
 func SMTP(username string, email string, otp string) {
+
+    var e Email
 
 	// Retrieve env variables
 	smtpAddress := os.Getenv("SMTP_ADDRESS")
@@ -16,9 +25,10 @@ func SMTP(username string, email string, otp string) {
 
     auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
 
-    to := email
-    subject := "IMS One-Time password"
-    body := `
+    e.From = "no-reply@IMS.com"
+    e.To = email
+    e.Subject = "IMS One-Time password"
+    e.Body = `
         <html>
             <head>
                 <style>
@@ -57,20 +67,24 @@ func SMTP(username string, email string, otp string) {
         </html>
     `
 
-    // Create new message
-    message := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\r\n"
-    message += fmt.Sprintf("From: %s\r\n", "no-reply@IMS.com")
-    message += fmt.Sprintf("To: %s\r\n", email)
-    message += fmt.Sprintf("Subject: %s\r\n", subject)
-    message += fmt.Sprintf("\r\n%s\r\n", body)
-
     err := smtp.SendMail(
         smtpAddress, // mailtrap.io SMTP server and port
         auth,
         "no-reply@IMS.com", // sender's email address
-        []string{to}, // recipient's email address
-        []byte(message), // email message
+        []string{e.To}, // recipient's email address
+        []byte(e.Message()), // email message
     )
 
     CheckError(err)
+}
+
+func (e Email) Message() string {
+    return fmt.Sprintf(`MIME-version: 1.0;
+Content-Type: text/html; charset="UTF-8";
+From: %s
+To: %s
+Subject: %s
+
+%s
+`, e.From, e.To, e.Subject, e.Body)
 }
