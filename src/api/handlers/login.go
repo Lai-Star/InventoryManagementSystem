@@ -1,4 +1,4 @@
-package controller
+package handlers
 
 import (
 	"encoding/json"
@@ -43,6 +43,12 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	if (!isValidPassword) {
 		utils.ResponseJson(w, http.StatusUnauthorized, "You have entered an incorrect username and/or password. Please try again.")
 		return;
+	}
+
+	// Check User Status (active/inactive)
+	dbStatus, _ := database.GetActiveStatusFromDB(user.Username)
+	if (dbStatus != 1) {
+		utils.ResponseJson(w, http.StatusForbidden, "Your account has been disabled. Please contact the IMS Administrator.")
 	}
 
 	// Generate Token with Claims

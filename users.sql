@@ -1,18 +1,18 @@
 -- Create user table
 
-CREATE TABLE IF NOT EXISTS users (
-	user_id SERIAL PRIMARY KEY,
+CREATE TABLE accounts (
+	user_id SERIAL NOT NULL PRIMARY KEY,
 	username VARCHAR(255) NOT NULL,
 	password VARCHAR(255) NOT NULL,
-	email VARCHAR(255),
-	isActive INT NOT NULL,
+	email VARCHAR(255) NOT NULL,
+	user_group VARCHAR(255) NOT NULL,
+	company_name VARCHAR(255) NOT NULL,
+	is_active SMALLINT NOT NULL,
 	added_date DATE NOT NULL,
 	updated_date DATE NOT NULL
 );
 
-SELECT * FROM users;
+SELECT * FROM accounts;
 
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO leon;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO leon;
-
-INSERT INTO users (username, password, email, isActive, added_date, updated_date) VALUES ("lowjiewei","password","test",1,now(),now());

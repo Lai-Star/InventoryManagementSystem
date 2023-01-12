@@ -37,3 +37,11 @@ func GetEmailFromDB(username string) (string, error) {
     return email, nil
 }
 
+func GetActiveStatusFromDB(username string) (int, error) {
+	var isActive int
+	row := db.QueryRow(fmt.Sprintf(querySelectFromAccounts, "is_active", "username"), username)
+	err := row.Scan(&isActive)
+	utils.CheckErrorDatabase(err)
+	return isActive, nil
+}
+

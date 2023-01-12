@@ -19,12 +19,12 @@
 
 ## User Group
 
-|       User Group       |                                            Description                                            |
-| :--------------------: | :-----------------------------------------------------------------------------------------------: |
-|         Admin          | Managing user accounts and permissions. Implementing new features and improvements to the system. |
-| Retail business owners |                                Use IMS to manage their inventory.                                 |
-| Retail store employees |                     Use IMS to check stock levels and place orders as needed.                     |
-|   Warehouse managers   |          Use IMS to track inventory for distribution centers or fulfillment warehouses.           |
+|    User Group     |                                                    Description                                                     |
+| :---------------: | :----------------------------------------------------------------------------------------------------------------: |
+|       Admin       |         Managing user accounts and permissions. Implementing new features and improvements to the system.          |
+|     IMS User      |              Can access all the functionalities of operations and financial analyst. (Self-Employed)               |
+|    Operations     |  Use IMS to manage and track sales, customer details, inventory and place orders for the business. (Organisation)  |
+| Financial Analyst | Use IMS to analyze financial data, such as profit margins, monthly profits, and inventory turnover. (Organisation) |
 
 ## User Stories
 
