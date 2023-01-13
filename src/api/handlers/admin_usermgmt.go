@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
@@ -38,5 +38,35 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	companyName := adminNewUser.CompanyName
 	isActive := adminNewUser.IsActive
 
-	fmt.Println(username, password, email, userGroup, companyName, isActive)
+	isValidUsername := utils.CheckUsernameFormat(w, username)
+	if (!isValidUsername) {return}
+
+	// Check if username already exists in database (duplicates not allowed)
+	isDuplicateUsername := database.UsernameExists(username)
+	if (isDuplicateUsername) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Username already exists. Please try again.")
+		return
+	}
+
+	isValidPassword := utils.CheckPasswordFormat(w, password);
+	if (!isValidPassword) {return}
+	hashedPassword := utils.GenerateHash(password)
+
+	isValidEmail := utils.CheckEmailFormat(w, email);
+	if (!isValidEmail) {return}
+
+	// Check if email already exists in database (duplicates not allowed)
+	isDuplicatedEmail := database.EmailExists(email)
+	if (isDuplicatedEmail) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Email address already exists. Please try again.")
+		return
+	}
+
+	err := database.AdminInsertNewUser(username, hashedPassword, email, userGroup, companyName, isActive)
+	utils.CheckErrorDatabase(err)
+	if err != nil {
+		utils.DatabaseServerError(w, "Internal Server Error: ", err)
+	}
+
+	utils.ResponseJson(w, http.StatusOK, "Successfully Created User!");
 }

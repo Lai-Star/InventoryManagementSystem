@@ -32,8 +32,8 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	username := newUser.Username
 	password := newUser.Password
 	email := newUser.Email
-	company_name := newUser.CompanyName
-
+	
+	company_name := "IMSer"
 	isActive := 1
 
 	isValidUsername := utils.CheckUsernameFormat(w, username)
@@ -53,7 +53,7 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	isValidEmail := utils.CheckEmailFormat(w, email);
 	if (!isValidEmail) {return}
 
-	// Check is email already exists in database (duplicates not allowed)
+	// Check if email already exists in database (duplicates not allowed)
 	isDuplicatedEmail := database.EmailExists(email)
 	if (isDuplicatedEmail) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Email address already exists. Please try again.")
