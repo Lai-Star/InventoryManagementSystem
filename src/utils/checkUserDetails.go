@@ -1,18 +1,23 @@
 package utils
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 func CheckUsernameFormat(w http.ResponseWriter, username string) bool {
+	username = strings.TrimSpace(username)
+
 	// Check if username is blank
 	if username == "" {
 		ResponseJson(w, http.StatusBadRequest, "Username cannot be empty.")
 		return false
 	}
 
-	// Check if username has a length >=8 or <=50
-	isValidUsernameLength := CheckLength(username, 8, 50)
+	// Check if username has a length >=5 or <=50
+	isValidUsernameLength := CheckLength(username, 5, 50)
 	if (!isValidUsernameLength) {
-		ResponseJson(w, http.StatusBadRequest, "Username must have a length between 8 and 50 characters.")
+		ResponseJson(w, http.StatusBadRequest, "Username must have a length between 5 and 50 characters.")
 		return false
 	}
 
@@ -49,6 +54,8 @@ func CheckPasswordFormat(w http.ResponseWriter, password string) bool {
 }
 
 func CheckEmailFormat(w http.ResponseWriter, email string) bool {
+	email = strings.TrimSpace(email)
+
 	// Check if email is blank
 	if email == "" {
 		ResponseJson(w, http.StatusBadRequest, "Email cannot be empty.")
@@ -62,4 +69,48 @@ func CheckEmailFormat(w http.ResponseWriter, email string) bool {
 		return false
 	}
 	return true
+}
+
+func CheckUserGroupFormat(w http.ResponseWriter, userGroups string) bool {
+	if userGroups == "" {
+		userGroups = "IMS User"
+	}
+
+	userGroups = strings.TrimSpace(userGroups)
+
+	groups := strings.Split(userGroups, ",")
+	validGroups := []string{"Admin", "IMS User", "Operations", "Financial Analyst"}
+	for _, group := range groups {
+		group = strings.TrimSpace(group)
+		if !Contains(validGroups, group) {
+			ResponseJson(w, http.StatusBadRequest, group + " user group is not registered. Please try again.")
+			return false
+		}
+	}
+	return true
+}
+
+func CheckCompanyNameFormat(w http.ResponseWriter, companyName string) bool {
+	if companyName == "" {
+		companyName = "IMSer"
+	}
+
+	companyName = strings.TrimSpace(companyName)
+
+	isValidCompanyNameLength := CheckLength(companyName, 5, 250)
+	if (!isValidCompanyNameLength) {
+		ResponseJson(w, http.StatusBadRequest, "Company Name must be between 5 and 250 characters. Please try again.")
+		return false
+	}
+
+	return true
+}
+
+func Contains(s []string, e string) bool {
+    for _, a := range s {
+        if strings.EqualFold(a, e) {
+            return true
+        }
+    }
+    return false
 }

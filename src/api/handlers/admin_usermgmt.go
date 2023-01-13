@@ -62,11 +62,19 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Check if user group belongs to the following (Admin, IMS User, Operations, Financial Analyst)
+	isValidUserGroup := utils.CheckUserGroupFormat(w, userGroup)
+	if (!isValidUserGroup) {return}
+
+	// Check if company name is between 5 and 250 characters and if blank company name provided (default to IMS)
+	isValidCompanyName := utils.CheckCompanyNameFormat(w, companyName)
+	if (!isValidCompanyName) {return}
+
 	err := database.AdminInsertNewUser(username, hashedPassword, email, userGroup, companyName, isActive)
 	utils.CheckErrorDatabase(err)
 	if err != nil {
 		utils.DatabaseServerError(w, "Internal Server Error: ", err)
 	}
 
-	utils.ResponseJson(w, http.StatusOK, "Successfully Created User!");
+	utils.ResponseJson(w, http.StatusOK, "Admin Successfully Created User!");
 }

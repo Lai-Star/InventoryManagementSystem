@@ -49,6 +49,7 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	dbStatus, _ := database.GetActiveStatusFromDB(user.Username)
 	if (dbStatus != 1) {
 		utils.ResponseJson(w, http.StatusForbidden, "Your account has been disabled. Please contact the IMS Administrator.")
+		return
 	}
 
 	// Generate Token with Claims
