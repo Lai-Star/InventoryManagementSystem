@@ -22,6 +22,9 @@ func Routes() http.Handler {
 
 	// Admin Management Routes
 	mux.Post("/admin-create-user", handlers.AdminCreateUser)
+	mux.Get("/admin-get-users", handlers.AdminGetUsers)
+	mux.Put("/admin-update-user", handlers.AdminUpdateUser)
+	mux.Delete("/admin-delete-user", handlers.AdminDeleteUser)
 
 	return mux
 }

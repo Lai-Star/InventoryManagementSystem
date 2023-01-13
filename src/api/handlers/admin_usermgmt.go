@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -18,12 +19,16 @@ type AdminUserMgmt struct {
 	IsActive int `json:"is_active"`
 }
 
+type AdminDeleteUserMgmt struct {
+	Username string `json:"username"`
+}
+
 func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json");
 	var adminNewUser AdminUserMgmt
 
-	// Reading the request body and UnMarshal the body to the LoginJson struct
+	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);
 	if err := json.Unmarshal(bs, &adminNewUser); err != nil {
 		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in AdminCreateUser route", err)
@@ -78,3 +83,46 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 
 	utils.ResponseJson(w, http.StatusOK, "Admin Successfully Created User!");
 }
+
+func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
+	
+}
+
+func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
+	// Set Headers
+	w.Header().Set("Content-Type", "application/json");
+	var adminUpdateUser AdminUserMgmt
+
+	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
+	bs, _ := io.ReadAll(req.Body);
+	if err := json.Unmarshal(bs, &adminUpdateUser); err != nil {
+		utils.CheckError(err)
+		utils.InternalServerError(w, "Internal Server Error: ", err)
+		return;
+	}
+
+	// Update user details
+	username := adminUpdateUser.Username
+	password := adminUpdateUser.Password
+	email := adminUpdateUser.Email
+	userGroup := adminUpdateUser.UserGroup
+	companyName := adminUpdateUser.CompanyName
+	isActive := adminUpdateUser.IsActive
+
+	fmt.Println(username, password, email, userGroup, companyName, isActive)
+}
+
+func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
+	// Set Headers
+	w.Header().Set("Content-Type", "application/json");
+	var adminDeleteUser AdminDeleteUserMgmt
+
+	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
+	bs, _ := io.ReadAll(req.Body);
+	if err := json.Unmarshal(bs, &adminDeleteUser); err != nil {
+		utils.CheckError(err)
+		utils.InternalServerError(w, "Internal Server Error: ", err)
+		return;
+	}
+}
+
