@@ -9,6 +9,7 @@ import (
 
 var (
 	querySelectFromAccounts = "SELECT %s FROM accounts WHERE %s = $1;"
+	querySelectAllFromAccounts = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM accounts;"
 )
 
 func UsernameExists(username string) bool {
@@ -43,5 +44,10 @@ func GetActiveStatusFromDB(username string) (int, error) {
 	err := row.Scan(&isActive)
 	utils.CheckErrorDatabase(err)
 	return isActive, nil
+}
+
+func GetUsers() (*sql.Rows, error) {
+	result, err := db.Query(querySelectAllFromAccounts)
+	return result, err
 }
 

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -21,6 +22,17 @@ type AdminUserMgmt struct {
 
 type AdminDeleteUserMgmt struct {
 	Username string `json:"username"`
+}
+
+type UserMgmtModel struct {
+	Username string
+	Password string
+	Email string
+	UserGroup string
+	CompanyName string
+	IsActive int
+	AddedDate string
+	UpdatedDate string
 }
 
 func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
@@ -85,7 +97,51 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 }
 
 func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
+	var data []UserMgmtModel
+	var username, password, email, userGroup, companyName, addedDate, updatedDate sql.NullString
+	var isActive sql.NullInt16
+
+	rows, err := database.GetUsers()
+	if err != nil {
+		utils.DatabaseServerError(w, "Database Server Error", err)
+		return 
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&username, &password, &email, &userGroup, &companyName, &isActive, &addedDate, &updatedDate)
+		if err != nil {
+			utils.DatabaseServerError(w, "Database Server Error", err)
+			return
+		}
+
+		response := UserMgmtModel {
+			Username: username.String, 
+			Password: password.String,
+			Email: email.String,
+			UserGroup: userGroup.String,
+			CompanyName: companyName.String,
+			IsActive: int(isActive.Int16),
+			AddedDate: addedDate.String,
+			UpdatedDate: updatedDate.String,
+		}
+
+		data = append(data, response)
 	
+	}
+	jsonStatus := struct {
+		Code int `json:"code"`
+		Response []UserMgmtModel `json:"response"`
+	}{
+		Response: data,
+		Code: http.StatusOK,
+	}
+
+	bs, err := json.Marshal(jsonStatus);
+	utils.CheckError(err)
+
+	io.WriteString(w, string(bs));
 }
 
 func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
@@ -108,6 +164,8 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	userGroup := adminUpdateUser.UserGroup
 	companyName := adminUpdateUser.CompanyName
 	isActive := adminUpdateUser.IsActive
+
+	
 
 	fmt.Println(username, password, email, userGroup, companyName, isActive)
 }
