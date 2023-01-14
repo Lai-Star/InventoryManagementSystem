@@ -3,8 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
+	"log"
 )
 
 var (
@@ -26,7 +25,9 @@ func GetPasswordFromDB(username string) (string, error) {
 	var password string
 	row := db.QueryRow(fmt.Sprintf(querySelectFromAccounts, "password", "username"), username)
 	err := row.Scan(&password)
-	utils.CheckErrorDatabase(err)
+	if err != nil {
+		log.Println("Error scanning when getting password from database: ", err)
+	}
 	return password, nil
 }
 
@@ -34,7 +35,9 @@ func GetEmailFromDB(username string) (string, error) {
     var email string
     row := db.QueryRow(fmt.Sprintf(querySelectFromAccounts, "email", "username"), username)
     err := row.Scan(&email)
-    utils.CheckErrorDatabase(err)
+    if err != nil {
+		log.Println("Error scanning when getting email from database: ", err)
+	}
     return email, nil
 }
 
@@ -42,7 +45,9 @@ func GetActiveStatusFromDB(username string) (int, error) {
 	var isActive int
 	row := db.QueryRow(fmt.Sprintf(querySelectFromAccounts, "is_active", "username"), username)
 	err := row.Scan(&isActive)
-	utils.CheckErrorDatabase(err)
+	if err != nil {
+		log.Println("Error scanning when getting isActive status from database: ", err)
+	}
 	return isActive, nil
 }
 

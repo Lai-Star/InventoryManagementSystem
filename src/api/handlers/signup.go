@@ -24,7 +24,7 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and UnMarshal the body to the LoginJson struct
 	bs, _ := io.ReadAll(req.Body);
 	if err := json.Unmarshal(bs, &newUser); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in SignUp route", err)
+		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in SignUp route: ", err)
 		return;
 	}
 
@@ -65,7 +65,7 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 
 	err := database.InsertNewUser(username, hashedPassword, email, userGroup, company_name, isActive)
 	if err != nil {
-		utils.DatabaseServerError(w, "Error inserting new user into database at /signup route", err)
+		utils.InternalServerError(w, "Internal Server Error in InsertNewUser: ", err)
 	}
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully Created User!");

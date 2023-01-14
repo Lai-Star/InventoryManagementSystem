@@ -27,7 +27,7 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and UnMarshal the body to the LoginJson struct
 	bs, _ := io.ReadAll(req.Body);
 	if err := json.Unmarshal(bs, &user); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in Login route", err)
+		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in Login route: ", err)
 		return;
 	}
 	
@@ -94,7 +94,7 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
-		utils.InternalServerError(w, "Error retrieving cookie: ", err)
+		utils.InternalServerError(w, "Internal Server Error in retrieving cookie: ", err)
 		return;
 	}
 	cookie.Value = ""

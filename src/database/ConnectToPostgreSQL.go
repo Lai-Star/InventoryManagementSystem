@@ -3,12 +3,11 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
 // For querying in other files inside database folder
@@ -17,7 +16,9 @@ var db *sql.DB
 func ConnectToPostgreSQL() *sql.DB {
 	// Loading the .env file in the config folder
 	err := godotenv.Load("../config/.env");
-	utils.CheckErrorDatabase(err);
+	if err != nil {
+		log.Println("Error loading .env file when connecting to PostgreSQL: ", err)
+	}
 
 	host := os.Getenv("POSTGRESQL_HOST")
 	port := os.Getenv("POSTGRESQL_PORT")
@@ -29,11 +30,15 @@ func ConnectToPostgreSQL() *sql.DB {
 	host, port, user, password, dbname)
 
 	db, err = sql.Open("postgres", pgsqlInfo)
-	utils.CheckErrorDatabase(err)
+	if err != nil {
+		log.Println("Error opening PostgreSQL: ", err)
+	}
 	
 	// Test the connection to the database
 	err = db.Ping()
-	utils.CheckErrorDatabase(err)
+	if err != nil {
+		log.Println("Error pinging PostgreSQL: ", err)
+	}
 
 	fmt.Println("Successfully connected to PostgreSQL database!")
 

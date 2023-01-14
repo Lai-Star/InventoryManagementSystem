@@ -17,7 +17,9 @@ func ResponseJson(w http.ResponseWriter, Code int, Message string) {
 	}
 
 	bs, err := json.Marshal(jsonStatus);
-	CheckError(err)
+	if err != nil {
+		log.Println("Error in Marshal JSON in ResponseJson: ", err)
+	}
 
 	// privateKey := keys.LoadPrivateKey();
 	// hashed := sha256.Sum256(bs)
@@ -30,31 +32,5 @@ func ResponseJson(w http.ResponseWriter, Code int, Message string) {
 
 func InternalServerError(w http.ResponseWriter, message string, err error) {
 	log.Println(message, err)
-	ResponseJson(w, http.StatusInternalServerError, "Internal Server Error");
-}
-
-func DatabaseServerError(w http.ResponseWriter, message string, err error) {
-	log.Println(message, err)
-	ResponseJson(w, http.StatusInternalServerError, "PostgreSQL Server Error");
-}
-
-func ResponseGetJson(w http.ResponseWriter, Code int, Response []string) {
-	jsonStatus := struct {
-		Code int `json:"code"`
-		Response []string `json:"response"`
-	}{
-		Response: Response,
-		Code: Code,
-	}
-
-	bs, err := json.Marshal(jsonStatus);
-	CheckError(err)
-
-	// privateKey := keys.LoadPrivateKey();
-	// hashed := sha256.Sum256(bs)
-	// signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashed[:])
-	// CheckError(err)
-	// io.WriteString(w, string(signature));
-
-	io.WriteString(w, string(bs));
+	ResponseJson(w, http.StatusInternalServerError, "An Internal Server Error Occurred.");
 }

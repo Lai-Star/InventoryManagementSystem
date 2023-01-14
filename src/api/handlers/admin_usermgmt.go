@@ -32,7 +32,7 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);
 	if err := json.Unmarshal(bs, &adminNewUser); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in AdminCreateUser route", err)
+		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in AdminCreateUser route: ", err)
 		return;
 	}
 
@@ -77,9 +77,8 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	if (!isValidCompanyName) {return}
 
 	err := database.AdminInsertNewUser(username, hashedPassword, email, userGroup, companyName, isActive)
-	utils.CheckErrorDatabase(err)
 	if err != nil {
-		utils.DatabaseServerError(w, "Internal Server Error: ", err)
+		utils.InternalServerError(w, "Internal Server Error in AdminInsertNewUser: ", err)
 	}
 
 	utils.ResponseJson(w, http.StatusOK, "Admin Successfully Created User!");
@@ -92,7 +91,7 @@ func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
 
 	rows, err := database.GetUsers()
 	if err != nil {
-		utils.DatabaseServerError(w, "Database Server Error", err)
+		utils.InternalServerError(w, "Internal Server Error in GetUsers: ", err)
 		return 
 	}
 
@@ -101,7 +100,7 @@ func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
 	for rows.Next() {
 		err = rows.Scan(&username, &password, &email, &userGroup, &companyName, &isActive, &addedDate, &updatedDate)
 		if err != nil {
-			utils.DatabaseServerError(w, "Database Server Error", err)
+			utils.InternalServerError(w, "Internal Server Error in Scanning GetUsers: ", err)
 			return
 		}
 
@@ -128,7 +127,11 @@ func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
 	}
 
 	bs, err := json.Marshal(jsonStatus);
-	utils.CheckError(err)
+	if err != nil {
+		utils.InternalServerError(w, "Internal Server Error in Marshal JSON body in GetUsers: ", err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 
 	io.WriteString(w, string(bs));
 }
@@ -141,8 +144,7 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);
 	if err := json.Unmarshal(bs, &adminUpdateUser); err != nil {
-		utils.CheckError(err)
-		utils.InternalServerError(w, "Internal Server Error: ", err)
+		utils.InternalServerError(w, "Internal Server Error in Unmarshal JSON body in AdminUpdateUser: ", err)
 		return;
 	}
 
@@ -167,8 +169,7 @@ func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);
 	if err := json.Unmarshal(bs, &adminDeleteUser); err != nil {
-		utils.CheckError(err)
-		utils.InternalServerError(w, "Internal Server Error: ", err)
+		utils.InternalServerError(w, "Internal Server Error in Unmarshal JSON body in AdminDeleteUser: ", err)
 		return;
 	}
 }

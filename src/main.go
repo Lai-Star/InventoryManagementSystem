@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/routes"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/keys"
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/joho/godotenv"
 )
 
@@ -28,11 +28,15 @@ func main() {
 
 	// Loading the .env file in the config folder
 	err := godotenv.Load("../config/.env");
-	utils.CheckError(err);
+	if err != nil {
+		log.Println("Error loading .env file in main.go: ", err)
+	}
 
 	// Connecting to localhost
 	port := fmt.Sprintf(":%v", os.Getenv("SERVER_PORT"))
 	fmt.Println("Server is running on port", port, "!")
 	err = http.ListenAndServe(port, mux)
-	utils.CheckError(err);
+	if err != nil {
+		log.Println("Error in listening to port in main.go: ",err)
+	}
 }

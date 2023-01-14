@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"net/smtp"
 	"os"
 )
@@ -75,7 +76,9 @@ func SMTP(username string, email string, otp string) {
         []byte(e.Message()), // email message
     )
 
-    CheckError(err)
+    if err != nil {
+        log.Println("Error in sending mail inside smtp function: ", err)
+    }
 }
 
 func (e Email) Message() string {
