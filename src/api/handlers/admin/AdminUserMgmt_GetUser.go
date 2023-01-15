@@ -57,6 +57,7 @@ func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
 	bs, err := json.Marshal(jsonStatus);
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in Marshal JSON body in GetUsers: ", err)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

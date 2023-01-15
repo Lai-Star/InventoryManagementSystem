@@ -31,6 +31,7 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	err := database.AdminInsertNewUser(adminNewUser.Username, hashedPassword, adminNewUser.Email, adminNewUser.UserGroup, adminNewUser.CompanyName, adminNewUser.IsActive)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in AdminInsertNewUser: ", err)
+		return
 	}
 
 	utils.ResponseJson(w, http.StatusOK, "Admin Successfully Created User!");

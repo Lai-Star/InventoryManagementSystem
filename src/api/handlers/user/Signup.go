@@ -66,6 +66,7 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	err := database.InsertNewUser(username, hashedPassword, email, userGroup, company_name, isActive)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in InsertNewUser: ", err)
+		return
 	}
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully Created User!");
