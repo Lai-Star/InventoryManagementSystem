@@ -48,7 +48,13 @@ func UserValidationForm(w http.ResponseWriter, adminNewUser AdminUserMgmt, actio
 
 	// Check if email already exists in database 
 	isEmailExists := database.EmailExists(email)
-	if isEmailExists {
+	userEmail, _ := database.GetEmailFromDB(username)
+	if action == "UPDATE" && userEmail != email {
+		if isEmailExists {
+			utils.ResponseJson(w, http.StatusBadRequest, "Email address already exists. Please try again.")
+			return false
+		}
+	} else if action == "INSERT" && isEmailExists {
 		utils.ResponseJson(w, http.StatusBadRequest, "Email address already exists. Please try again.")
 		return false
 	} 

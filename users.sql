@@ -20,10 +20,11 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO leon;
 -- Create products table
 
 CREATE TABLE products (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    sku VARCHAR(255) NOT NULL,
-    colour VARCHAR(255) NOT NULL,
+    product_id SERIAL PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL,
+    product_description TEXT NOT NULL,
+    product_sku VARCHAR(255) NOT NULL,
+    product_colour VARCHAR(255) NOT NULL,
 	XXS INTEGER,
     XS INTEGER,
     S INTEGER,
@@ -31,5 +32,6 @@ CREATE TABLE products (
     L INTEGER,
     XL INTEGER,
     XXL INTEGER,
-    total_quantity INTEGER NOT NULL
+    product_quantity INTEGER NOT NULL
 );
+

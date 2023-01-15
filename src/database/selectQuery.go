@@ -9,6 +9,7 @@ import (
 var (
 	querySelectFromAccounts = "SELECT %s FROM accounts WHERE %s = $1;"
 	querySelectAllFromAccounts = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM accounts;"
+	querySelectAllFromAccountsByUsername = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM accounts WHERE username = $1;"
 )
 
 func UsernameExists(username string) bool {
@@ -62,7 +63,12 @@ func GetUserGroupFromDB(username string) (string, error) {
 }
 
 func GetUsers() (*sql.Rows, error) {
-	result, err := db.Query(querySelectAllFromAccounts)
-	return result, err
+	row, err := db.Query(querySelectAllFromAccounts)
+	return row, err
+}
+
+func GetUserByUsername(username string) *sql.Row {
+	row := db.QueryRow(querySelectAllFromAccountsByUsername, username)
+	return row
 }
 
