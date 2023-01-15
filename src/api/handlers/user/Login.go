@@ -1,4 +1,4 @@
-package handlers
+package handlers_user
 
 import (
 	"encoding/json"
@@ -85,55 +85,4 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	dbEmail, _ := database.GetEmailFromDB(user.Username)
 	go utils.SMTP(user.Username, dbEmail, utils.Generate2FA())
 
-}
-
-func Logout(w http.ResponseWriter, req *http.Request) {
-	RetrieveIssuer(w, req)
-	// fmt.Println("Retrieved Issuer", w.Header().Get("username"))
-
-	w.Header().Set("Content-Type", "application/json")
-	cookie, err := req.Cookie("leon-jwt-token")
-	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in retrieving cookie: ", err)
-		return;
-	}
-	cookie.Value = ""
-
-	cookie = &http.Cookie {
-		Name: "leon-jwt-token",
-		Value: "",
-		MaxAge: -1,
-		Path: "",
-		Domain: "",
-		Secure: false,
-		HttpOnly: true,
-	}
-
-	http.SetCookie(w, cookie)
-
-	utils.ResponseJson(w, http.StatusOK, "Successfully Logged Out!")
-}
-
-func RetrieveIssuer(w http.ResponseWriter, req *http.Request) {
-	cookie, err := req.Cookie("leon-jwt-token")
-	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in retrieving cookie: ", err);
-		return;
-	}
-
-	// Parses the cookie jwt claims using the secret key to verify
-	token, err := jwt.ParseWithClaims(cookie.Value, &jwt.RegisteredClaims{}, func(*jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("SECRET_KEY")), nil
-	})
-	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in parsing cookie: ", err)
-		return
-	}
-
-	// To access the issuer, we need the token claims to be type RegisteredClaims
-	claims := token.Claims.(*jwt.RegisteredClaims)
-
-	// fmt.Println("Retrieved Issuer using claims.Issuer: ", claims.Issuer)
-	w.Header().Set("username", claims.Issuer)
-	// fmt.Println("Retrieved Issuer using w.Header().Get():" , w.Header().Get("username"))
 }

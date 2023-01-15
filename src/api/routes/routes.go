@@ -3,7 +3,8 @@ package routes
 import (
 	"net/http"
 
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers"
+	handlers_admin "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/admin"
+	handlers_user "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
@@ -16,15 +17,15 @@ func Routes() http.Handler {
 	mux.Use(middleware.Recoverer)
 
 	// User Management Routes
-	mux.Post("/login", handlers.Login)
-	mux.Get("/logout", handlers.Logout)
-	mux.Post("/signup", handlers.SignUp)
+	mux.Post("/login", handlers_user.Login)
+	mux.Get("/logout", handlers_user.Logout)
+	mux.Post("/signup", handlers_user.SignUp)
 
 	// Admin Management Routes
-	mux.Post("/admin-create-user", handlers.AdminCreateUser)
-	mux.Get("/admin-get-users", handlers.AdminGetUsers)
-	mux.Put("/admin-update-user", handlers.AdminUpdateUser)
-	mux.Delete("/admin-delete-user", handlers.AdminDeleteUser)
+	mux.Post("/admin-create-user", handlers_admin.AdminCreateUser)
+	mux.Get("/admin-get-users", handlers_admin.AdminGetUsers)
+	mux.Put("/admin-update-user", handlers_admin.AdminUpdateUser)
+	mux.Delete("/admin-delete-user", handlers_admin.AdminDeleteUser)
 
 	return mux
 }

@@ -16,3 +16,20 @@ SELECT * FROM accounts;
 
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO leon;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO leon;
+
+-- Create products table
+
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    sku VARCHAR(255) NOT NULL,
+    colour VARCHAR(255) NOT NULL,
+	XXS INTEGER,
+    XS INTEGER,
+    S INTEGER,
+    M INTEGER,
+    L INTEGER,
+    XL INTEGER,
+    XXL INTEGER,
+    total_quantity INTEGER NOT NULL
+);

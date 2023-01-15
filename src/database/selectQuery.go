@@ -51,6 +51,16 @@ func GetActiveStatusFromDB(username string) (int, error) {
 	return isActive, nil
 }
 
+func GetUserGroupFromDB(username string) (string, error) {
+	var userGroup string
+	row := db.QueryRow(fmt.Sprintf(querySelectFromAccounts, "user_group", "username"), username)
+	err := row.Scan(&userGroup)
+	if err != nil {
+		log.Println("Error scanning when getting user group from database: ", err)
+	}
+	return userGroup, nil
+}
+
 func GetUsers() (*sql.Rows, error) {
 	result, err := db.Query(querySelectAllFromAccounts)
 	return result, err
