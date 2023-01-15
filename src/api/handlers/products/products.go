@@ -1,4 +1,4 @@
-package handlers
+package handlers_products
 
 type ProductJson struct {
 	ProductName   string `json:"product_name"`

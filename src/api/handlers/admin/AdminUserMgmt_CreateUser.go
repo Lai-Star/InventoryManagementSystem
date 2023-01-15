@@ -22,7 +22,7 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Validate form inputs
-	if !UserValidationForm(w, adminNewUser) {
+	if !UserValidationForm(w, adminNewUser, "INSERT") {
 		return 
 	}
 

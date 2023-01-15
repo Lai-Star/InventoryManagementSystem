@@ -10,7 +10,7 @@ func CheckUsernameFormat(w http.ResponseWriter, username string) bool {
 
 	// Check if username is blank
 	if username == "" {
-		ResponseJson(w, http.StatusBadRequest, "Username cannot be empty.")
+		ResponseJson(w, http.StatusBadRequest, "Please enter a username.")
 		return false
 	}
 

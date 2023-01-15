@@ -30,9 +30,11 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	isActive := adminUpdateUser.IsActive
 
 	// Validate form inputs
-	if !UserValidationForm(w, adminUpdateUser) {
+	if !UserValidationForm(w, adminUpdateUser, "UPDATE") {
 		return 
 	}
+
+
 
 	fmt.Println(username, password, email, userGroup, companyName, isActive)
 }

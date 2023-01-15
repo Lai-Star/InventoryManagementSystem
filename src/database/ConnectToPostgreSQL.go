@@ -40,7 +40,9 @@ func ConnectToPostgreSQL() *sql.DB {
 		log.Println("Error pinging PostgreSQL: ", err)
 	}
 
-	fmt.Println("Successfully connected to PostgreSQL database!")
+	if err == nil {
+		fmt.Println("Successfully connected to PostgreSQL database!")
+	}
 
 	return db
 }

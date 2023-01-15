@@ -20,7 +20,7 @@ type AdminDeleteUserMgmt struct {
 	Username string `json:"username"`
 }
 
-func UserValidationForm(w http.ResponseWriter, adminNewUser AdminUserMgmt) bool {
+func UserValidationForm(w http.ResponseWriter, adminNewUser AdminUserMgmt, action string) bool {
 	username := adminNewUser.Username
 	password := adminNewUser.Password
 	email := adminNewUser.Email
@@ -30,10 +30,13 @@ func UserValidationForm(w http.ResponseWriter, adminNewUser AdminUserMgmt) bool 
 	isValidUsername := utils.CheckUsernameFormat(w, username)
 	if (!isValidUsername) {return false}
 
-	// Check if username already exists in database (duplicates not allowed)
-	isDuplicateUsername := database.UsernameExists(username)
-	if (isDuplicateUsername) {
+	// Check if username already exists in database
+	isUsernameExists := database.UsernameExists(username)
+	if action == "INSERT" && isUsernameExists {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username already exists. Please try again.")
+		return false
+	} else if action == "UPDATE" && !isUsernameExists {
+		utils.ResponseJson(w, http.StatusBadRequest, "Username does not exist in database. Please try again.")
 		return false
 	}
 
@@ -43,12 +46,12 @@ func UserValidationForm(w http.ResponseWriter, adminNewUser AdminUserMgmt) bool 
 	isValidEmail := utils.CheckEmailFormat(w, email);
 	if (!isValidEmail) {return false}
 
-	// Check if email already exists in database (duplicates not allowed)
-	isDuplicatedEmail := database.EmailExists(email)
-	if (isDuplicatedEmail) {
+	// Check if email already exists in database 
+	isEmailExists := database.EmailExists(email)
+	if isEmailExists {
 		utils.ResponseJson(w, http.StatusBadRequest, "Email address already exists. Please try again.")
 		return false
-	}
+	} 
 
 	// Check if user group belongs to the following (Admin, IMS User, Operations, Financial Analyst)
 	isValidUserGroup := utils.CheckUserGroupFormat(w, userGroup)

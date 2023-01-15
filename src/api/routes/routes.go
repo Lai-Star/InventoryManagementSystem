@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	handlers_admin "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/admin"
+	handlers_products "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/products"
 	handlers_user "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -26,6 +27,9 @@ func Routes() http.Handler {
 	mux.Get("/admin-get-users", handlers_admin.AdminGetUsers)
 	mux.Put("/admin-update-user", handlers_admin.AdminUpdateUser)
 	mux.Delete("/admin-delete-user", handlers_admin.AdminDeleteUser)
+
+	// Product Routes
+	mux.Post("/create-product", handlers_products.CreateProduct)
 
 	return mux
 }
