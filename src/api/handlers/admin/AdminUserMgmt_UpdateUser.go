@@ -3,6 +3,7 @@ package handlers_admin
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -23,11 +24,15 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 		return;
 	}
 
-	// Validate form inputs
-	if !UserValidationForm(w, adminUpdateUser, "UPDATE") {return}
-	
 	// Update user with current user data (if none provided)
 	adminUpdateUser = UpdateCurrentData(w, adminUpdateUser)
+	
+	adminUpdateUser.Password = utils.GenerateHash(adminUpdateUser.Password)
+
+	fmt.Println(adminUpdateUser.Password)
+	
+	// Validate form inputs
+	if !UserValidationForm(w, adminUpdateUser, "UPDATE") {return}
 
 	// Update accounts table
 	err := database.AdminUpdateUser(adminUpdateUser.Username, adminUpdateUser.Password, adminUpdateUser.Email, adminUpdateUser.UserGroup, adminUpdateUser.CompanyName, adminUpdateUser.IsActive)

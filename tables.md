@@ -23,20 +23,24 @@
 | product_description | TEXT         | NOT NULL    |
 | product_sku         | VARCHAR(255) | NOT NULL    |
 | product_colour      | VARCHAR(255) | NOT NULL    |
-| XXS                 | INTEGER      |             |
-| XS                  | INTEGER      |             |
-| S                   | INTEGER      |             |
-| M                   | INTEGER      |             |
-| L                   | INTEGER      |             |
-| XL                  | INTEGER      |             |
-| XXL                 | INTEGER      |             |
+| product_category    | VARCHAR(255) | NOT NULL    |
+| product_brand       | VARCHAR(255) | NOT NULL    |
+| size_id             | INT          | FOREIGN KEY |
 | product_quantity    | INTEGER      | NOT NULL    |
+
+### Product Sizes Table
+
+| Column Name | Data Type    | Constraints |
+| ----------- | ------------ | ----------- |
+| size_id     | SERIAL       | PRIMARY KEY |
+| size_name   | VARCHAR(255) | NOT NULL    |
 
 ### Orders Table
 
 | Column Name    | Data Type    | Constraints |
 | -------------- | ------------ | ----------- |
 | order_id       | INT          | PRIMARY KEY |
+| customer_id    | INT          | FOREIGN KEY |
 | product_id     | INT          | FOREIGN KEY |
 | order_quantity | INT          | NOT NULL    |
 | order_date     | DATE         | NOT NULL    |
@@ -61,16 +65,21 @@
 | customer_id   | INT           | FOREIGN KEY |
 | sale_quantity | INT           | NOT NULL    |
 | sale_date     | DATE          | NOT NULL    |
+| product_cost  | DECIMAL(10,2) | NOT NULL    |
 | sale_price    | DECIMAL(10,2) | NOT NULL    |
+| profit        | DECIMAL(10,2) | NOT NULL    |
 
 ### Inventory Table
 
-| Column Name        | Data Type | Constraints |
-| ------------------ | --------- | ----------- |
-| inventory_id       | INT       | PRIMARY KEY |
-| product_id         | INT       | FOREIGN KEY |
-| inventory_quantity | INT       | NOT NULL    |
-| inventory_date     | DATE      | NOT NULL    |
+| Column Name        | Data Type     | Constraints |
+| ------------------ | ------------- | ----------- |
+| inventory_id       | INT           | PRIMARY KEY |
+| product_id         | INT           | FOREIGN KEY |
+| inventory_quantity | INT           | NOT NULL    |
+| inventory_date     | DATE          | NOT NULL    |
+| average_inventory  | DECIMAL(10,2) | NOT NULL    |
+| cost_of_goods_sold | DECIMAL(10,2) | NOT NULL    |
+| inventory_turnover | DECIMAL(10,2) | NOT NULL    |
 
 ### Transactions Table
 
