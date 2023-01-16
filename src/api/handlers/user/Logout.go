@@ -8,7 +8,7 @@ import (
 
 func Logout(w http.ResponseWriter, req *http.Request) {
 	RetrieveIssuer(w, req)
-	// fmt.Println("Retrieved Issuer", w.Header().Get("username"))
+	// fmt.Println("Retrieved Issuer from Logout", w.Header().Get("username"))
 
 	w.Header().Set("Content-Type", "application/json")
 	cookie, err := req.Cookie("leon-jwt-token")
