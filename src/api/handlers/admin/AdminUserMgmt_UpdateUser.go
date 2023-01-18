@@ -26,13 +26,18 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 
 	// Update user with current user data (if none provided)
 	adminUpdateUser = UpdateCurrentData(w, adminUpdateUser)
-	
-	adminUpdateUser.Password = utils.GenerateHash(adminUpdateUser.Password)
 
-	fmt.Println(adminUpdateUser.Password)
-	
 	// Validate form inputs
 	if !UserValidationForm(w, adminUpdateUser, "UPDATE") {return}
+	
+	// Only generate hash if password is not empty
+	if adminUpdateUser.Password != "" && !(len(adminUpdateUser.Password) > 20) {
+		adminUpdateUser.Password = utils.GenerateHash(adminUpdateUser.Password)
+	}
+
+	if adminUpdateUser.Password == "" {
+		fmt.Println("Empty password FUCK")
+	}
 
 	// Update accounts table
 	err := database.AdminUpdateUser(adminUpdateUser.Username, adminUpdateUser.Password, adminUpdateUser.Email, adminUpdateUser.UserGroup, adminUpdateUser.CompanyName, adminUpdateUser.IsActive)

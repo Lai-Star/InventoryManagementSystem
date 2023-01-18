@@ -1,81 +1,41 @@
--- Create user table
+-- Create accounts table
+/*
+    Table Description: Stores the user accounts details.
+*/
 
 CREATE TABLE accounts (
-	user_id SERIAL NOT NULL PRIMARY KEY,
-	username VARCHAR(255) NOT NULL,
-	password VARCHAR(255) NOT NULL,
-	email VARCHAR(255) NOT NULL,
-	user_group VARCHAR(255) NOT NULL,
-	company_name VARCHAR(255) NOT NULL,
-	is_active SMALLINT NOT NULL,
-	added_date DATE NOT NULL,
-	updated_date DATE NOT NULL
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    is_active SMALLINT DEFAULT 1,
+    added_date TIMESTAMP DEFAULT NOW(),
+    updated_date TIMESTAMP DEFAULT NOW()
 );
 
--- Create products table
+-- Create user_group_mapping table
+/*
+    Table Description: To identify which user belongs to which user group
+    Composite key: user_id and user_group_id
+*/
 
-CREATE TABLE products (
-    product_id SERIAL PRIMARY KEY,
-    product_name VARCHAR(255) NOT NULL,
-    product_description TEXT NOT NULL,
-    product_sku VARCHAR(255) NOT NULL,
-    product_colour VARCHAR(255) NOT NULL,
-    product_category VARCHAR(255) NOT NULL,
-    product_brand VARCHAR(255) NOT NULL,
-    size_id INT REFERENCES product_sizes(size_id),
-    product_quantity INTEGER NOT NULL
+CREATE TABLE user_group_mapping (
+    user_id INT REFERENCES accounts(user_id) ON DELETE CASCADE,
+    user_group_id INT NOT NULL,
+    PRIMARY KEY (user_id, user_group_id)
 );
 
-CREATE TABLE product_sizes (
-    size_id SERIAL PRIMARY KEY,
-    size_name VARCHAR(255) NOT NULL
+-- Create allowed_groups table
+/*
+    Table Description: To create user groups
+    Unique Constraint: user_group (to ensure that there are no duplicates inserted into that column).
+*/
+
+CREATE TABLE allowed_groups (
+    user_group_id SERIAL PRIMARY KEY,
+    user_group VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
+    added_date TIMESTAMP DEFAULT NOW(),
+    updated_date TIMESTAMP DEFAULT NOW()
 );
-
-CREATE TABLE orders (
-    order_id INT PRIMARY KEY,
-    customer_id INT REFERENCES customers(customer_id),
-    product_id INT REFERENCES products(product_id),
-    order_quantity INT NOT NULL,
-    order_date DATE NOT NULL,
-    order_status VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE customers (
-    customer_id INT PRIMARY KEY,
-    customer_name VARCHAR(255) NOT NULL,
-    customer_address VARCHAR(255) NOT NULL,
-    customer_phone VARCHAR(255) NOT NULL,
-    customer_email VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE sales (
-    sale_id INT PRIMARY KEY,
-    product_id INT REFERENCES products(product_id),
-    customer_id INT REFERENCES customers(customer_id),
-    sale_quantity INT NOT NULL,
-    sale_date DATE NOT NULL,
-    product_cost DECIMAL(10,2) NOT NULL,
-    sale_price DECIMAL(10,2) NOT NULL,
-    profit DECIMAL(10,2) NOT NULL
-);
-
-CREATE TABLE inventory (
-    inventory_id SERIAL PRIMARY KEY,
-    product_id INTEGER NOT NULL REFERENCES products(product_id),
-    inventory_quantity INTEGER NOT NULL,
-    inventory_date DATE NOT NULL,
-    average_inventory DECIMAL(10,2) NOT NULL,
-    cost_of_goods_sold DECIMAL(10,2) NOT NULL,
-    inventory_turnover DECIMAL(10,2) NOT NULL
-);
-
-CREATE TABLE transactions (
-    transaction_id SERIAL PRIMARY KEY,
-    product_id INTEGER NOT NULL REFERENCES products(product_id),
-    transaction_quantity INTEGER NOT NULL,
-    transaction_type VARCHAR(255) NOT NULL,
-    transaction_date DATE NOT NULL
-);
-
-
 

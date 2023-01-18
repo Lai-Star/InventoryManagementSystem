@@ -40,8 +40,13 @@ func UserValidationForm(w http.ResponseWriter, adminNewUser AdminUserMgmt, actio
 		return false
 	}
 
-	isValidPassword := utils.CheckPasswordFormat(w, password);
-	if (!isValidPassword) {return false}
+	if action == "INSERT" {
+		isValidPassword := utils.CheckPasswordFormat(w, password);
+		if (!isValidPassword) {return false}
+	} else if action == "UPDATE" && !(len(password) > 20) {
+		isValidPassword := utils.CheckPasswordFormat(w, password);
+		if (!isValidPassword) {return false}
+	}
 
 	isValidEmail := utils.CheckEmailFormat(w, email);
 	if (!isValidEmail) {return false}

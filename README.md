@@ -35,6 +35,12 @@
 - As a user, I want to be able to add a new product to the IMS.
 - As a user, I want to be able to view, edit and delete the products in my IMS account.
 
+## Entity-Relationship Diagram (ERD)
+
+#### User Management ERD
+
+<img src='./src/docs/ERD-User-Management.png' style='width:60%'>
+
 ## 2FA Authentication
 
 - 2FA provides an additional layer of security as it mitigates the risks associated with weak or stolen passwords.
