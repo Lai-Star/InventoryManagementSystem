@@ -20,10 +20,11 @@ CREATE TABLE accounts (
 */
 
 CREATE TABLE user_group_mapping (
-    user_id INT REFERENCES accounts(user_id) ON DELETE CASCADE,
-    user_group_id INT NOT NULL,
+    user_id INT NOT NULL REFERENCES accounts(user_id) ON DELETE CASCADE,
+    user_group_id INT NOT NULL REFERENCES allowed_groups (user_group_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, user_group_id)
 );
+
 
 -- Create allowed_groups table
 /*

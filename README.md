@@ -39,7 +39,11 @@
 
 #### User Management ERD
 
-<img src='./src/docs/ERD-User-Management.png' style='width:60%'>
+<img src='./src/docs/ERD-User-Management.png' style='width:70%'>
+
+#### Inventory Management ERD
+
+<img src='./src/docs/ERD-Inventory-Management.png' style='width:70%'>
 
 ## 2FA Authentication
 

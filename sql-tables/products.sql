@@ -8,14 +8,21 @@ CREATE TABLE products (
     product_colour VARCHAR(255) NOT NULL,
     product_category VARCHAR(255) NOT NULL,
     product_brand VARCHAR(255) NOT NULL,
-    size_id INT REFERENCES product_sizes(size_id),
-    product_quantity INTEGER NOT NULL
+    total_quantity INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE sizes (
+    size_id SERIAL PRIMARY KEY,
+    size_name VARCHAR(255) NOT NULL,
+    size_quantity INT NOT NULL
 );
 
 CREATE TABLE product_sizes (
-    size_id SERIAL PRIMARY KEY,
-    size_name VARCHAR(255) NOT NULL
+    product_id INT REFERENCES products(product_id) ON DELETE CASCADE,
+    size_id INT REFERENCES sizes(size_id) ON DELETE CASCADE,
+    PRIMARY KEY (product_id, size_id)
 );
+
 
 CREATE TABLE orders (
     order_id INT PRIMARY KEY,
