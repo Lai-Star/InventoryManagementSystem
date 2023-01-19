@@ -39,11 +39,11 @@
 
 #### User Management ERD
 
-<img src='./src/docs/ERD-User-Management.png' alt='User Management ERD Diagram'>
+<img src='./server/src/docs/ERD-User-Management.png' alt='User Management ERD Diagram'>
 
 #### Inventory Management ERD
 
-<img src='./src/docs/ERD-Inventory-Management.png' alt='Inventory Management ERD Diagram'>
+<img src='./server/src/docs/ERD-Inventory-Management.png' alt='Inventory Management ERD Diagram'>
 
 ## 2FA Authentication
 
