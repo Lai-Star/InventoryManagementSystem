@@ -1,8 +1,35 @@
 package handlers_products
 
-import "net/http"
+import (
+	"encoding/json"
+	"io"
+	"net/http"
+
+	handlers_user "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
+)
 
 func CreateProduct(w http.ResponseWriter, req *http.Request) {
+	// Set Headers
+	w.Header().Set("Content-Type", "application/json")
+	var createProduct ProductJson
+
+	// Reading the request body and Unmarshal the body to the ProductJson struct
+	bs, _ := io.ReadAll(req.Body)
+	if err := json.Unmarshal(bs, &createProduct); err != nil {
+		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in CreateProduct route: ", err)
+		return;
+	}
+
+	// CheckUserGroup: IMS User and Operations
+	handlers_user.RetrieveIssuer(w, req)
+	checkUserGroupIMSUser := utils.CheckUserGroup(w.Header().Get("username"), "IMS User")
+	checkUserGroupOperations := utils.CheckUserGroup(w.Header().Get("username"), "Operations")
+	if !checkUserGroupIMSUser || !checkUserGroupOperations {
+		utils.ResponseJson(w, http.StatusForbidden, "Access Denied: You do not have permission to access this resource.")
+		return
+	}
+
 	
 }
 
