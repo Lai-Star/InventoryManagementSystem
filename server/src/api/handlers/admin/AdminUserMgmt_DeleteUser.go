@@ -14,7 +14,7 @@ func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json");
 	var adminDeleteUser AdminDeleteUserMgmt
 
-	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
+	// Reading the request body and UnMarshal the body to the AdminDeleteUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);
 	if err := json.Unmarshal(bs, &adminDeleteUser); err != nil {
 		utils.InternalServerError(w, "Internal Server Error in Unmarshal JSON body in AdminDeleteUser: ", err)

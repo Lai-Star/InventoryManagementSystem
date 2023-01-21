@@ -29,6 +29,13 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Check Product Sku to see if it exists in database
+	isExistProductSku := database.ProductSkuExists(createProduct.ProductSku)
+	if isExistProductSku {
+		utils.ResponseJson(w, http.StatusBadRequest, "Product Sku already exists. Please try again.")
+		return
+	}
+
 	// Insert new product into PostgreSQL database
 	err := database.InsertNewProduct(createProduct.ProductName, createProduct.ProductDescription, createProduct.ProductSku, createProduct.ProductColour, createProduct.ProductCategory, createProduct.ProductBrand, createProduct.ProductCost)
 	if err != nil {

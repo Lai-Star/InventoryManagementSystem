@@ -28,5 +28,6 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Update products table
 	
 }

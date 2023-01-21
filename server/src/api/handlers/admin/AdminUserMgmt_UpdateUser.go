@@ -3,7 +3,6 @@ package handlers_admin
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -33,10 +32,6 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	// Only generate hash if password is not empty
 	if adminUpdateUser.Password != "" && !(len(adminUpdateUser.Password) > 20) {
 		adminUpdateUser.Password = utils.GenerateHash(adminUpdateUser.Password)
-	}
-
-	if adminUpdateUser.Password == "" {
-		fmt.Println("Empty password FUCK")
 	}
 
 	// Update accounts table

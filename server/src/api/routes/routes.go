@@ -25,12 +25,14 @@ func Routes() http.Handler {
 	// Admin Management Routes
 	mux.Post("/admin-create-user", handlers_admin.AdminCreateUser)
 	mux.Get("/admin-get-users", handlers_admin.AdminGetUsers)
-	mux.Put("/admin-update-user", handlers_admin.AdminUpdateUser)
+	mux.Patch("/admin-update-user", handlers_admin.AdminUpdateUser)
 	mux.Delete("/admin-delete-user", handlers_admin.AdminDeleteUser)
 
 	// Product Routes
 	mux.Post("/create-product", handlers_products.CreateProduct)
 	mux.Get("/get-products", handlers_products.GetProducts)
+	mux.Patch("/update-product", handlers_products.UpdateProduct)
+	mux.Delete("/delete-product", handlers_products.DeleteProduct)
 
 	return mux
 }
