@@ -13,7 +13,7 @@ import (
 func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json");
-	var adminNewUser AdminUserMgmt
+	var adminNewUser AdminUserMgmtJson
 
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);

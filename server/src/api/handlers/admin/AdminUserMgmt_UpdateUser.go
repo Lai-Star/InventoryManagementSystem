@@ -15,7 +15,7 @@ import (
 func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json");
-	var adminUpdateUser AdminUserMgmt
+	var adminUpdateUser AdminUserMgmtJson
 
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);
@@ -49,7 +49,7 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	utils.ResponseJson(w, http.StatusOK, "Successfully updated user!")
 }
 
-func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUserMgmt) AdminUserMgmt {
+func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUserMgmtJson) AdminUserMgmtJson {
 	currentUserData, err := GetCurrentUserData(w, adminUpdateUser.Username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error when getting current user data: ", err)

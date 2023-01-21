@@ -7,7 +7,7 @@ import (
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-type AdminUserMgmt struct {
+type AdminUserMgmtJson struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
@@ -20,12 +20,12 @@ type AdminDeleteUserMgmt struct {
 	Username string `json:"username"`
 }
 
-func UserValidationForm(w http.ResponseWriter, adminNewUser AdminUserMgmt, action string) bool {
-	username := adminNewUser.Username
-	password := adminNewUser.Password
-	email := adminNewUser.Email
-	userGroup := adminNewUser.UserGroup
-	companyName := adminNewUser.CompanyName
+func UserValidationForm(w http.ResponseWriter, adminUser AdminUserMgmtJson, action string) bool {
+	username := adminUser.Username
+	password := adminUser.Password
+	email := adminUser.Email
+	userGroup := adminUser.UserGroup
+	companyName := adminUser.CompanyName
 
 	isValidUsername := utils.CheckUsernameFormat(w, username)
 	if (!isValidUsername) {return false}
@@ -70,6 +70,8 @@ func UserValidationForm(w http.ResponseWriter, adminNewUser AdminUserMgmt, actio
 	
 	// Check if company name is between 5 and 250 characters and if blank company name provided (default to IMS)
 	isValidCompanyName := utils.CheckCompanyNameFormat(w, companyName)
-	return isValidCompanyName
+	if !isValidCompanyName {return false}
+
+	return true
 }
 

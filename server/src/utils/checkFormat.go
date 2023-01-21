@@ -2,11 +2,19 @@ package utils
 
 import "regexp"
 
-func CheckLength(str string, minLength int, maxLength int) bool {
+func CheckLengthRange(str string, minLength int, maxLength int) bool {
 	if (len(str) > maxLength || len(str) < minLength) {
 		return false
 	}
 	return true
+}
+
+func CheckMaxLength(str string, maxLength int) bool {
+	return len(str) <= maxLength
+}
+
+func CheckMinLength(str string, minLength int) bool {
+	return len(str) >= minLength
 }
 
 func CheckWhiteSpaces(str string) bool {

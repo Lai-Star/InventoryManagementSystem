@@ -76,3 +76,12 @@ func GetUserByUsername(username string) *sql.Row {
 	return row
 }
 
+func ProductSkuExists(product_sku string) bool {
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_PRODUCTS, "product_sku", "product_sku"), product_sku)
+	return row.Scan() != sql.ErrNoRows
+}
+
+// func EmailExists(email string) bool {
+// 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ACCOUNTS, "email", "email"), email)
+// 	return row.Scan() != sql.ErrNoRows
+// }

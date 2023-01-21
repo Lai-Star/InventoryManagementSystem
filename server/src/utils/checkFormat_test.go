@@ -19,7 +19,7 @@ func Test_Length(t *testing.T) {
 	}
 
 	for _, e := range lengthTests {
-		result := CheckLength(e.str, e.minLength, e.maxLength)
+		result := CheckLengthRange(e.str, e.minLength, e.maxLength)
 		if e.expected && !result {
 			t.Errorf("%s: expected true but got %v", e.testName, result)
 		}

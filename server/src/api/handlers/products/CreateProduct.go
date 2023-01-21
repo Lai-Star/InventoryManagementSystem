@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	handlers_user "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
@@ -30,6 +31,18 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	
+	// Product Form Validation
+	if !ProductsFormValdiation(w, createProduct) {
+		return
+	}
+
+	// Insert new product into PostgreSQL database
+	err := database.InsertNewProduct(createProduct.ProductName, createProduct.ProductDescription, createProduct.ProductSku, createProduct.ProductColour, createProduct.ProductCategory, createProduct.ProductBrand, createProduct.ProductCost)
+	if err != nil {
+		utils.InternalServerError(w, "Internal Server Error in InsertNewProduct: ", err)
+		return
+	}
+
+	utils.ResponseJson(w, http.StatusOK, "Successfully created a new product!")
 }
 

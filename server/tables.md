@@ -25,6 +25,7 @@
 | product_colour      | VARCHAR(255) | NOT NULL    |
 | product_category    | VARCHAR(255) | NOT NULL    |
 | product_brand       | VARCHAR(255) | NOT NULL    |
+| product_code        | VARCHAR(255) | NOT NULL    |
 | size_id             | INT          | FOREIGN KEY |
 | product_quantity    | INTEGER      | NOT NULL    |
 

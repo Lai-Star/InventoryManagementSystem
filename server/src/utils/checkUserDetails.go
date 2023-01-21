@@ -15,7 +15,7 @@ func CheckUsernameFormat(w http.ResponseWriter, username string) bool {
 	}
 
 	// Check if username has a length >=5 or <=50
-	isValidUsernameLength := CheckLength(username, 5, 50)
+	isValidUsernameLength := CheckLengthRange(username, 5, 50)
 	if (!isValidUsernameLength) {
 		ResponseJson(w, http.StatusBadRequest, "Username must have a length between 5 and 50 characters.")
 		return false
@@ -45,7 +45,7 @@ func CheckPasswordFormat(w http.ResponseWriter, password string) bool {
 	}
 
 	// Check if password has a length >=8 and <=20
-	isValidPasswordLength := CheckLength(password, 8, 20)
+	isValidPasswordLength := CheckLengthRange(password, 8, 20)
 	if (!isValidPasswordLength) {
 		ResponseJson(w, http.StatusBadRequest, "Password must have a length between 8 and 20 characters.")
 		return false;
@@ -97,7 +97,7 @@ func CheckCompanyNameFormat(w http.ResponseWriter, companyName string) bool {
 
 	companyName = strings.TrimSpace(companyName)
 
-	isValidCompanyNameLength := CheckLength(companyName, 5, 250)
+	isValidCompanyNameLength := CheckLengthRange(companyName, 5, 250)
 	if (!isValidCompanyNameLength) {
 		ResponseJson(w, http.StatusBadRequest, "Company Name must be between 5 and 250 characters. Please try again.")
 		return false
