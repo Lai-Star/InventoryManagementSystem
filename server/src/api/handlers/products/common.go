@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	handlers_user "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
@@ -37,6 +38,18 @@ func ProductsFormValdiation(w http.ResponseWriter, product ProductJson) bool {
 		return false
 	}
 
+	return true
+}
+
+func CheckProductsUserGroup(w http.ResponseWriter, req *http.Request) bool {
+	// CheckUserGroup: IMS User and Operations
+	handlers_user.RetrieveIssuer(w, req)
+	checkUserGroupIMSUser := utils.CheckUserGroup(w.Header().Get("username"), "IMS User")
+	checkUserGroupOperations := utils.CheckUserGroup(w.Header().Get("username"), "Operations")
+	if !checkUserGroupIMSUser || !checkUserGroupOperations {
+		utils.ResponseJson(w, http.StatusForbidden, "Access Denied: You do not have permission to access this resource.")
+		return false
+	}
 	return true
 }
 

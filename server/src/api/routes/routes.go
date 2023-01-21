@@ -30,6 +30,7 @@ func Routes() http.Handler {
 
 	// Product Routes
 	mux.Post("/create-product", handlers_products.CreateProduct)
+	mux.Get("/get-products", handlers_products.GetProducts)
 
 	return mux
 }
