@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
@@ -24,10 +26,19 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	if !CheckProductsUserGroup(w, req) {return}
 
 	// Product Form Validation
-	if !ProductsFormValdiation(w, updateProduct) {
+	if !ProductsFormValdiation(w, updateProduct) {return}
+
+	// Get productid from url params
+	productId := req.URL.Query().Get("product_id")
+	x, _ := strconv.Atoi(productId)
+
+	// Update products table
+	err := database.UpdateProduct(x, updateProduct.ProductName, updateProduct.ProductDescription, updateProduct.ProductSku, updateProduct.ProductColour, updateProduct.ProductCategory, updateProduct.ProductBrand, updateProduct.ProductCost)
+	if err != nil {
+		utils.InternalServerError(w, "Internal Server Error in UpdateProduct: ", err)
 		return
 	}
 
-	// Update products table
+	utils.ResponseJson(w, http.StatusOK, "Successfully updated product!")
 	
 }

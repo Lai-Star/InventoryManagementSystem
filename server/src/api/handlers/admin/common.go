@@ -3,6 +3,7 @@ package handlers_admin
 import (
 	"net/http"
 
+	handlers_user "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
@@ -72,6 +73,17 @@ func UserValidationForm(w http.ResponseWriter, adminUser AdminUserMgmtJson, acti
 	isValidCompanyName := utils.CheckCompanyNameFormat(w, companyName)
 	if !isValidCompanyName {return false}
 
+	return true
+}
+
+func CheckUserGroupAdmin(w http.ResponseWriter, req *http.Request) bool {
+	// CheckUserGroup: IMS User and Operations
+	handlers_user.RetrieveIssuer(w, req)
+	checkUserGroupIMSUser := utils.CheckUserGroup(w.Header().Get("username"), "Admin")
+	if !checkUserGroupIMSUser {
+		utils.ResponseJson(w, http.StatusForbidden, "Access Denied: You do not have permission to access this resource.")
+		return false
+	}
 	return true
 }
 

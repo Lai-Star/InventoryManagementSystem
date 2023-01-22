@@ -12,6 +12,11 @@ import (
 )
 
 func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
+
+	// Check User Group Admin
+	w.Header().Set("Content-Type", "application/json");
+	if !CheckUserGroupAdmin(w, req) {return}
+
 	var data []handlers.User
 	// To handle nullable columns in a database table
 	var username, password, email, userGroup, companyName, addedDate, updatedDate sql.NullString

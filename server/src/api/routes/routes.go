@@ -31,7 +31,7 @@ func Routes() http.Handler {
 	// Product Routes
 	mux.Post("/create-product", handlers_products.CreateProduct)
 	mux.Get("/get-products", handlers_products.GetProducts)
-	mux.Patch("/update-product", handlers_products.UpdateProduct)
+	mux.Patch("/update-product/{product_id}", handlers_products.UpdateProduct)
 	mux.Delete("/delete-product", handlers_products.DeleteProduct)
 
 	return mux

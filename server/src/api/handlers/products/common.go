@@ -44,14 +44,16 @@ func CheckProductsUserGroup(w http.ResponseWriter, req *http.Request) bool {
 func CheckProductSkuFormat(w http.ResponseWriter, productSku string) bool {
 
 	// Check Product Sku length to see if the length is less than 50
-	isValidLengthProductSku := utils.CheckMaxLength(productSku, 50)
+	isValidLengthProductSku := utils.CheckLengthRange(productSku, 0, 50)
 	if !isValidLengthProductSku {
-		utils.ResponseJson(w, http.StatusBadRequest, "Product Sku should have less than or equal to 50 characters.")
+		utils.ResponseJson(w, http.StatusBadRequest, "Product Sku length must be between 0 and 50 characters.")
 		return false
 	}
 
 	return true
+
 }
+
 
 
 

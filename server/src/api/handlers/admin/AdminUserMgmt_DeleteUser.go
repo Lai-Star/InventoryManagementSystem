@@ -21,13 +21,10 @@ func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
 		return;
 	}
 
-	username := adminDeleteUser.Username
+	// Check User Group Admin
+	if !CheckUserGroupAdmin(w, req) {return}
 
-	// Check User Group to ensure the person is an Admin
-	// if !utils.CheckUserGroup(username, "Admin") {
-	// 	utils.ResponseJson(w, http.StatusForbidden, "You do not have permission to delete this user.")
-	// 	return
-	// }
+	username := adminDeleteUser.Username
 
 	// Check username format
 	if !utils.CheckUsernameFormat(w, username) {return}

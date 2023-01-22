@@ -22,6 +22,9 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 		return;
 	}
 
+	// Check User Group Admin
+	if !CheckUserGroupAdmin(w, req) {return}
+
 	// Check User Group
 	handlers_user.RetrieveIssuer(w, req)
 	checkUserGroup := utils.CheckUserGroup(w.Header().Get("username"), "Admin")

@@ -23,6 +23,9 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 		return;
 	}
 
+	// Check User Group Admin
+	if !CheckUserGroupAdmin(w, req) {return}
+
 	// Update user with current user data (if none provided)
 	adminUpdateUser = UpdateCurrentData(w, adminUpdateUser)
 
