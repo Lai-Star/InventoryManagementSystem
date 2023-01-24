@@ -26,8 +26,15 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	// Check User Group Admin
 	if !CheckUserGroupAdmin(w, req) {return}
 
+	// Check if username exists in database
+	if !database.UsernameExists(adminUpdateUser.Username) {
+		utils.ResponseJson(w, http.StatusNotFound, "User does not exist in database. Please try again.")
+		return
+	}
+
 	// Update user with current user data (if none provided)
-	adminUpdateUser = UpdateCurrentData(w, adminUpdateUser)
+	adminUpdateUser, result := UpdateCurrentData(w, adminUpdateUser)
+	if !result {return}
 
 	// Validate form inputs
 	if !UserValidationForm(w, adminUpdateUser, "UPDATE") {return}
@@ -47,10 +54,11 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	utils.ResponseJson(w, http.StatusOK, "Successfully updated user!")
 }
 
-func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUserMgmtJson) AdminUserMgmtJson {
+func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUserMgmtJson) (AdminUserMgmtJson, bool) {
 	currentUserData, err := GetCurrentUserData(w, adminUpdateUser.Username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error when getting current user data: ", err)
+		return AdminUserMgmtJson{}, false
 	}
 
 	// Fill empty password
@@ -78,7 +86,7 @@ func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUserMgmtJson)
 		adminUpdateUser.IsActive = currentUserData.IsActive
 	}
 
-	return adminUpdateUser
+	return adminUpdateUser, true
 }
 
 func GetCurrentUserData(w http.ResponseWriter, username string) (handlers.User, error) {

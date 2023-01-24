@@ -25,7 +25,7 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	if !CheckProductsUserGroup(w, req) {return}
 
 	// Product Form Validation
-	if !ProductsFormValdiation(w, createProduct) {
+	if !ProductValidationForm(w, createProduct) {
 		return
 	}
 

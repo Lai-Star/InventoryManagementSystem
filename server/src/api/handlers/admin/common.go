@@ -78,7 +78,8 @@ func UserValidationForm(w http.ResponseWriter, adminUser AdminUserMgmtJson, acti
 
 func CheckUserGroupAdmin(w http.ResponseWriter, req *http.Request) bool {
 	// CheckUserGroup: IMS User and Operations
-	handlers_user.RetrieveIssuer(w, req)
+	if !handlers_user.RetrieveIssuer(w, req) {return false}
+	
 	checkUserGroupIMSUser := utils.CheckUserGroup(w.Header().Get("username"), "Admin")
 	if !checkUserGroupIMSUser {
 		utils.ResponseJson(w, http.StatusForbidden, "Access Denied: You do not have permission to access this resource.")

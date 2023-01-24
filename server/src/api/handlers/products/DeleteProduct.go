@@ -1,11 +1,12 @@
 package handlers_products
 
 import (
-	"encoding/json"
-	"io"
 	"net/http"
+	"strconv"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
+	"github.com/go-chi/chi"
 )
 
 func DeleteProduct(w http.ResponseWriter, req *http.Request) {
@@ -14,22 +15,26 @@ func DeleteProduct(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var deleteProduct DeleteProductJson
 
-	// Reading the request body and UnMarshal the body to the DeleteProductJson struct
-	bs, _ := io.ReadAll(req.Body);
-	if err := json.Unmarshal(bs, &deleteProduct); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in Unmarshal JSON body in DeleteProduct: ", err)
-		return;
-	}
-
 	// CheckUserGroup: IMS User and Operations
 	if !CheckProductsUserGroup(w, req) {return}
 
-	productSku := deleteProduct.ProductSku
+	// Get productid from url params
+	productIdStr := chi.URLParam(req, "product_id")
+	deleteProduct.ProductId, _ = strconv.Atoi(productIdStr)
 
-	// Check Product Sku Format
-	if !CheckProductSkuFormat(w, productSku) {return}
+	// Check if product exists in database
+	if !database.ProductIdExists(deleteProduct.ProductId) {
+		utils.ResponseJson(w, http.StatusNotFound, "Product does not exist in database. Please try again.")
+		return
+	}
 
+	err := database.DeleteProductFromProducts(deleteProduct.ProductId)
+	if err != nil {
+		utils.InternalServerError(w, "Internal Server Error in deleting product from products table: ", err)
+		return
+	}
 	
+	utils.ResponseJson(w, http.StatusOK, "Successfully Deleted Product!")
 
 }
 

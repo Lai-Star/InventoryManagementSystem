@@ -8,6 +8,7 @@ import (
 )
 
 type ProductJson struct {
+	ProductId int
 	ProductName        string `json:"product_name"`
 	ProductDescription string `json:"product_description"`
 	ProductSku         string `json:"product_sku"`
@@ -18,10 +19,10 @@ type ProductJson struct {
 }
 
 type DeleteProductJson struct {
-	ProductSku string `json:"product_sku"`
+	ProductId int
 }
 
-func ProductsFormValdiation(w http.ResponseWriter, product ProductJson) bool {
+func ProductValidationForm(w http.ResponseWriter, product ProductJson) bool {
 
 	isValidProductSku := CheckProductSkuFormat(w, product.ProductSku)
 	if !isValidProductSku {return false}
@@ -31,7 +32,7 @@ func ProductsFormValdiation(w http.ResponseWriter, product ProductJson) bool {
 
 func CheckProductsUserGroup(w http.ResponseWriter, req *http.Request) bool {
 	// CheckUserGroup: IMS User and Operations
-	handlers_user.RetrieveIssuer(w, req)
+	if !handlers_user.RetrieveIssuer(w, req) {return false}
 	checkUserGroupIMSUser := utils.CheckUserGroup(w.Header().Get("username"), "IMS User")
 	checkUserGroupOperations := utils.CheckUserGroup(w.Header().Get("username"), "Operations")
 	if !checkUserGroupIMSUser || !checkUserGroupOperations {

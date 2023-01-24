@@ -8,11 +8,11 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func RetrieveIssuer(w http.ResponseWriter, req *http.Request) {
+func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in retrieving cookie: ", err);
-		return;
+		return false;
 	}
 
 	// Parses the cookie jwt claims using the secret key to verify
@@ -21,7 +21,7 @@ func RetrieveIssuer(w http.ResponseWriter, req *http.Request) {
 	})
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in parsing cookie: ", err)
-		return
+		return false
 	}
 
 	// To access the issuer, we need the token claims to be type RegisteredClaims
@@ -30,4 +30,6 @@ func RetrieveIssuer(w http.ResponseWriter, req *http.Request) {
 	// fmt.Println("Retrieved Issuer using claims.Issuer: ", claims.Issuer)
 	w.Header().Set("username", claims.Issuer)
 	// fmt.Println("Retrieved Issuer using w.Header().Get():" , w.Header().Get("username"))
+
+	return true
 }

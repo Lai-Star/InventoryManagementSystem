@@ -15,6 +15,7 @@ var (
 var (
 	SQL_SELECT_FROM_PRODUCTS = "SELECT %s FROM products WHERE %s = $1;"
 	SQL_SELECT_ALL_FROM_PRODUCTS = "SELECT product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost FROM products;"
+	SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID = "SELECT product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost FROM products WHERE product_id = $1;"
 )
 
 func UsernameExists(username string) bool {
@@ -77,6 +78,11 @@ func GetUserByUsername(username string) *sql.Row {
 	return row
 }
 
+func ProductIdExists(product_id int) bool {
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_PRODUCTS, "product_id", "product_id"), product_id)
+	return row.Scan() != sql.ErrNoRows
+}
+
 func ProductSkuExists(product_sku string) bool {
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_PRODUCTS, "product_sku", "product_sku"), product_sku)
 	return row.Scan() != sql.ErrNoRows
@@ -85,4 +91,9 @@ func ProductSkuExists(product_sku string) bool {
 func GetProducts() (*sql.Rows, error) {
 	row, err := db.Query(SQL_SELECT_ALL_FROM_PRODUCTS)
 	return row, err
+}
+
+func GetProductByProductId(product_id int) *sql.Row {
+	row := db.QueryRow(SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID, product_id)
+	return row
 }
