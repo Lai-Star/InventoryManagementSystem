@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	handlers_user "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
@@ -98,13 +99,13 @@ func (product ProductJson) ProductFieldsTrimSpaces() ProductJson {
 	product.ProductSku = strings.TrimSpace(product.ProductSku)
 	product.ProductColour = strings.TrimSpace(product.ProductColour)
 	product.ProductCategory = strings.TrimSpace(product.ProductCategory)
-	product.ProductBrand = strings.TrimSpace(product.ProductCategory)
+	product.ProductBrand = strings.TrimSpace(product.ProductBrand)
 
 	return product
 
 }
 
-func SizesFormValidation(w http.ResponseWriter, sizes []Size) (bool, []Size) {
+func ValidateAndInsertSize(w http.ResponseWriter, sizes []Size, productId int32) (bool, []Size) {
 
 	for _, size := range sizes {
 		// Check length of SizeName (length of 0 - 5)
@@ -134,12 +135,25 @@ func SizesFormValidation(w http.ResponseWriter, sizes []Size) (bool, []Size) {
 			utils.ResponseJson(w, http.StatusBadRequest, strconv.Itoa(size.SizeQuantity) + " is not in the correct Integer format. Please try again!")
 			return false, sizes
 		}
+
+		// Insert Size to sizes table
+		err, sizeId := database.InsertNewSize(size.SizeName, size.SizeQuantity)
+		if err != nil {
+			utils.InternalServerError(w, "Error in inserting new size to sizes table: ", err)
+			return false, sizes
+		}
+
+		// Insert product_id and size_id to product_sizes table
+		err = database.InsertNewProductSizes(productId, sizeId)
+		if err != nil {
+			utils.InternalServerError(w, "Error in inserting new productsizes into product_sizes table: ", err)
+			return false, sizes
+		}
 	}
 
 	return true, sizes
 
 }
-
 
 func IsAllowedProductSize(size string) bool {
 	allowedSizes := []string {"XXS", "XS", "S", "M", "L", "XL", "XXL"}
