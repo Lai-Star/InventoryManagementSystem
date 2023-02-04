@@ -1,2 +1,86 @@
+# ---------- Golang ----------
 server/**/.env
 *.pem
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Project-local glide cache
+.glide/
+
+# IntelliJ IDEA / GoLand .idea directory and .iml files
+.idea/
+*.iml
+
+# Generated Go files
+*.go
+
+# Generated protobuf files
+*.pb.go
+
+# Generated bindata file
+*.go-bindata-assetfs.go
+
+# Generated gRPC stubs
+*.pb.gw.go
+
+# Generated swagger documentation
+docs/swagger-ui/*
+
+# Build artifacts
+bin/
+pkg/
+
+# Testing artifacts
+_test/
+
+# Go modules artifacts
+go.sum
+go.mod
+
+# ---------- ReactJS ----------
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.*
+
+# yarn cache
+.yarn-cache
+
+# .env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IntelliJ
+.idea/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db

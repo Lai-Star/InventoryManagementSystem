@@ -37,7 +37,6 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-
 	// Insert new product into products table
 	err, productId := database.InsertNewProduct(createProduct.ProductName, createProduct.ProductDescription, createProduct.ProductSku, createProduct.ProductColour, createProduct.ProductCategory, createProduct.ProductBrand, createProduct.ProductCost)
 	if err != nil {

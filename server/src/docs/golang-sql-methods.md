@@ -1,4 +1,6 @@
-# `db.QueryRow` vs `db.Exec`
+# Golang SQL DB Method
+
+## `db.QueryRow` vs `db.Exec`
 
 - `db.QueryRow`
   - Used to retrieve a single row from a database query.
@@ -9,7 +11,7 @@
   - Used to execute a query that does not return any rows such as INSERT, UPDATE or DELETE statement.
   - The `Exec` method returns an `sql.Result` object that can be used to retrieve information about the number of affected rows, but it cannot be used to retrieve the values of the inserted row.
 
-# `db.QueryRow` vs `db.Query`
+## `db.QueryRow` vs `db.Query`
 
 - `db.QueryRow`
     - Returns a single row, which can be returned as a scan of the returned result. 

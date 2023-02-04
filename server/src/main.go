@@ -22,7 +22,7 @@ func main() {
 	defer db.Close()
 
 	// Generating & validating the public and private keys for signed Json
-	keys.GenerateKeys()
+	// keys.GenerateKeys()
 	keys.CheckKeys()
 
 	// get application routes
