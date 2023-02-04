@@ -22,14 +22,14 @@ func main() {
 	defer db.Close()
 
 	// Generating & validating the public and private keys for signed Json
-	// keys.GenerateKeys()
+	keys.GenerateKeys()
 	keys.CheckKeys()
 
 	// get application routes
 	mux := routes.Routes()
 
 	// Loading the .env file in the config folder
-	err := godotenv.Load("../config/.env");
+	err := godotenv.Load("./config/.env");
 	if err != nil {
 		log.Println("Error loading .env file in main.go: ", err)
 	}

@@ -15,7 +15,7 @@ var db *sql.DB
 
 func ConnectToPostgreSQL() *sql.DB {
 	// Loading the .env file in the config folder
-	err := godotenv.Load("../config/.env");
+	err := godotenv.Load("./config/.env");
 	if err != nil {
 		log.Println("Error loading .env file when connecting to PostgreSQL: ", err)
 	}

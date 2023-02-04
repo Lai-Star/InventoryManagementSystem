@@ -43,7 +43,7 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	if !result {return}
 
 	// Product Form Validation
-	if !ProductValidationForm(w, updateProduct) {return}
+	if !ProductFormValidation(w, updateProduct) {return}
 
 	// Update products table
 	err := database.UpdateProduct(updateProduct.ProductId, updateProduct.ProductName, updateProduct.ProductDescription, updateProduct.ProductSku, updateProduct.ProductColour, updateProduct.ProductCategory, updateProduct.ProductBrand, updateProduct.ProductCost)

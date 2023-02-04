@@ -2,6 +2,7 @@ package handlers_products
 
 import (
 	"net/http"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -12,13 +13,19 @@ import (
 
 type ProductJson struct {
 	ProductId int
-	ProductName        string `json:"product_name"`
-	ProductDescription string `json:"product_description"`
-	ProductSku         string `json:"product_sku"`
-	ProductColour      string `json:"product_colour"`
-	ProductCategory    string `json:"product_category"`
-	ProductBrand       string `json:"product_brand"`
+	ProductName        string  `json:"product_name"`
+	ProductDescription string  `json:"product_description"`
+	ProductSku         string  `json:"product_sku"`
+	ProductColour      string  `json:"product_colour"`
+	ProductCategory    string  `json:"product_category"`
+	ProductBrand       string  `json:"product_brand"`
 	ProductCost        float32 `json:"product_cost"`
+	Sizes              []Size  `json:"sizes"`
+}
+
+type Size struct {
+	SizeName     string `json:"size_name"`
+	SizeQuantity int    `json:"size_quantity"`
 }
 
 type DeleteProductJson struct {
@@ -95,6 +102,53 @@ func (product ProductJson) ProductFieldsTrimSpaces() ProductJson {
 
 	return product
 
+}
+
+func SizesFormValidation(w http.ResponseWriter, sizes []Size) (bool, []Size) {
+
+	for _, size := range sizes {
+		// Check length of SizeName (length of 0 - 5)
+		isValidSizeName := utils.CheckLengthRange(size.SizeName, 0, 5)
+		if !isValidSizeName {
+			utils.ResponseJson(w, http.StatusBadRequest, "Size name must have a length of 0 - 5 characters. Please try again!")
+			return false, sizes
+		}
+
+		// Trim white space for each size
+		size.SizeName = strings.TrimSpace(size.SizeName)
+
+		// SizeName must be in uppercase
+		size.SizeName = strings.ToUpper(size.SizeName)
+
+		// Check that this size name is valid (XXS, XS, S, M, L, XL, XXL)
+		isValidSize := IsAllowedProductSize(size.SizeName)
+		if !isValidSize {
+			utils.ResponseJson(w, http.StatusBadRequest, size.SizeName + " is not a valid size name. Please try again.")
+			return false, sizes
+		}
+
+		// Check that size quantity is of type int
+		// reflect: inspect and manipulate values of different types dynamically at runtime
+		// reflect.TypeOf gets the value stored in SizeQuantity and .Kind() checks the data type of the value
+		if reflect.TypeOf(size.SizeQuantity).Kind() != reflect.Int {
+			utils.ResponseJson(w, http.StatusBadRequest, strconv.Itoa(size.SizeQuantity) + " is not in the correct Integer format. Please try again!")
+			return false, sizes
+		}
+	}
+
+	return true, sizes
+
+}
+
+
+func IsAllowedProductSize(size string) bool {
+	allowedSizes := []string {"XXS", "XS", "S", "M", "L", "XL", "XXL"}
+	for _, allowedSize := range allowedSizes {
+		if size == allowedSize {
+			return true
+		}
+	}
+	return false
 }
 
 

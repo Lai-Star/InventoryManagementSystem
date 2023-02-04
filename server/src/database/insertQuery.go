@@ -9,7 +9,7 @@ var (
 )
 
 var (
-	SQL_INSERT_INTO_PRODUCTS = "INSERT INTO products (product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost, added_date, updated_date) VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now())"
+	SQL_INSERT_INTO_PRODUCTS = "INSERT INTO products (product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost, added_date, updated_date) VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now()) RETURNING product_id"
 )
 
 func InsertNewUser(username, password, email, user_group, company_name string, isActive int) error {
@@ -28,10 +28,11 @@ func AdminInsertNewUser(username, password, email, user_group, company_name stri
 	return err
 }
 
-func InsertNewProduct(product_name, product_description, product_sku, product_colour, product_category, product_brand string, product_cost float32) error {
-	_, err := db.Exec(SQL_INSERT_INTO_PRODUCTS, product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost)
+func InsertNewProduct(product_name, product_description, product_sku, product_colour, product_category, product_brand string, product_cost float32) (error, int32) {
+	var product_id int32
+	err := db.QueryRow(SQL_INSERT_INTO_PRODUCTS, product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost).Scan(&product_id)
 	if err != nil {
 		log.Println("Error inserting new product: ", err)
 	}
-	return err
+	return err, product_id
 }
