@@ -19,4 +19,11 @@ type Product struct {
 	ProductCategory string
 	ProductBrand string
 	ProductCost float32
+	Sizes []ProductSize
 }
+
+type ProductSize struct {
+	SizeName string
+	SizeQuantity int
+}
+

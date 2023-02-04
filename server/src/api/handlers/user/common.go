@@ -9,6 +9,9 @@ import (
 )
 
 func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
+
+	w.Header().Set("Content-Type", "application/json");
+
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in retrieving cookie: ", err);

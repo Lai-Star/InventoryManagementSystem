@@ -18,9 +18,13 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
 
 	// Retrieve products from SQL database
 	var data []handlers.Product
+	productSizes := make(map[string][]handlers.ProductSize)
+
 	// To handle nullable columns in a database table
 	var productName, productDescription, productSku, productColour, productCategory, productBrand sql.NullString
 	var productCost sql.NullFloat64
+	var sizeName sql.NullString
+	var sizeQuantity sql.NullInt32
 
 	rows, err := database.GetProducts()
 	if err != nil {
@@ -31,13 +35,13 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&productName, &productDescription, &productSku, &productColour, &productCategory, &productBrand, &productCost)
+		err = rows.Scan(&productName, &productDescription, &productSku, &productColour, &productCategory, &productBrand, &productCost, &sizeName, &sizeQuantity)
 		if err != nil {
 			utils.InternalServerError(w, "Internal Server Error in Scanning GetProducts: ", err)
 			return
 		}
 
-		response := handlers.Product{
+		product := handlers.Product{
 			ProductName: productName.String,
 			ProductDescription: productDescription.String,
 			ProductSku: productSku.String,
@@ -47,8 +51,19 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
 			ProductCost: float32(productCost.Float64),
 		}
 
-		data = append(data, response)
+		data = append(data, product)
+
+		productSize := handlers.ProductSize {
+			SizeName: sizeName.String,
+			SizeQuantity: int(sizeQuantity.Int32),
+		}
+		productSizes[productSku.String] = append(productSizes[productSku.String], productSize)
 	}
+
+	for i, product := range data {
+		data[i].Sizes = productSizes[product.ProductSku]
+	}
+
 	jsonStatus := struct {
 		Code int `json:"code"`
 		Response []handlers.Product `json:"response"`
