@@ -16,8 +16,8 @@ var (
 	SQL_SELECT_FROM_PRODUCTS = "SELECT %s FROM products WHERE %s = $1;"
 	SQL_SELECT_ALL_FROM_PRODUCTS = "SELECT p.product_name, p.product_description, p.product_sku, p.product_colour, p.product_category, p.product_brand, p.product_cost, s.size_name, s.size_quantity " +
 									 "FROM products p " + 
-									 "JOIN product_sizes ps ON p.product_id = ps.product_id " +
-									 "JOIN sizes s ON s.size_id = ps.size_id;"
+									 "LEFT JOIN product_sizes ps ON p.product_id = ps.product_id " +
+									 "LEFT JOIN sizes s ON s.size_id = ps.size_id;"
 	SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID = "SELECT product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost" + 
 													"FROM products WHERE product_id = $1;"
 )
