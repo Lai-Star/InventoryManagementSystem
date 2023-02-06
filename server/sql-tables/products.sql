@@ -41,4 +41,18 @@ CREATE TABLE product_sizes (
     PRIMARY KEY (product_id, size_id)  -- composite key
 )
 
+-- Create product_user table
+/*
+    Table Description: To find out which users are part of which organisations and find out who added a specific product to the inventory.
+*/
+
+CREATE TABLE product_user (
+    product_id INT REFERENCES products(product_id) ON DELETE CASCADE,
+    user_id INT REFERENCES accounts(user_id) ON DELETE CASCADE,
+    company_name VARCHAR(255) NOT NULL,
+    added_date TIMESTAMP NOT NULL,
+    updated_date TIMESTAMP NOT NULL,
+    UNIQUE (product_id, user_id, company_name)
+)
+
 

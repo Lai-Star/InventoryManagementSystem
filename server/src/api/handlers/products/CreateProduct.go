@@ -30,12 +30,26 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	// Product Form Validation
 	if !ProductFormValidation(w, createProduct) {return}
 
-	// Check Product Sku to see if it exists in database (cannot have duplicates)
-	isExistProductSku := database.ProductSkuExists(createProduct.ProductSku)
-	if isExistProductSku {
-		utils.ResponseJson(w, http.StatusBadRequest, "Product Sku already exists. Please try again.")
+	// Check User Organisation
+	username := w.Header().Get("username")
+	userOrganisation, err := database.GetCompanyNameFromDB(username)
+	if err != nil {
+		utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
 		return
 	}
+
+	// Check Product Sku to see if it exists in database (cannot have duplicates within the same organisation)
+	// if user belongs to "IMSer" means it is a regular user, check for existing product sku based on username
+	if userOrganisation == "IMSer" {
+		// isExistProductSku := database.ProductSkuExists(createProduct.ProductSku)
+		// if isExistProductSku {
+		// 	utils.ResponseJson(w, http.StatusBadRequest, "Product Sku already exists. Please try again.")
+		// 	return
+		// }
+	} else {
+		// user does not belong to "IMSer", user belongs to specific organisation
+	}
+
 
 	// Insert new product into products table
 	err, productId := database.InsertNewProduct(createProduct.ProductName, createProduct.ProductDescription, createProduct.ProductSku, createProduct.ProductColour, createProduct.ProductCategory, createProduct.ProductBrand, createProduct.ProductCost)

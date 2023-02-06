@@ -62,6 +62,16 @@ func GetActiveStatusFromDB(username string) (int, error) {
 	return isActive, nil
 }
 
+func GetCompanyNameFromDB(username string) (string, error) {
+	var companyName string
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ACCOUNTS, "company_name", "username"), username)
+	err := row.Scan(&companyName)
+	if err != nil {
+		log.Println("Error scanning when getting companyName from database: ", err)
+	}
+	return companyName, err
+}
+
 func GetUserGroupFromDB(username string) (string, error) {
 	var userGroup string
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ACCOUNTS, "user_group", "username"), username)
@@ -87,7 +97,8 @@ func ProductIdExists(product_id int) bool {
 	return row.Scan() != sql.ErrNoRows
 }
 
-func ProductSkuExists(product_sku string) bool {
+func ProductSkuExistsByUsername(product_sku, username string) bool {
+
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_PRODUCTS, "product_sku", "product_sku"), product_sku)
 	return row.Scan() != sql.ErrNoRows
 }
