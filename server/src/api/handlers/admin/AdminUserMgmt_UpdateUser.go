@@ -27,7 +27,7 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	if !CheckUserGroupAdmin(w, req) {return}
 
 	// Check if username exists in database
-	if !database.UsernameExists(adminUpdateUser.Username) {
+	if !database.GetUsername(adminUpdateUser.Username) {
 		utils.ResponseJson(w, http.StatusNotFound, "User does not exist in database. Please try again.")
 		return
 	}

@@ -7,9 +7,11 @@ import (
 )
 
 var (
-	SQL_SELECT_FROM_ACCOUNTS = "SELECT %s FROM accounts WHERE %s = $1;"
-	SQL_SELECT_ALL_FROM_ACCOUNTS = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM accounts;"
-	SQL_SELECT_ALL_FROM_ACCOUNTS_BY_USERNAME = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM accounts WHERE username = $1;"
+	SQL_SELECT_FROM_USERS = "SELECT %s FROM users WHERE %s = $1;"
+	SQL_SELECT_FROM_ORGANISATIONS = "SELECT %s FROM organisations WHERE %s = $1;"
+	SQL_SELECT_FROM_USER_GROUPS = "SELECT %s FROM user_groups WHERE %s = $1;"
+	SQL_SELECT_ALL_FROM_USERS = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM USERS;"
+	SQL_SELECT_ALL_FROM_USERS_BY_USERNAME = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM USERS WHERE username = $1;"
 )
 
 var (
@@ -22,19 +24,41 @@ var (
 													"FROM products WHERE product_id = $1;"
 )
 
-func UsernameExists(username string) bool {
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ACCOUNTS, "username", "username"), username)
+func GetUsername(username string) bool {
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "username", "username"), username)
 	return row.Scan() != sql.ErrNoRows
 }
 
+func GetOrganisationId(organisationName string) (int, error) {
+	var organisationId int
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "organisation_id", "organisation_name"), organisationName)
+	err := row.Scan(&organisationId)
+	if err != nil {
+		log.Println("Error in scan when getting organisation id from database", err)
+		return 0, err
+	}
+	return organisationId, nil
+}
+
+func GetUserGroupId(userGroup string) (int, error) {
+	var userGroupId int
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USER_GROUPS, "user_group_id", "user_group"), userGroup)
+	err := row.Scan(&userGroupId)
+	if err != nil {
+		log.Println("Error in scan when getting user group id from database", err)
+		return 0, err
+	}
+	return userGroupId, nil
+}
+
 func EmailExists(email string) bool {
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ACCOUNTS, "email", "email"), email)
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "email", "email"), email)
 	return row.Scan() != sql.ErrNoRows
 }
 
 func GetPasswordFromDB(username string) (string, error) {
 	var password string
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ACCOUNTS, "password", "username"), username)
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "password", "username"), username)
 	err := row.Scan(&password)
 	if err != nil {
 		log.Println("Error scanning when getting password from database: ", err)
@@ -44,7 +68,7 @@ func GetPasswordFromDB(username string) (string, error) {
 
 func GetEmailFromDB(username string) (string, error) {
     var email string
-    row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ACCOUNTS, "email", "username"), username)
+    row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "email", "username"), username)
     err := row.Scan(&email)
     if err != nil {
 		log.Println("Error scanning when getting email from database: ", err)
@@ -54,7 +78,7 @@ func GetEmailFromDB(username string) (string, error) {
 
 func GetActiveStatusFromDB(username string) (int, error) {
 	var isActive int
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ACCOUNTS, "is_active", "username"), username)
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "is_active", "username"), username)
 	err := row.Scan(&isActive)
 	if err != nil {
 		log.Println("Error scanning when getting isActive status from database: ", err)
@@ -64,7 +88,7 @@ func GetActiveStatusFromDB(username string) (int, error) {
 
 func GetCompanyNameFromDB(username string) (string, error) {
 	var companyName string
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ACCOUNTS, "company_name", "username"), username)
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "company_name", "username"), username)
 	err := row.Scan(&companyName)
 	if err != nil {
 		log.Println("Error scanning when getting companyName from database: ", err)
@@ -74,7 +98,7 @@ func GetCompanyNameFromDB(username string) (string, error) {
 
 func GetUserGroupFromDB(username string) (string, error) {
 	var userGroup string
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ACCOUNTS, "user_group", "username"), username)
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "user_group", "username"), username)
 	err := row.Scan(&userGroup)
 	if err != nil {
 		log.Println("Error scanning when getting user group from database: ", err)
@@ -83,12 +107,12 @@ func GetUserGroupFromDB(username string) (string, error) {
 }
 
 func GetUsers() (*sql.Rows, error) {
-	row, err := db.Query(SQL_SELECT_ALL_FROM_ACCOUNTS)
+	row, err := db.Query(SQL_SELECT_ALL_FROM_USERS)
 	return row, err
 }
 
 func GetUserByUsername(username string) *sql.Row {
-	row := db.QueryRow(SQL_SELECT_ALL_FROM_ACCOUNTS_BY_USERNAME, username)
+	row := db.QueryRow(SQL_SELECT_ALL_FROM_USERS_BY_USERNAME, username)
 	return row
 }
 

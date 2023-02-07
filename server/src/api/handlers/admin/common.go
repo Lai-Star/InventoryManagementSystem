@@ -32,7 +32,7 @@ func UserValidationForm(w http.ResponseWriter, adminUser AdminUserMgmtJson, acti
 	if (!isValidUsername) {return false}
 
 	// Check if username already exists in database
-	isUsernameExists := database.UsernameExists(username)
+	isUsernameExists := database.GetUsername(username)
 	if action == "INSERT" && isUsernameExists {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username already exists. Please try again.")
 		return false

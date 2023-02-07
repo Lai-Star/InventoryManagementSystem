@@ -32,7 +32,7 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	}
 	
 	// Check if username exists in database
-	if (!database.UsernameExists(user.Username)) {
+	if (!database.GetUsername(user.Username)) {
 		utils.ResponseJson(w, http.StatusUnauthorized, "You have entered an incorrect username and/or password. Please try again.")
 		return;
 	}

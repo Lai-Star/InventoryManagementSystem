@@ -2,6 +2,7 @@ package utils
 
 import "regexp"
 
+// Return true if the string length is within the range provided (inclusive)
 func CheckLengthRange(str string, minLength int, maxLength int) bool {
 	if (len(str) > maxLength || len(str) < minLength) {
 		return false
@@ -9,10 +10,12 @@ func CheckLengthRange(str string, minLength int, maxLength int) bool {
 	return true
 }
 
+// Returns true if the maximum length is met (inclusive)
 func CheckMaxLength(str string, maxLength int) bool {
 	return len(str) <= maxLength
 }
 
+// Returns true if the minimum length is met (inclusive)
 func CheckMinLength(str string, minLength int) bool {
 	return len(str) >= minLength
 }

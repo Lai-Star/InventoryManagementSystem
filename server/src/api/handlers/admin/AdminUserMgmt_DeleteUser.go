@@ -30,7 +30,7 @@ func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
 	if !utils.CheckUsernameFormat(w, username) {return}
 
 	// Check if username exists in the database
-	if !database.UsernameExists(username) {
+	if !database.GetUsername(username) {
 		utils.ResponseJson(w, http.StatusNotFound, "Username does not exist in database. Please try again.")
 		return
 	}

@@ -9,13 +9,6 @@ import (
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-type SignUpJson struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	CompanyName string `json:"company_name"`
-}
-
 func SignUp(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json");
@@ -27,45 +20,67 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in SignUp route: ", err)
 		return;
 	}
-
-	// New User sign up details
-	username := newUser.Username
-	password := newUser.Password
-	email := newUser.Email
 	
-	company_name := "IMSer"
+	// Default company name (only admin can create a different organisation name)
+	userGroup := "InvenNexus User"
+	organisationName := "InvenNexus" 
 	isActive := 1
 
-	isValidUsername := utils.CheckUsernameFormat(w, username)
-	if (!isValidUsername) {return}
+	// Trim whitespaces (username and email)
+	newUser = newUser.UserFieldsTrimSpaces()
+
+	// SignUp form validation
+	if !SignUpFormValidation(w, newUser) {return}
+
+	// Generate password hash
+	hashedPassword := utils.GenerateHash(newUser.Password)
 
 	// Check if username already exists in database (duplicates not allowed)
-	isDuplicateUsername := database.UsernameExists(username)
-	if (isDuplicateUsername) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Username already exists. Please try again.")
+	isExistingUsername := database.GetUsername(newUser.Username)
+	if (isExistingUsername) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Username has already been taken. Please try again.")
 		return
 	}
-
-	isValidPassword := utils.CheckPasswordFormat(w, password);
-	if (!isValidPassword) {return}
-	hashedPassword := utils.GenerateHash(password)
-
-	isValidEmail := utils.CheckEmailFormat(w, email);
-	if (!isValidEmail) {return}
 
 	// Check if email already exists in database (duplicates not allowed)
-	isDuplicatedEmail := database.EmailExists(email)
+	isDuplicatedEmail := database.EmailExists(newUser.Email)
 	if (isDuplicatedEmail) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Email address already exists. Please try again.")
+		utils.ResponseJson(w, http.StatusBadRequest, "Email address has already been taken. Please try again.")
 		return
 	}
 
-	// For new users, userGroup is default to "Retail Business Owner"
-	userGroup := "IMS User"
-
-	err := database.InsertNewUser(username, hashedPassword, email, userGroup, company_name, isActive)
+	// Insert new user to `users` table
+	userId, err := database.InsertNewUser(newUser.Username, hashedPassword, newUser.Email, isActive)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in InsertNewUser: ", err)
+		return
+	}
+	
+	// Get organisation_id from `user_organisation_mapping` table
+	organisationId, err := database.GetOrganisationId(organisationName)
+	if err != nil {
+		utils.InternalServerError(w, "Internal Server Error in GetOrgaisationId: ", err)
+		return
+	}
+
+	// Insert user_id and organisation_id into `user_organisation` table
+	err = database.InsertIntoUserOrganisationMapping(userId, organisationId)
+	if err != nil {
+		utils.InternalServerError(w, "Internal Server Error in inserting into user_organisation_mapping: ", err)
+		return
+	}
+
+	// Get user_group_id from `user_group_mapping` table
+	userGroupId, err := database.GetUserGroupId(userGroup)
+	if err != nil {
+		utils.InternalServerError(w, "Internal Server Error in getting usergroupid: ", err)
+		return
+	}
+
+	// Insert user_id and user_group_id into `user_group_mapping` table
+	err = database.InsertIntoUserGroupMapping(userId, userGroupId)
+	if err != nil {
+		utils.InternalServerError(w, "Internal Server Error in inserting into user_group_mapping: ", err)
 		return
 	}
 

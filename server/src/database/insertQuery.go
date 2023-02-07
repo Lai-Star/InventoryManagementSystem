@@ -5,7 +5,11 @@ import (
 )
 
 var (
-	SQL_INSERT_INTO_ACCOUNTS = "INSERT INTO accounts (username, password, email, user_group, company_name, is_active, added_date, updated_date) VALUES ($1, $2, $3, $4, $5, $6, now(), now());"
+	SQL_INSERT_INTO_USERS = "INSERT INTO users (username, password, email, is_active, added_date, updated_date)" + 
+							"VALUES ($1, $2, $3, $4, now(), now()) RETURNING user_id;"
+	SQL_INSERT_INTO_USER_ORGANISATION_MAPPING = "INSERT INTO user_organisation_mapping (user_id, organisation_id)" + 
+										"VALUES ($1, $2);"
+	SQL_INSERT_INTO_USER_GROUP_MAPPING = "INSERT INTO user_group_mapping (user_id, user_group_id) VALUES ($1, $2);"
 )
 
 var (
@@ -14,16 +18,34 @@ var (
 	SQL_INSERT_INTO_PRODUCT_SIZES = "INSERT INTO product_sizes (product_id, size_id) VALUES ($1, $2);"
 )
 
-func InsertNewUser(username, password, email, user_group, company_name string, isActive int) error {
-	_, err := db.Exec(SQL_INSERT_INTO_ACCOUNTS, username, password, email, user_group, company_name, isActive)
+func InsertNewUser(username, password, email string, isActive int) (int, error) {
+	var user_id int
+	err := db.QueryRow(SQL_INSERT_INTO_USERS, username, password, email, isActive).Scan(&user_id)
 	if err != nil {
 		log.Println("Error inserting new user to database: ", err)
+		return 0, err
+	}
+	return user_id, nil
+}
+
+func InsertIntoUserOrganisationMapping(userId, organisationId int) error {
+	_, err := db.Exec(SQL_INSERT_INTO_USER_ORGANISATION_MAPPING, userId, organisationId)
+	if err != nil {
+		log.Println("Error inserting into user_organisation_mapping table: ", err)
+	}
+	return err
+}
+
+func InsertIntoUserGroupMapping(userId, userGroupId int) error {
+	_, err := db.Exec(SQL_INSERT_INTO_USER_GROUP_MAPPING, userId, userGroupId)
+	if err != nil {
+		log.Println("Error inserting into user_group_mapping table: ", err)
 	}
 	return err
 }
 
 func AdminInsertNewUser(username, password, email, user_group, company_name string, isActive int) error {
-	_, err := db.Exec(SQL_INSERT_INTO_ACCOUNTS, username, password, email, user_group, company_name, isActive)
+	_, err := db.Exec(SQL_INSERT_INTO_USERS, username, password, email, user_group, company_name, isActive)
 	if err != nil {
 		log.Println("Error admin inserting new user to database: ", err)
 	}
