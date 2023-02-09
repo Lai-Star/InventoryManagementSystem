@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	handlers_user "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user"
+	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
@@ -13,7 +13,7 @@ import (
 func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json");
-	var adminNewUser AdminUserMgmtJson
+	var adminNewUser handlers_user_management.AdminUserMgmtJson
 
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);
@@ -25,22 +25,15 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	// Check User Group Admin
 	if !CheckUserGroupAdmin(w, req) {return}
 
-	// Check User Group
-	handlers_user.RetrieveIssuer(w, req)
-	checkUserGroup := utils.CheckUserGroup(w.Header().Get("username"), "Admin")
-	if !checkUserGroup {
-		utils.ResponseJson(w, http.StatusForbidden, "Access Denied: You do not have admin permissions to access this resource.")
-		return
-	}
+	// Trim white spaces (username, password, email, company name)
+	adminNewUser = adminNewUser.AdminUserMgmtFieldsTrimSpaces()
 
 	// Validate form inputs
-	if !UserValidationForm(w, adminNewUser, "INSERT") {
-		return 
-	}
+	if !handlers_user_management.AdminUserMgmtFormValidation(w, adminNewUser) {return}
 
 	hashedPassword := utils.GenerateHash(adminNewUser.Password)
 
-	err := database.AdminInsertNewUser(adminNewUser.Username, hashedPassword, adminNewUser.Email, adminNewUser.UserGroup, adminNewUser.CompanyName, adminNewUser.IsActive)
+	err := database.AdminInsertNewUser(adminNewUser.Username, hashedPassword, adminNewUser.Email, adminNewUser.UserGroup, adminNewUser.OrganisationName, adminNewUser.IsActive)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in AdminInsertNewUser: ", err)
 		return

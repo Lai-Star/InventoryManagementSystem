@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 
+	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
@@ -12,7 +13,7 @@ import (
 func SignUp(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json");
-	var newUser SignUpJson
+	var newUser handlers_user_management.SignUpJson
 
 	// Reading the request body and UnMarshal the body to the LoginJson struct
 	bs, _ := io.ReadAll(req.Body);
@@ -30,7 +31,7 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	newUser = newUser.UserFieldsTrimSpaces()
 
 	// SignUp form validation
-	if !SignUpFormValidation(w, newUser) {return}
+	if !handlers_user_management.SignUpFormValidation(w, newUser) {return}
 
 	// Generate password hash
 	hashedPassword := utils.GenerateHash(newUser.Password)

@@ -3,9 +3,9 @@ package routes
 import (
 	"net/http"
 
-	handlers_admin "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/admin"
 	handlers_products "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/products"
-	handlers_user "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user"
+	handlers_admin "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/admin"
+	handlers_auth "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
@@ -18,9 +18,9 @@ func Routes() http.Handler {
 	mux.Use(middleware.Recoverer)
 
 	// User Management Routes
-	mux.Post("/login", handlers_user.Login)
-	mux.Get("/logout", handlers_user.Logout)
-	mux.Post("/signup", handlers_user.SignUp)
+	mux.Post("/login", handlers_auth.Login)
+	mux.Get("/logout", handlers_auth.Logout)
+	mux.Post("/signup", handlers_auth.SignUp)
 
 	// Admin Management Routes
 	mux.Post("/admin-create-user", handlers_admin.AdminCreateUser)

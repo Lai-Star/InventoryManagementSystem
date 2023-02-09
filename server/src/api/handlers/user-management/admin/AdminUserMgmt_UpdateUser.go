@@ -7,14 +7,17 @@ import (
 	"net/http"
 
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers"
+	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
+type AdminUser = handlers_user_management.AdminUserMgmtJson
+
 func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json");
-	var adminUpdateUser AdminUserMgmtJson
+	var adminUpdateUser AdminUser
 
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);
@@ -45,7 +48,7 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Update accounts table
-	err := database.AdminUpdateUser(adminUpdateUser.Username, adminUpdateUser.Password, adminUpdateUser.Email, adminUpdateUser.UserGroup, adminUpdateUser.CompanyName, adminUpdateUser.IsActive)
+	err := database.AdminUpdateUser(adminUpdateUser.Username, adminUpdateUser.Password, adminUpdateUser.Email, adminUpdateUser.UserGroup, adminUpdateUser.OrganisationName, adminUpdateUser.IsActive)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in AdminUpdateUser: ", err)
 		return
@@ -54,11 +57,11 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	utils.ResponseJson(w, http.StatusOK, "Successfully updated user!")
 }
 
-func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUserMgmtJson) (AdminUserMgmtJson, bool) {
+func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUser) (AdminUser, bool) {
 	currentUserData, err := GetCurrentUserData(w, adminUpdateUser.Username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error when getting current user data: ", err)
-		return AdminUserMgmtJson{}, false
+		return AdminUser{}, false
 	}
 
 	// Fill empty password
@@ -77,8 +80,8 @@ func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUserMgmtJson)
 	}
 	
 	// Fill empty company name
-	if adminUpdateUser.CompanyName == "" {
-		adminUpdateUser.CompanyName = currentUserData.CompanyName
+	if adminUpdateUser.OrganisationName == "" {
+		adminUpdateUser.OrganisationName = currentUserData.OrganisationName
 	}
 
 	// Fill empty isActive
@@ -90,18 +93,18 @@ func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUserMgmtJson)
 }
 
 func GetCurrentUserData(w http.ResponseWriter, username string) (handlers.User, error) {
-	var password, email, userGroup, companyName, addedDate, updatedDate sql.NullString
+	var password, email, userGroup, organisationName, addedDate, updatedDate sql.NullString
 	var isActive sql.NullInt16
 	result := database.GetUserByUsername(username)
 
 	var currentUserData handlers.User
 
-	err := result.Scan(&username, &password, &email, &userGroup, &companyName, &isActive, &addedDate, &updatedDate)
+	err := result.Scan(&username, &password, &email, &userGroup, &organisationName, &isActive, &addedDate, &updatedDate)
 	if err != sql.ErrNoRows {
 		currentUserData.Password = password.String
 		currentUserData.Email = email.String
 		currentUserData.UserGroup = userGroup.String
-		currentUserData.CompanyName = companyName.String
+		currentUserData.OrganisationName = organisationName.String
 		currentUserData.IsActive = int(isActive.Int16)
 		currentUserData.AddedDate = addedDate.String
 		currentUserData.UpdatedDate = updatedDate.String

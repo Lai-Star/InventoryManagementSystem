@@ -3,30 +3,21 @@ package handlers_admin
 import (
 	"net/http"
 
-	handlers_user "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user"
+	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
-
-type AdminUserMgmtJson struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	UserGroup string `json:"user_group"`
-	CompanyName string `json:"company_name"`
-	IsActive int `json:"is_active"`
-}
 
 type AdminDeleteUserMgmt struct {
 	Username string `json:"username"`
 }
 
-func UserValidationForm(w http.ResponseWriter, adminUser AdminUserMgmtJson, action string) bool {
+func UserValidationForm(w http.ResponseWriter, adminUser handlers_user_management.AdminUserMgmtJson, action string) bool {
 	username := adminUser.Username
 	password := adminUser.Password
 	email := adminUser.Email
 	userGroup := adminUser.UserGroup
-	companyName := adminUser.CompanyName
+	companyName := adminUser.OrganisationName
 
 	isValidUsername := utils.CheckUsernameFormat(w, username)
 	if (!isValidUsername) {return false}
@@ -78,7 +69,7 @@ func UserValidationForm(w http.ResponseWriter, adminUser AdminUserMgmtJson, acti
 
 func CheckUserGroupAdmin(w http.ResponseWriter, req *http.Request) bool {
 	// CheckUserGroup: IMS User and Operations
-	if !handlers_user.RetrieveIssuer(w, req) {return false}
+	if !handlers_user_management.RetrieveIssuer(w, req) {return false}
 	
 	checkUserGroupIMSUser := utils.CheckUserGroup(w.Header().Get("username"), "Admin")
 	if !checkUserGroupIMSUser {

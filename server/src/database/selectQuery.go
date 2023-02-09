@@ -10,8 +10,8 @@ var (
 	SQL_SELECT_FROM_USERS = "SELECT %s FROM users WHERE %s = $1;"
 	SQL_SELECT_FROM_ORGANISATIONS = "SELECT %s FROM organisations WHERE %s = $1;"
 	SQL_SELECT_FROM_USER_GROUPS = "SELECT %s FROM user_groups WHERE %s = $1;"
-	SQL_SELECT_ALL_FROM_USERS = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM USERS;"
-	SQL_SELECT_ALL_FROM_USERS_BY_USERNAME = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM USERS WHERE username = $1;"
+	SQL_SELECT_ALL_FROM_USERS = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM users;"
+	SQL_SELECT_ALL_FROM_USERS_BY_USERNAME = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM users WHERE username = $1;"
 )
 
 var (

@@ -1,4 +1,4 @@
-package handlers_user
+package handlers_user_management
 
 import (
 	"net/http"
@@ -14,6 +14,15 @@ type SignUpJson struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
+}
+
+type AdminUserMgmtJson struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	UserGroup string `json:"user_group"`
+	OrganisationName string `json:"organisation_name"`
+	IsActive int `json:"is_active"`
 }
 
 func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
@@ -53,55 +62,76 @@ func (user SignUpJson) UserFieldsTrimSpaces() (SignUpJson) {
 	return user
 }
 
-func SignUpFormValidation(w http.ResponseWriter, user SignUpJson) bool {
-	
+// Form Validation: Username
+func UsernameFormValidation(w http.ResponseWriter, username string) bool {
 	// Ensure username is not blank
-	if !utils.CheckMinLength(user.Username, 0) {
+	if !utils.CheckMinLength(username, 0) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username cannot be blank. Please try again.")
 		return false
 	}
 
 	// Ensure username has a length of 5 - 50 characters
-	if !utils.CheckLengthRange(user.Username, 5, 50) {
+	if !utils.CheckLengthRange(username, 5, 50) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username must have a length of 5 - 50 characters. Please try again.")
 		return false
 	}
 
 	// Ensure username does not have special characters (only underscore is allowed)
-	if !CheckUsernameSpecialCharacter(user.Username) {
+	if !CheckUsernameSpecialCharacter(username) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username cannot contain special characters other than underscore (_). Please try again.")
 		return false
 	}
+	return true
+}
 
+// Form Validation: Password
+func PasswordFormValidation(w http.ResponseWriter, password string) bool {
 	// Ensure password is not blank
-	if !utils.CheckMinLength(user.Password, 0) {
+	if !utils.CheckMinLength(password, 0) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Password cannot be blank. Please try again.")
 		return false
 	}
 
 	// Ensure password has a length of 8 - 20 characters 
-	if !utils.CheckLengthRange(user.Password, 8, 20) {
+	if !utils.CheckLengthRange(password, 8, 20) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Password must have a length of 8 - 20 characters. Please try again.")
 		return false
 	}
+	return true
+}
 
+// Form Validation: Email
+func EmailFormValidation(w http.ResponseWriter, email string) bool {
 	// Email cannot be blank
-	if !utils.CheckMinLength(user.Email, 0) {
+	if !utils.CheckMinLength(email, 0) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Email address cannot be blank. Please try again.")
 		return false
 	}
 
 	// Ensure email has a maximum length of 255 characters.
-	if !utils.CheckMaxLength(user.Email, 255) {
+	if !utils.CheckMaxLength(email, 255) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Email address has a maximum length of 255 characters. Please try again.")
 		return false
 	}
 
 	// Ensure email address is in the correct format
-	if !CheckEmailAddressFormat(user.Email) {
+	if !CheckEmailAddressFormat(email) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Email address is not in the correct format. Please try again.")
 		return false
 	}
+	return true
+}
+
+func SignUpFormValidation(w http.ResponseWriter, user SignUpJson) bool {
+
+	// Username form validation
+	if !UsernameFormValidation(w, user.Username) {return false}
+
+	// Password form validation
+	if !PasswordFormValidation(w, user.Username) {return false}
+
+	// Email form validation
+	if !EmailFormValidation(w, user.Username) {return false}
 
 	return true
 }
@@ -116,4 +146,45 @@ func CheckUsernameSpecialCharacter(str string) bool {
 func CheckEmailAddressFormat (email string) bool {
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`)
 	return emailRegex.MatchString(email)
+}
+
+// Trim Spaces for fields in the Admin User Management JSON
+func (user AdminUserMgmtJson) AdminUserMgmtFieldsTrimSpaces() AdminUserMgmtJson {
+	user.Username = strings.TrimSpace(user.Username)
+	user.Password = strings.TrimSpace(user.Password)
+	user.Email = strings.TrimSpace(user.Email)
+	user.OrganisationName = strings.TrimSpace(user.OrganisationName)
+
+	return user
+}
+
+func AdminUserMgmtFormValidation(w http.ResponseWriter, user AdminUserMgmtJson) bool {
+
+	// Username form validation
+	if !UsernameFormValidation(w, user.Username) {return false}
+
+	// Password form validation
+	if !PasswordFormValidation(w, user.Username) {return false}
+
+	// Email form validation
+	if !EmailFormValidation(w, user.Username) {return false}
+
+	// If organisation name is blank, default to 'InvenNexus'
+	if !utils.CheckMinLength(user.OrganisationName, 0) {
+		user.OrganisationName = "InvenNexus"
+	}
+
+	// Ensure organisation name has a maximum length of 255 characters
+	if !utils.CheckMaxLength(user.OrganisationName, 255) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Organisation name has a maximum length of 255 characters. Please try again.")
+		return false
+	}
+
+	// Ensure isActive has values of 0 or 1
+	if user.IsActive != 0 && user.IsActive != 1 {
+		utils.ResponseJson(w, http.StatusBadRequest, "IsActive field can only have values Active or Inactive. Please try again.")
+		return false
+	}
+
+	return true
 }

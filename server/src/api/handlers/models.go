@@ -5,7 +5,7 @@ type User struct {
 	Password string
 	Email string
 	UserGroup string
-	CompanyName string
+	OrganisationName string
 	IsActive int
 	AddedDate string
 	UpdatedDate string

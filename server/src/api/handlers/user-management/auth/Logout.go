@@ -3,11 +3,12 @@ package handlers_user
 import (
 	"net/http"
 
+	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
 func Logout(w http.ResponseWriter, req *http.Request) {
-	RetrieveIssuer(w, req)
+	handlers_user_management.RetrieveIssuer(w, req)
 	// fmt.Println("Retrieved Issuer from Logout", w.Header().Get("username"))
 
 	w.Header().Set("Content-Type", "application/json")

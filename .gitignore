@@ -22,9 +22,6 @@ server/**/.env
 .idea/
 *.iml
 
-# Generated Go files
-*.go
-
 # Generated protobuf files
 *.pb.go
 

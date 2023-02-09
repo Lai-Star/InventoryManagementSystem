@@ -15,11 +15,13 @@ func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
 
 	// Check User Group Admin
 	w.Header().Set("Content-Type", "application/json");
+
+	// Check User Group (Admin)
 	if !CheckUserGroupAdmin(w, req) {return}
 
 	var data []handlers.User
 	// To handle nullable columns in a database table
-	var username, password, email, userGroup, companyName, addedDate, updatedDate sql.NullString
+	var username, password, email, userGroup, organisationName, addedDate, updatedDate sql.NullString
 	var isActive sql.NullInt16
 
 	rows, err := database.GetUsers()
@@ -31,7 +33,7 @@ func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&username, &password, &email, &userGroup, &companyName, &isActive, &addedDate, &updatedDate)
+		err = rows.Scan(&username, &password, &email, &userGroup, &organisationName, &isActive, &addedDate, &updatedDate)
 		if err != nil {
 			utils.InternalServerError(w, "Internal Server Error in Scanning GetUsers: ", err)
 			return
@@ -42,7 +44,7 @@ func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
 			Password: password.String,
 			Email: email.String,
 			UserGroup: userGroup.String,
-			CompanyName: companyName.String,
+			OrganisationName: organisationName.String,
 			IsActive: int(isActive.Int16),
 			AddedDate: addedDate.String,
 			UpdatedDate: updatedDate.String,
