@@ -8,8 +8,6 @@ import (
 
 var (
 	SQL_SELECT_FROM_USERS = "SELECT %s FROM users WHERE %s = $1;"
-	SQL_SELECT_FROM_ORGANISATIONS = "SELECT %s FROM organisations WHERE %s = $1;"
-	SQL_SELECT_FROM_USER_GROUPS = "SELECT %s FROM user_groups WHERE %s = $1;"
 	SQL_SELECT_ALL_FROM_USERS = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM users;"
 	SQL_SELECT_ALL_FROM_USERS_BY_USERNAME = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM users WHERE username = $1;"
 )
@@ -27,28 +25,6 @@ var (
 func GetUsername(username string) bool {
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "username", "username"), username)
 	return row.Scan() != sql.ErrNoRows
-}
-
-func GetOrganisationId(organisationName string) (int, error) {
-	var organisationId int
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "organisation_id", "organisation_name"), organisationName)
-	err := row.Scan(&organisationId)
-	if err != nil {
-		log.Println("Error in scan when getting organisation id from database", err)
-		return 0, err
-	}
-	return organisationId, nil
-}
-
-func GetUserGroupId(userGroup string) (int, error) {
-	var userGroupId int
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USER_GROUPS, "user_group_id", "user_group"), userGroup)
-	err := row.Scan(&userGroupId)
-	if err != nil {
-		log.Println("Error in scan when getting user group id from database", err)
-		return 0, err
-	}
-	return userGroupId, nil
 }
 
 func EmailExists(email string) bool {

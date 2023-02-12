@@ -137,7 +137,7 @@ func ValidateAndInsertSize(w http.ResponseWriter, sizes []Size, productId int32)
 		}
 
 		// Insert Size to sizes table
-		err, sizeId := database.InsertNewSize(size.SizeName, size.SizeQuantity)
+		sizeId, err := database.InsertNewSize(size.SizeName, size.SizeQuantity)
 		if err != nil {
 			utils.InternalServerError(w, "Error in inserting new size to sizes table: ", err)
 			return false, sizes

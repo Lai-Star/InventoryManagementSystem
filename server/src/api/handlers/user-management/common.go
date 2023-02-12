@@ -128,10 +128,10 @@ func SignUpFormValidation(w http.ResponseWriter, user SignUpJson) bool {
 	if !UsernameFormValidation(w, user.Username) {return false}
 
 	// Password form validation
-	if !PasswordFormValidation(w, user.Username) {return false}
+	if !PasswordFormValidation(w, user.Password) {return false}
 
 	// Email form validation
-	if !EmailFormValidation(w, user.Username) {return false}
+	if !EmailFormValidation(w, user.Email) {return false}
 
 	return true
 }
@@ -164,10 +164,10 @@ func AdminUserMgmtFormValidation(w http.ResponseWriter, user AdminUserMgmtJson) 
 	if !UsernameFormValidation(w, user.Username) {return false}
 
 	// Password form validation
-	if !PasswordFormValidation(w, user.Username) {return false}
+	if !PasswordFormValidation(w, user.Password) {return false}
 
 	// Email form validation
-	if !EmailFormValidation(w, user.Username) {return false}
+	if !EmailFormValidation(w, user.Email) {return false}
 
 	// If organisation name is blank, default to 'InvenNexus'
 	if !utils.CheckMinLength(user.OrganisationName, 0) {
