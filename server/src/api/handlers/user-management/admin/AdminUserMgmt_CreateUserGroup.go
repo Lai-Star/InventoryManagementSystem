@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
@@ -27,7 +28,8 @@ func AdminCreateUserGroup(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check User Group Admin
-	// if !CheckUserGroupAdmin(w, req) {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {return}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {return}
 
 	userGroup := newUserGroup.UserGroup
 

@@ -18,12 +18,8 @@ func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// Check User Group (Admin)
-	if !handlers_user_management.RetrieveIssuer(w, req) {
-		return
-	}
-	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {
-		return
-	}
+	if !handlers_user_management.RetrieveIssuer(w, req) {return}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {return}
 
 	var data []handlers.User
 	var users = make(map[int]handlers.User) // A map to store unique user records by UserId
