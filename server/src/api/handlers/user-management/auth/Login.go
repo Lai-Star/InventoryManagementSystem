@@ -38,7 +38,7 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Compare password with hashed password in database
-	dbPassword, _ := database.GetPasswordFromDB(user.Username)
+	dbPassword, _ := database.GetPasswordByUsername(user.Username)
 	isValidPassword := utils.CompareHash(dbPassword, user.Password);
 	if (!isValidPassword) {
 		utils.ResponseJson(w, http.StatusUnauthorized, "You have entered an incorrect username and/or password. Please try again.")
@@ -46,7 +46,7 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check User Status (active/inactive)
-	dbStatus, _ := database.GetActiveStatusFromDB(user.Username)
+	dbStatus, _ := database.GetActiveStatusByUsername(user.Username)
 	if (dbStatus != 1) {
 		utils.ResponseJson(w, http.StatusForbidden, "Your account has been disabled. Please contact the IMS Administrator.")
 		return
@@ -82,7 +82,7 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	utils.ResponseJson(w, http.StatusOK, "Successfully Logged In!");
 
 	// Retrieve user's email to send OTP
-	dbEmail, _ := database.GetEmailFromDB(user.Username)
+	dbEmail, _ := database.GetEmailByUsername(user.Username)
 	go utils.SMTP(user.Username, dbEmail, utils.Generate2FA())
 
 }

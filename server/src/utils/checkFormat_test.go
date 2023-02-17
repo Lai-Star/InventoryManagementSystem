@@ -62,7 +62,7 @@ func Test_CheckSpecialChar(t *testing.T) {
 	}
 
 	for _, e := range specialCharTests {
-		result := CheckSpecialChar(e.str)
+		result := CheckUsernameSpecialChar(e.str)
 		if e.expected && !result {
 			t.Errorf("%s: expected true but got %v", e.testName, result)
 		}

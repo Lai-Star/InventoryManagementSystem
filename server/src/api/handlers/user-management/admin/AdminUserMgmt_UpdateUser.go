@@ -7,17 +7,15 @@ import (
 	"net/http"
 
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers"
-	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
+	handlers_user_mgmt "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-type AdminUser = handlers_user_management.AdminUserMgmtJson
-
 func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json");
-	var adminUpdateUser AdminUser
+	var adminUpdateUser handlers_user_mgmt.AdminUserMgmtJson
 
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);
@@ -48,20 +46,20 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Update accounts table
-	err := database.AdminUpdateUser(adminUpdateUser.Username, adminUpdateUser.Password, adminUpdateUser.Email, adminUpdateUser.UserGroup, adminUpdateUser.OrganisationName, adminUpdateUser.IsActive)
-	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in AdminUpdateUser: ", err)
-		return
-	}
+	// err := database.AdminUpdateUser(adminUpdateUser.Username, adminUpdateUser.Password, adminUpdateUser.Email, adminUpdateUser.UserGroup, adminUpdateUser.OrganisationName, adminUpdateUser.IsActive)
+	// if err != nil {
+	// 	utils.InternalServerError(w, "Internal Server Error in AdminUpdateUser: ", err)
+	// 	return
+	// }
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully updated user!")
 }
 
-func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUser) (AdminUser, bool) {
+func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser handlers_user_mgmt.AdminUserMgmtJson) (handlers_user_mgmt.AdminUserMgmtJson, bool) {
 	currentUserData, err := GetCurrentUserData(w, adminUpdateUser.Username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error when getting current user data: ", err)
-		return AdminUser{}, false
+		return handlers_user_mgmt.AdminUserMgmtJson{}, false
 	}
 
 	// Fill empty password
@@ -75,9 +73,9 @@ func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser AdminUser) (AdminU
 	}
 
 	// Fill empty user group
-	if adminUpdateUser.UserGroup == "" {
-		adminUpdateUser.UserGroup = currentUserData.UserGroup
-	}
+	// if adminUpdateUser.UserGroup == "" {
+	// 	adminUpdateUser.UserGroup = currentUserData.UserGroup
+	// }
 	
 	// Fill empty company name
 	if adminUpdateUser.OrganisationName == "" {

@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -20,7 +21,7 @@ type AdminUserMgmtJson struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
-	UserGroup string `json:"user_group"`
+	UserGroup []string `json:"user_groups"`
 	OrganisationName string `json:"organisation_name"`
 	IsActive int `json:"is_active"`
 }
@@ -95,6 +96,13 @@ func PasswordFormValidation(w http.ResponseWriter, password string) bool {
 	// Ensure password has a length of 8 - 20 characters 
 	if !utils.CheckLengthRange(password, 8, 20) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Password must have a length of 8 - 20 characters. Please try again.")
+		return false
+	}
+
+	// Check if password contains the correct format
+	isValidPasswordCharacters := utils.CheckPasswordSpecialChar(password)
+	if (!isValidPasswordCharacters) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Password must contain at least one lowercase, uppercase, numbers and special character.")
 		return false
 	}
 	return true
@@ -184,6 +192,28 @@ func AdminUserMgmtFormValidation(w http.ResponseWriter, user AdminUserMgmtJson) 
 	if user.IsActive != 0 && user.IsActive != 1 {
 		utils.ResponseJson(w, http.StatusBadRequest, "IsActive field can only have values Active or Inactive. Please try again.")
 		return false
+	}
+
+	return true
+}
+
+func UserGroupFormValidation(w http.ResponseWriter, userGroups []string) bool {
+
+	// iterate over the user groups array
+	for idx, ug := range(userGroups) {
+		// trim user group
+		userGroups[idx] = strings.TrimSpace(ug)
+		
+		// check if user group belongs in the group of user groups
+		count, err := database.GetUserGroupCount(ug)
+		if err != nil {
+			utils.InternalServerError(w, "Internal server error in getting user groups: ", err)
+			return false
+		}
+		if count == 0 {
+			utils.ResponseJson(w, http.StatusNotFound, ug + " does not exist. Please try again.")
+			return false
+		}
 	}
 
 	return true

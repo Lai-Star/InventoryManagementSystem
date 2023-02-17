@@ -29,7 +29,7 @@ func CheckUsernameFormat(w http.ResponseWriter, username string) bool {
 	}
 
 	// Check if username contains special characters (other than underscore _)
-	isValidUsernameCharacters := CheckSpecialChar(username)
+	isValidUsernameCharacters := CheckUsernameSpecialChar(username)
 	if (!isValidUsernameCharacters) {
 		ResponseJson(w, http.StatusBadRequest, "Username cannot contain special characters other than underscore ('_').")
 		return false
@@ -50,6 +50,14 @@ func CheckPasswordFormat(w http.ResponseWriter, password string) bool {
 		ResponseJson(w, http.StatusBadRequest, "Password must have a length between 8 and 20 characters.")
 		return false;
 	}
+
+	// Check if password contains the correct format
+	isValidPasswordCharacters := CheckPasswordSpecialChar(password)
+	if (!isValidPasswordCharacters) {
+		ResponseJson(w, http.StatusBadRequest, "Password must contain at least one lowercase, uppercase, numbers and special character.")
+		return false
+	}
+
 	return true
 }
 

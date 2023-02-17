@@ -32,7 +32,7 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 
 	// Check User Organisation
 	username := w.Header().Get("username")
-	userOrganisation, err := database.GetCompanyNameFromDB(username)
+	userOrganisation, err := database.GetCompanyNameByUsername(username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
 		return

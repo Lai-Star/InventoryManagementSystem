@@ -13,7 +13,7 @@ func CheckUserGroup(username, userGroup string) bool {
 	
 	result := false
 
-	userGroupDB, err := database.GetUserGroupFromDB(username)
+	userGroupDB, err := database.GetUserGroupByUsername(username)
 
 	user_groups = strings.Split(userGroupDB, ",")
 

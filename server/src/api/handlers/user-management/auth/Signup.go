@@ -44,7 +44,7 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if email already exists in database (duplicates not allowed)
-	isDuplicatedEmail := database.EmailExists(newUser.Email)
+	isDuplicatedEmail := database.GetEmail(newUser.Email)
 	if (isDuplicatedEmail) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Email address has already been taken. Please try again.")
 		return

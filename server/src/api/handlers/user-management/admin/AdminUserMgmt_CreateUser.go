@@ -2,6 +2,7 @@ package handlers_admin
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -33,11 +34,41 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 
 	hashedPassword := utils.GenerateHash(adminNewUser.Password)
 
-	err := database.AdminInsertNewUser(adminNewUser.Username, hashedPassword, adminNewUser.Email, adminNewUser.UserGroup, adminNewUser.OrganisationName, adminNewUser.IsActive)
-	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in AdminInsertNewUser: ", err)
+	// Check if username already exists in database (duplicates not allowed)
+	isExistingUsername := database.GetUsername(adminNewUser.Username)
+	if (isExistingUsername) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Username has already been taken. Please try again.")
 		return
 	}
+
+	// Check if email already exists in database (duplicates not allowed)
+	isExistingEmail := database.GetEmail(adminNewUser.Email)
+	if (isExistingEmail) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Email address has already been taken. Please try again.")
+		return
+	}
+
+	// Check if organisation already exists in database
+	isExistingOrganisation := database.GetOrganisationName(adminNewUser.OrganisationName)
+	if !isExistingOrganisation {
+		utils.ResponseJson(w, http.StatusNotFound, "Organisation name cannot be found. Please try again.")
+		return
+	}
+
+	// Check if user group is valid and trim user group
+	isValidUserGroup := handlers_user_management.UserGroupFormValidation(w, adminNewUser.UserGroup)
+	if !isValidUserGroup {return}
+
+	// Insert users table
+	fmt.Println(hashedPassword) // Insert hashed password
+	// Insert user_organisation_mapping table
+	// Insert user_group_mapping table
+
+	// err := database.AdminInsertNewUser(adminNewUser.Username, hashedPassword, adminNewUser.Email, adminNewUser.UserGroup, adminNewUser.OrganisationName, adminNewUser.IsActive)
+	// if err != nil {
+	// 	utils.InternalServerError(w, "Internal Server Error in AdminInsertNewUser: ", err)
+	// 	return
+	// }
 
 	utils.ResponseJson(w, http.StatusOK, "Admin Successfully Created User!");
 }

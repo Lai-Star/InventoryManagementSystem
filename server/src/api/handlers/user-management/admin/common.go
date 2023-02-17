@@ -3,20 +3,21 @@ package handlers_admin
 import (
 	"net/http"
 
-	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
+	handlers_user_mgmt "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
+
 
 type AdminDeleteUserMgmt struct {
 	Username string `json:"username"`
 }
 
-func UserValidationForm(w http.ResponseWriter, adminUser handlers_user_management.AdminUserMgmtJson, action string) bool {
+func UserValidationForm(w http.ResponseWriter, adminUser handlers_user_mgmt.AdminUserMgmtJson, action string) bool {
 	username := adminUser.Username
 	password := adminUser.Password
 	email := adminUser.Email
-	userGroup := adminUser.UserGroup
+	// userGroup := adminUser.UserGroup
 	companyName := adminUser.OrganisationName
 
 	isValidUsername := utils.CheckUsernameFormat(w, username)
@@ -44,9 +45,9 @@ func UserValidationForm(w http.ResponseWriter, adminUser handlers_user_managemen
 	if (!isValidEmail) {return false}
 
 	// Check if email already exists in database 
-	isEmailExists := database.EmailExists(email)
+	isEmailExists := database.GetEmail(email)
 	if action == "UPDATE" {
-		userEmail, _ := database.GetEmailFromDB(username)
+		userEmail, _ := database.GetEmailByUsername(username)
 		if isEmailExists && userEmail != email {
 			utils.ResponseJson(w, http.StatusBadRequest, "Email address already exists. Please try again.")
 			return false
@@ -57,8 +58,8 @@ func UserValidationForm(w http.ResponseWriter, adminUser handlers_user_managemen
 	} 
 
 	// Check if user group belongs to the following (Admin, IMS User, Operations, Financial Analyst)
-	isValidUserGroup := utils.CheckUserGroupFormat(w, userGroup)
-	if (!isValidUserGroup) {return false}
+	// isValidUserGroup := utils.CheckUserGroupFormat(w, userGroup)
+	// if (!isValidUserGroup) {return false}
 	
 	// Check if company name is between 5 and 250 characters and if blank company name provided (default to IMS)
 	isValidCompanyName := utils.CheckCompanyNameFormat(w, companyName)
@@ -69,7 +70,7 @@ func UserValidationForm(w http.ResponseWriter, adminUser handlers_user_managemen
 
 func CheckUserGroupAdmin(w http.ResponseWriter, req *http.Request) bool {
 	// CheckUserGroup: IMS User and Operations
-	if !handlers_user_management.RetrieveIssuer(w, req) {return false}
+	if !handlers_user_mgmt.RetrieveIssuer(w, req) {return false}
 	
 	checkUserGroupIMSUser := utils.CheckUserGroup(w.Header().Get("username"), "Admin")
 	if !checkUserGroupIMSUser {
