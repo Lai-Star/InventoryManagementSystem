@@ -49,14 +49,6 @@ func InsertIntoUserGroupMapping(userId int, userGroup string) error {
 	return err
 }
 
-func AdminInsertNewUser(username, password, email, user_group, company_name string, isActive int) error {
-	_, err := db.Exec(SQL_INSERT_INTO_USERS, username, password, email, user_group, company_name, isActive)
-	if err != nil {
-		log.Println("Error admin inserting new user to database: ", err)
-	}
-	return err
-}
-
 func InsertNewProduct(product_name, product_description, product_sku, product_colour, product_category, product_brand string, product_cost float32) (int32, error) {
 	var productId int32
 	err := db.QueryRow(SQL_INSERT_INTO_PRODUCTS, product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost).Scan(&productId)

@@ -2,7 +2,6 @@ package handlers_admin
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -60,15 +59,27 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	if !isValidUserGroup {return}
 
 	// Insert users table
-	fmt.Println(hashedPassword) // Insert hashed password
+	userId, err := database.InsertNewUser(adminNewUser.Username, hashedPassword, adminNewUser.Email, adminNewUser.IsActive)
+	if err != nil {
+		utils.InternalServerError(w, "Error inserting new user via admin route: ", err)
+		return
+	}
+	
 	// Insert user_organisation_mapping table
-	// Insert user_group_mapping table
+	err = database.InsertIntoUserOrganisationMapping(userId, adminNewUser.OrganisationName)
+	if err != nil {
+		utils.InternalServerError(w, "Error inserting into user_organisation_mapping table: ", err)
+		return
+	}
 
-	// err := database.AdminInsertNewUser(adminNewUser.Username, hashedPassword, adminNewUser.Email, adminNewUser.UserGroup, adminNewUser.OrganisationName, adminNewUser.IsActive)
-	// if err != nil {
-	// 	utils.InternalServerError(w, "Internal Server Error in AdminInsertNewUser: ", err)
-	// 	return
-	// }
+	// Insert multiple user groups to user_group_mapping table
+	for _, ug := range(adminNewUser.UserGroup) {
+		err = database.InsertIntoUserGroupMapping(userId, ug)
+		if err != nil {
+			utils.InternalServerError(w, "Error inserting into user_group_mapping table: ", err)
+			return
+		}
+	}
 
 	utils.ResponseJson(w, http.StatusOK, "Admin Successfully Created User!");
 }
