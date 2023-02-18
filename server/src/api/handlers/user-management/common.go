@@ -26,6 +26,10 @@ type AdminUserMgmtJson struct {
 	IsActive int `json:"is_active"`
 }
 
+type AdminCreateUserGroupJson struct {
+	UserGroup []string `json:"user_group"`
+}
+
 func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
 
 	w.Header().Set("Content-Type", "application/json");
@@ -78,7 +82,7 @@ func UsernameFormValidation(w http.ResponseWriter, username string) bool {
 	}
 
 	// Ensure username does not have special characters (only underscore is allowed)
-	if !CheckUsernameSpecialCharacter(username) {
+	if !utils.CheckUsernameSpecialChar(username) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username cannot contain special characters other than underscore (_). Please try again.")
 		return false
 	}
@@ -130,6 +134,26 @@ func EmailFormValidation(w http.ResponseWriter, email string) bool {
 	return true
 }
 
+// Form Validation: Organisation
+func OrganisationFormValidation(w http.ResponseWriter, organisationName, action string) bool {
+	// If organisation name is blank, default to 'InvenNexus'
+	if !utils.CheckMinLength(organisationName, 0) {
+		if action == "CREATE_USER" {
+			organisationName = "InvenNexus"
+		} else if action == "CREATE_ORGANISATION" {
+			utils.ResponseJson(w, http.StatusBadRequest, "Please provide an organisation name.")
+			return false
+		}
+	}
+
+	// Ensure organisation name has a maximum length of 255 characters
+	if !utils.CheckMaxLength(organisationName, 255) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Organisation name has a maximum length of 255 characters. Please try again.")
+		return false
+	}
+	return true
+}
+
 func SignUpFormValidation(w http.ResponseWriter, user SignUpJson) bool {
 
 	// Username form validation
@@ -142,12 +166,6 @@ func SignUpFormValidation(w http.ResponseWriter, user SignUpJson) bool {
 	if !EmailFormValidation(w, user.Email) {return false}
 
 	return true
-}
-
-// Returns true if string does not contain special characters (underscore is allowed)
-func CheckUsernameSpecialCharacter(str string) bool {
-	specialCharRegex := regexp.MustCompile(`^[a-zA-Z0-9_]*$`)
-	return specialCharRegex.MatchString(str)
 }
 
 // Returns true if email address is in the correct format
@@ -177,16 +195,8 @@ func AdminUserMgmtFormValidation(w http.ResponseWriter, user AdminUserMgmtJson) 
 	// Email form validation
 	if !EmailFormValidation(w, user.Email) {return false}
 
-	// If organisation name is blank, default to 'InvenNexus'
-	if !utils.CheckMinLength(user.OrganisationName, 0) {
-		user.OrganisationName = "InvenNexus"
-	}
-
-	// Ensure organisation name has a maximum length of 255 characters
-	if !utils.CheckMaxLength(user.OrganisationName, 255) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Organisation name has a maximum length of 255 characters. Please try again.")
-		return false
-	}
+	// Organisation form validation
+	if !OrganisationFormValidation(w, user.OrganisationName, "CREATE_USER") {return false}
 
 	// Ensure isActive has values of 0 or 1
 	if user.IsActive != 0 && user.IsActive != 1 {

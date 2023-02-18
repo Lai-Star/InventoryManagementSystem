@@ -38,7 +38,11 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Compare password with hashed password in database
-	dbPassword, _ := database.GetPasswordByUsername(user.Username)
+	dbPassword, err := database.GetPasswordByUsername(user.Username)
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in getting password in login route: ", err)
+		return
+	}
 	isValidPassword := utils.CompareHash(dbPassword, user.Password);
 	if (!isValidPassword) {
 		utils.ResponseJson(w, http.StatusUnauthorized, "You have entered an incorrect username and/or password. Please try again.")
@@ -46,7 +50,11 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check User Status (active/inactive)
-	dbStatus, _ := database.GetActiveStatusByUsername(user.Username)
+	dbStatus, err := database.GetActiveStatusByUsername(user.Username)
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in getting active status in login route: ", err)
+		return
+	}
 	if (dbStatus != 1) {
 		utils.ResponseJson(w, http.StatusForbidden, "Your account has been disabled. Please contact the IMS Administrator.")
 		return

@@ -15,6 +15,7 @@ var (
 							"SELECT $1, user_group_id " + 
 							"FROM user_groups " + 
 							"WHERE user_group = $2;"
+	SQL_INSERT_INTO_ORGANISATIONS = "INSERT INTO organisations (organisation_name, added_date, updated_date) VALUES ($1, now(), now());"
 )
 
 var (
@@ -46,6 +47,11 @@ func InsertIntoUserGroupMapping(userId int, userGroup string) error {
 	if err != nil {
 		log.Println("Error inserting into user_group_mapping table: ", err)
 	}
+	return err
+}
+
+func InsertIntoOrganisations(organisationName string) error {
+	_, err := db.Exec(SQL_INSERT_INTO_ORGANISATIONS, organisationName)
 	return err
 }
 

@@ -27,6 +27,8 @@ func Routes() http.Handler {
 	mux.Get("/admin-get-users", handlers_admin.AdminGetUsers)
 	mux.Patch("/admin-update-user", handlers_admin.AdminUpdateUser)
 	mux.Delete("/admin-delete-user", handlers_admin.AdminDeleteUser)
+	mux.Post("/admin-create-user-group", handlers_admin.AdminCreateUserGroup)
+	mux.Post("/admin-create-organisation", handlers_admin.AdminCreateOrganisation)
 
 	// Product Routes
 	mux.Post("/create-product", handlers_products.CreateProduct)

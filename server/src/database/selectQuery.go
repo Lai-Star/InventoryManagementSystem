@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"log"
 )
 
 var (
@@ -43,39 +42,27 @@ func GetPasswordByUsername(username string) (string, error) {
 	var password string
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "password", "username"), username)
 	err := row.Scan(&password)
-	if err != nil {
-		log.Println("Error scanning when getting password from database: ", err)
-	}
-	return password, nil
+	return password, err
 }
 
 func GetEmailByUsername(username string) (string, error) {
     var email string
     row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "email", "username"), username)
     err := row.Scan(&email)
-    if err != nil {
-		log.Println("Error scanning when getting email from database: ", err)
-	}
-    return email, nil
+    return email, err
 }
 
 func GetActiveStatusByUsername(username string) (int, error) {
 	var isActive int
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "is_active", "username"), username)
 	err := row.Scan(&isActive)
-	if err != nil {
-		log.Println("Error scanning when getting isActive status from database: ", err)
-	}
-	return isActive, nil
+	return isActive, err
 }
 
 func GetCompanyNameByUsername(username string) (string, error) {
 	var companyName string
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "company_name", "username"), username)
 	err := row.Scan(&companyName)
-	if err != nil {
-		log.Println("Error scanning when getting companyName from database: ", err)
-	}
 	return companyName, err
 }
 
@@ -83,21 +70,21 @@ func GetUserGroupByUsername(username string) (string, error) {
 	var userGroup string
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "user_group", "username"), username)
 	err := row.Scan(&userGroup)
-	if err != nil {
-		log.Println("Error scanning when getting user group from database: ", err)
-	}
-	return userGroup, nil
+	return userGroup, err
 }
 
 func GetUserGroupCount(usergroup string) (int, error) {
 	var count int
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERGROUPS, "user_group"), usergroup)
 	err := row.Scan(&count)
-	if err != nil {
-		log.Println("Error scanning when getting user group count from database: ", err)
-		return 0, err
-	}
-	return count, nil
+	return count, err
+}
+
+func GetOrganisationNameCount(organisationName string) (int, error) {
+	var count int
+	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "COUNT(*)", "organisation_name"), organisationName)
+	err := row.Scan(&count)
+	return count, err
 }
 
 func GetUsers() (*sql.Rows, error) {

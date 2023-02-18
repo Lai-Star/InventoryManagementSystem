@@ -1,5 +1,7 @@
 package handlers_admin
 
-func AdminCreateUserGroup() {
+import "net/http"
+
+func AdminCreateUserGroup(w http.ResponseWriter, req *http.Request) {
 	
 }
