@@ -213,6 +213,12 @@ func UserGroupFormValidation(w http.ResponseWriter, userGroups []string) bool {
 	for idx, ug := range(userGroups) {
 		// trim user group
 		userGroups[idx] = strings.TrimSpace(ug)
+
+		// Check if user group has a length of more than 255 characters
+		if len(ug) > 255 {
+			utils.ResponseJson(w, http.StatusBadRequest, "User Group cannot have a length of more than 255 characters. Please try again.")
+			return false
+		}
 		
 		// check if user group belongs in the group of user groups
 		count, err := database.GetUserGroupCount(ug)

@@ -27,7 +27,7 @@ func AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check User Group Admin
-	// if !CheckUserGroupAdmin(w, req) {return}
+	if !CheckUserGroupAdmin(w, req) {return}
 
 	organisationName := organisation.OrganisationName
 
