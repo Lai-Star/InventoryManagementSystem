@@ -17,7 +17,7 @@ func AdminGetUsers(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json");
 
 	// Check User Group (Admin)
-	if !CheckUserGroupAdmin(w, req) {return}
+	if !utils.CheckUserGroup(w, w.Header().Get("Username"), "Admin") {return}
 
 	var data []handlers.User
 	// To handle nullable columns in a database table

@@ -1,31 +1,35 @@
 package utils
 
 import (
-	"database/sql"
-	"strings"
+	"net/http"
 
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 )
 
 // Determines if a user has been assigned that usergroup
-func CheckUserGroup(username, userGroup string) bool {
-	var user_groups []string
-	
-	result := false
+func CheckUserGroup(w http.ResponseWriter, username string, userGroups ...string) bool {
 
-	userGroupDB, err := database.GetUserGroupByUsername(username)
+	rows, err := database.GetUserGroupsByUsername(username)
 
-	user_groups = strings.Split(userGroupDB, ",")
+	if err != nil {
+		InternalServerError(w, "Internal server error in check user group: ", err)
+		return false
+	}
 
-	if err == sql.ErrNoRows {
-		result = false
-	} else if err == nil {
-		if Contains(user_groups, userGroup) {
-			result = true
-		} else {
-			result = false
+	var userGroup string
+
+	for rows.Next() {
+		err = rows.Scan(&userGroup)
+		if err != nil {
+			InternalServerError(w, "Internal server error in scanning user groups in check user group function: ", err)
+			return false
+		}
+
+		if Contains(userGroups, userGroup) {
+			return true
 		}
 	}
 
-	return result
+	ResponseJson(w, http.StatusForbidden, "Access Denied: You do not have permission to access this resource.")
+	return false
 }

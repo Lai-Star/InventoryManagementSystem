@@ -36,8 +36,8 @@ type DeleteProductJson struct {
 func CheckProductsUserGroup(w http.ResponseWriter, req *http.Request) bool {
 	// CheckUserGroup: IMS User and Operations
 	if !handlers_user.RetrieveIssuer(w, req) {return false}
-	checkUserGroupIMSUser := utils.CheckUserGroup(w.Header().Get("username"), "IMS User")
-	checkUserGroupOperations := utils.CheckUserGroup(w.Header().Get("username"), "Operations")
+	checkUserGroupIMSUser := utils.CheckUserGroup(w, w.Header().Get("username"), "IMS User")
+	checkUserGroupOperations := utils.CheckUserGroup(w, w.Header().Get("username"), "Operations")
 	if !checkUserGroupIMSUser || !checkUserGroupOperations {
 		utils.ResponseJson(w, http.StatusForbidden, "Access Denied: You do not have permission to access this resource.")
 		return false

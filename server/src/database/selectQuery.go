@@ -11,6 +11,10 @@ var (
 	SQL_SELECT_ALL_FROM_USERS_BY_USERNAME = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM users WHERE username = $1;"
 	SQL_SELECT_FROM_ORGANISATIONS = "SELECT %s FROM organisations WHERE %s = $1;"
 	SQL_SELECT_FROM_USERGROUPS = "SELECT COUNT(*) FROM user_groups WHERE %s = $1;"
+	SQL_SELECT_USERGROUPS_BY_USERNAME = `SELECT ug.user_group FROM user_groups ug
+										 LEFT JOIN user_group_mapping ugm 
+										 ON ugm.user_group_id = ug.user_group_id 
+										 WHERE ugm.user_id = (SELECT user_id FROM users WHERE username = $1);`
 )
 
 var (
@@ -66,12 +70,17 @@ func GetCompanyNameByUsername(username string) (string, error) {
 	return companyName, err
 }
 
-func GetUserGroupByUsername(username string) (string, error) {
-	var userGroup string
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "user_group", "username"), username)
-	err := row.Scan(&userGroup)
-	return userGroup, err
+func GetUserGroupsByUsername(username string) (*sql.Rows, error) {
+	rows, err := db.Query(SQL_SELECT_USERGROUPS_BY_USERNAME, username)
+	return rows, err
 }
+
+// func GetUserGroupByUsername(username string) (string, error) {
+// 	var userGroup string
+// 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "user_group", "username"), username)
+// 	err := row.Scan(&userGroup)
+// 	return userGroup, err
+// }
 
 func GetUserGroupCount(usergroup string) (int, error) {
 	var count int

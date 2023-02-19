@@ -22,7 +22,7 @@ func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check User Group Admin
-	if !CheckUserGroupAdmin(w, req) {return}
+	if !utils.CheckUserGroup(w, w.Header().Get("Username"), "Admin") {return}
 
 	username := adminDeleteUser.Username
 

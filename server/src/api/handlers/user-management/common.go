@@ -36,7 +36,7 @@ func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
 
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in retrieving cookie: ", err);
+		utils.ResponseJson(w, http.StatusUnauthorized, "Access Denied: You are unauthorized.");
 		return false;
 	}
 

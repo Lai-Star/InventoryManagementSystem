@@ -27,7 +27,8 @@ func AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check User Group Admin
-	if !CheckUserGroupAdmin(w, req) {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {return}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {return}
 
 	organisationName := organisation.OrganisationName
 
