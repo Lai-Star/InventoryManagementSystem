@@ -5,9 +5,14 @@ import (
 	"io"
 	"net/http"
 
+	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
+
+type AdminDeleteUserMgmt struct {
+	Username string `json:"username"`
+}
 
 func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
@@ -22,20 +27,21 @@ func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check User Group Admin
+	if !handlers_user_management.RetrieveIssuer(w, req) {return}
 	if !utils.CheckUserGroup(w, w.Header().Get("Username"), "Admin") {return}
 
 	username := adminDeleteUser.Username
 
 	// Check username format
-	if !utils.CheckUsernameFormat(w, username) {return}
+	if !handlers_user_management.UsernameFormValidation(w, username) {return}
 
-	// Check if username exists in the database
+	// // Check if username exists in the database
 	if !database.GetUsername(username) {
-		utils.ResponseJson(w, http.StatusNotFound, "Username does not exist in database. Please try again.")
+		utils.ResponseJson(w, http.StatusNotFound, "Username does not exist. Please try again.")
 		return
 	}
 
-	err := database.DeleteUserFromAccounts(username)
+	err := database.DeleteUserFromUsers(username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in deleting user from accounts table: ", err)
 		return
