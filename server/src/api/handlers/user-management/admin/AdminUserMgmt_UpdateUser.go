@@ -2,6 +2,7 @@ package handlers_admin
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -21,19 +22,23 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 		utils.InternalServerError(w, "Internal Server Error in Unmarshal JSON body in AdminUpdateUser: ", err)
 		return;
 	}
-
+	
 	// Check User Group Admin
 	// if !CheckUserGroupAdmin(w, req) {return}
+
+	// Trim whitespaces (username, password, email, organisation_name)
+	adminUpdateUser = adminUpdateUser.AdminUserMgmtFieldsTrimSpaces()
 	
-	// Check if username field is empty
+	// Check if username field is empty (mandatory field to update user, others can be empty)
 	if len(adminUpdateUser.Username) == 0 {
 		utils.ResponseJson(w, http.StatusBadRequest, "Please enter a username.")
 		return
 	}
 
 	// Check if username exists in database
-	if !database.GetUsername(adminUpdateUser.Username) {
-		utils.ResponseJson(w, http.StatusNotFound, "Username does not exist. Please try again.")
+	isExistingUsername := database.GetUsername(adminUpdateUser.Username)
+	if (!isExistingUsername) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Username does not exist. Please try again.")
 		return
 	}
 
@@ -56,20 +61,46 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if organisation name exists
+	isExistingOrganisation := database.GetOrganisationName(adminUpdateUser.OrganisationName)
+	if !isExistingOrganisation && len(adminUpdateUser.OrganisationName) > 0 {
+		utils.ResponseJson(w, http.StatusNotFound, "Organisation name cannot be found. Please try again.")
+		return
+	}
 
 	// Perform user group validation and check if user group exists
-
+	isValidUserGroup := handlers_user_mgmt.UserGroupFormValidation(w, adminUpdateUser.UserGroup)
+	if !isValidUserGroup {return}
 	
 	// Only generate hash if password is not empty
-	// if adminUpdateUser.Password != "" && !(len(adminUpdateUser.Password) > 20) {
-	// 	adminUpdateUser.Password = utils.GenerateHash(adminUpdateUser.Password)
-	// }
+	if len(adminUpdateUser.Password) > 0 {
+		adminUpdateUser.Password = utils.GenerateHash(adminUpdateUser.Password)
+	}
 
 	// Update users table (get user_id)
+	userId, err := database.UpdateUsers(adminUpdateUser.Username, adminUpdateUser.Password, adminUpdateUser.Email, adminUpdateUser.IsActive)
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in admin update users table: ", err)
+		return
+	}
 
 	// Update user_organisation_mapping table
+	if len(adminUpdateUser.OrganisationName) > 0 {
+		err = database.UpdateUserOrganisationMapping(userId, adminUpdateUser.OrganisationName)
+		if err != nil {
+			utils.InternalServerError(w, "Internal server error in admin update user_organisation_mapping table: ", err)
+			return
+		}
+	}
 
 	// Update user_group_mapping table
+	if len(adminUpdateUser.UserGroup) > 0 {
+		fmt.Println(adminUpdateUser.UserGroup)
+		err = database.UpdateUserGroupMapping(userId, adminUpdateUser.UserGroup)
+		if err != nil {
+			utils.InternalServerError(w, "Internal server error in admin update user_group_mapping table: ", err)
+			return
+		}
+	}
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully updated user!")
 }

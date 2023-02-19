@@ -2,7 +2,6 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -32,7 +31,6 @@ func ResponseJson(w http.ResponseWriter, Code int, Message string) {
 }
 
 func InternalServerError(w http.ResponseWriter, message string, err error) {
-	fmt.Println("Hit here")
 	log.Println(message, err)
 	ResponseJson(w, http.StatusInternalServerError, "An Internal Server Error Occurred.");
 }

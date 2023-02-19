@@ -47,7 +47,7 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Check if organisation already exists in database
+	// Check if organisation exists in database
 	isExistingOrganisation := database.GetOrganisationName(adminNewUser.OrganisationName)
 	if !isExistingOrganisation {
 		utils.ResponseJson(w, http.StatusNotFound, "Organisation name cannot be found. Please try again.")
