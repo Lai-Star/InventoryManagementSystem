@@ -67,7 +67,6 @@ func UserValidationForm(w http.ResponseWriter, adminUser handlers_user_mgmt.Admi
 
 	return true
 }
-
 func CheckUserGroupAdmin(w http.ResponseWriter, req *http.Request) bool {
 	// CheckUserGroup: IMS User and Operations
 	if !handlers_user_mgmt.RetrieveIssuer(w, req) {return false}

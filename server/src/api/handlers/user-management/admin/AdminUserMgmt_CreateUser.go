@@ -29,7 +29,7 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	adminNewUser = adminNewUser.AdminUserMgmtFieldsTrimSpaces()
 
 	// Validate form inputs
-	if !handlers_user_management.AdminUserMgmtFormValidation(w, adminNewUser) {return}
+	if !handlers_user_management.AdminUserMgmtFormValidation(w, adminNewUser, "CREATE_USER") {return}
 
 	hashedPassword := utils.GenerateHash(adminNewUser.Password)
 

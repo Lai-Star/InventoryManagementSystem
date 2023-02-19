@@ -1,12 +1,10 @@
 package handlers_admin
 
 import (
-	"database/sql"
 	"encoding/json"
 	"io"
 	"net/http"
 
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers"
 	handlers_user_mgmt "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
@@ -25,91 +23,53 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check User Group Admin
-	if !CheckUserGroupAdmin(w, req) {return}
-
-	// Check if username exists in database
-	if !database.GetUsername(adminUpdateUser.Username) {
-		utils.ResponseJson(w, http.StatusNotFound, "User does not exist in database. Please try again.")
+	// if !CheckUserGroupAdmin(w, req) {return}
+	
+	// Check if username field is empty
+	if len(adminUpdateUser.Username) == 0 {
+		utils.ResponseJson(w, http.StatusBadRequest, "Please enter a username.")
 		return
 	}
 
-	// Update user with current user data (if none provided)
-	adminUpdateUser, result := UpdateCurrentData(w, adminUpdateUser)
-	if !result {return}
+	// Check if username exists in database
+	if !database.GetUsername(adminUpdateUser.Username) {
+		utils.ResponseJson(w, http.StatusNotFound, "Username does not exist. Please try again.")
+		return
+	}
 
-	// Validate form inputs
-	if !UserValidationForm(w, adminUpdateUser, "UPDATE") {return}
+	// Admin User Form Validation
+	isValidAdminUserForm := handlers_user_mgmt.AdminUserMgmtFormValidation(w, adminUpdateUser, "UPDATE_USER")
+	if !isValidAdminUserForm {return}
+
+	// Check if email exists
+	isExistingEmail := database.GetEmail(adminUpdateUser.Email)
+	userCurrentEmail, err := database.GetEmailByUsername(adminUpdateUser.Username)
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in getting email by username: ", err)
+		return
+	}
+	if isExistingEmail {
+		if userCurrentEmail != adminUpdateUser.Email {
+			utils.ResponseJson(w, http.StatusBadRequest, adminUpdateUser.Email + " already exists. Please try again.")
+			return
+		}
+	}
+
+	// Check if organisation name exists
+
+	// Perform user group validation and check if user group exists
+
 	
 	// Only generate hash if password is not empty
-	if adminUpdateUser.Password != "" && !(len(adminUpdateUser.Password) > 20) {
-		adminUpdateUser.Password = utils.GenerateHash(adminUpdateUser.Password)
-	}
-
-	// Update accounts table
-	// err := database.AdminUpdateUser(adminUpdateUser.Username, adminUpdateUser.Password, adminUpdateUser.Email, adminUpdateUser.UserGroup, adminUpdateUser.OrganisationName, adminUpdateUser.IsActive)
-	// if err != nil {
-	// 	utils.InternalServerError(w, "Internal Server Error in AdminUpdateUser: ", err)
-	// 	return
+	// if adminUpdateUser.Password != "" && !(len(adminUpdateUser.Password) > 20) {
+	// 	adminUpdateUser.Password = utils.GenerateHash(adminUpdateUser.Password)
 	// }
+
+	// Update users table (get user_id)
+
+	// Update user_organisation_mapping table
+
+	// Update user_group_mapping table
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully updated user!")
-}
-
-func UpdateCurrentData(w http.ResponseWriter, adminUpdateUser handlers_user_mgmt.AdminUserMgmtJson) (handlers_user_mgmt.AdminUserMgmtJson, bool) {
-	currentUserData, err := GetCurrentUserData(w, adminUpdateUser.Username)
-	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error when getting current user data: ", err)
-		return handlers_user_mgmt.AdminUserMgmtJson{}, false
-	}
-
-	// Fill empty password
-	if adminUpdateUser.Password == "" {
-		adminUpdateUser.Password = currentUserData.Password
-	}
-
-	// Fill empty email
-	if adminUpdateUser.Email == "" {
-		adminUpdateUser.Email = currentUserData.Email
-	}
-
-	// Fill empty user group
-	// if adminUpdateUser.UserGroup == "" {
-	// 	adminUpdateUser.UserGroup = currentUserData.UserGroup
-	// }
-	
-	// Fill empty company name
-	if adminUpdateUser.OrganisationName == "" {
-		adminUpdateUser.OrganisationName = currentUserData.OrganisationName
-	}
-
-	// Fill empty isActive
-	if adminUpdateUser.IsActive == -1 {
-		adminUpdateUser.IsActive = currentUserData.IsActive
-	}
-
-	return adminUpdateUser, true
-}
-
-func GetCurrentUserData(w http.ResponseWriter, username string) (handlers.User, error) {
-	var password, email, userGroup, organisationName, addedDate, updatedDate sql.NullString
-	var isActive sql.NullInt16
-	result := database.GetUserByUsername(username)
-
-	var currentUserData handlers.User
-
-	err := result.Scan(&username, &password, &email, &userGroup, &organisationName, &isActive, &addedDate, &updatedDate)
-	if err != sql.ErrNoRows {
-		currentUserData.Password = password.String
-		currentUserData.Email = email.String
-		currentUserData.UserGroup = userGroup.String
-		currentUserData.OrganisationName = organisationName.String
-		currentUserData.IsActive = int(isActive.Int16)
-		currentUserData.AddedDate = addedDate.String
-		currentUserData.UpdatedDate = updatedDate.String
-	} else {
-		utils.InternalServerError(w, "Internal Server Error at getCurrentUserData: ", err)
-		return handlers.User{}, err
-	}
-
-	return currentUserData, nil
 }

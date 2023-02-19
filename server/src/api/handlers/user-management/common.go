@@ -90,67 +90,81 @@ func UsernameFormValidation(w http.ResponseWriter, username string) bool {
 }
 
 // Form Validation: Password
-func PasswordFormValidation(w http.ResponseWriter, password string) bool {
+func PasswordFormValidation(w http.ResponseWriter, password, action string) bool {
 	// Ensure password is not blank
-	if !utils.CheckMinLength(password, 0) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Password cannot be blank. Please try again.")
-		return false
+	if action == "CREATE_USER" {
+		if !utils.CheckMinLength(password, 0) {
+			utils.ResponseJson(w, http.StatusBadRequest, "Password cannot be blank. Please try again.")
+			return false
+		}
 	}
 
-	// Ensure password has a length of 8 - 20 characters 
-	if !utils.CheckLengthRange(password, 8, 20) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Password must have a length of 8 - 20 characters. Please try again.")
-		return false
+	if action == "CREATE_USER" || (action == "UPDATE_USER" && len(password) > 0) {
+		// Ensure password has a length of 8 - 20 characters
+		if !utils.CheckLengthRange(password, 8, 20) {
+			utils.ResponseJson(w, http.StatusBadRequest, "Password must have a length of 8 - 20 characters. Please try again.")
+			return false
+		}
+	
+		// Check if password contains the correct format
+		isValidPasswordCharacters := utils.CheckPasswordSpecialChar(password)
+		if (!isValidPasswordCharacters) {
+			utils.ResponseJson(w, http.StatusBadRequest, "Password must contain at least one lowercase, uppercase, numbers and special character.")
+			return false
+		}
 	}
 
-	// Check if password contains the correct format
-	isValidPasswordCharacters := utils.CheckPasswordSpecialChar(password)
-	if (!isValidPasswordCharacters) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Password must contain at least one lowercase, uppercase, numbers and special character.")
-		return false
-	}
 	return true
 }
 
 // Form Validation: Email
-func EmailFormValidation(w http.ResponseWriter, email string) bool {
+func EmailFormValidation(w http.ResponseWriter, email, action string) bool {
 	// Email cannot be blank
-	if !utils.CheckMinLength(email, 0) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Email address cannot be blank. Please try again.")
-		return false
+	if action == "CREATE_USER" {
+		if !utils.CheckMinLength(email, 0) {
+			utils.ResponseJson(w, http.StatusBadRequest, "Email address cannot be blank. Please try again.")
+			return false
+		}
 	}
 
-	// Ensure email has a maximum length of 255 characters.
-	if !utils.CheckMaxLength(email, 255) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Email address has a maximum length of 255 characters. Please try again.")
-		return false
+	if action == "CREATE_USER" || (action == "UPDATE_USER" && len(email) > 0) {
+		// Ensure email has a maximum length of 255 characters.
+		if !utils.CheckMaxLength(email, 255) {
+			utils.ResponseJson(w, http.StatusBadRequest, "Email address has a maximum length of 255 characters. Please try again.")
+			return false
+		}
+	
+		// Ensure email address is in the correct format
+		if !CheckEmailAddressFormat(email) {
+			utils.ResponseJson(w, http.StatusBadRequest, "Email address is not in the correct format. Please try again.")
+			return false
+		}
 	}
 
-	// Ensure email address is in the correct format
-	if !CheckEmailAddressFormat(email) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Email address is not in the correct format. Please try again.")
-		return false
-	}
 	return true
 }
 
 // Form Validation: Organisation
 func OrganisationFormValidation(w http.ResponseWriter, organisationName, action string) bool {
-	// If organisation name is blank, default to 'InvenNexus'
-	if !utils.CheckMinLength(organisationName, 0) {
-		if action == "CREATE_USER" {
-			organisationName = "InvenNexus"
-		} else if action == "CREATE_ORGANISATION" {
+
+	if (action == "CREATE_USER" || action == "CREATE_ORGANISATION") && !utils.CheckMinLength(organisationName, 0) {
+		if action == "CREATE_ORGANISATION" {
 			utils.ResponseJson(w, http.StatusBadRequest, "Please provide an organisation name.")
 			return false
+		} else {
+			// If organisation name is blank, default to 'InvenNexus'
+			organisationName = "InvenNexus"
 		}
 	}
 
 	// Ensure organisation name has a maximum length of 255 characters
-	if !utils.CheckMaxLength(organisationName, 255) {
-		utils.ResponseJson(w, http.StatusBadRequest, "Organisation name has a maximum length of 255 characters. Please try again.")
-		return false
+	if (action == "CREATE_USER" || action == "CREATE_ORGANISATION" || (action == "UPDATE_USER" && len(organisationName) > 0)) {
+		if !utils.CheckMaxLength(organisationName, 255) {
+			utils.ResponseJson(w, http.StatusBadRequest, "Organisation name has a maximum length of 255 characters. Please try again.")
+			return false
+		}
 	}
+
 	return true
 }
 
@@ -160,10 +174,10 @@ func SignUpFormValidation(w http.ResponseWriter, user SignUpJson) bool {
 	if !UsernameFormValidation(w, user.Username) {return false}
 
 	// Password form validation
-	if !PasswordFormValidation(w, user.Password) {return false}
+	if !PasswordFormValidation(w, user.Password, "CREATE_USER") {return false}
 
 	// Email form validation
-	if !EmailFormValidation(w, user.Email) {return false}
+	if !EmailFormValidation(w, user.Email, "CREATE_USER") {return false}
 
 	return true
 }
@@ -184,19 +198,19 @@ func (user AdminUserMgmtJson) AdminUserMgmtFieldsTrimSpaces() AdminUserMgmtJson 
 	return user
 }
 
-func AdminUserMgmtFormValidation(w http.ResponseWriter, user AdminUserMgmtJson) bool {
+func AdminUserMgmtFormValidation(w http.ResponseWriter, user AdminUserMgmtJson, action string) bool {
 
 	// Username form validation
 	if !UsernameFormValidation(w, user.Username) {return false}
 
 	// Password form validation
-	if !PasswordFormValidation(w, user.Password) {return false}
+	if !PasswordFormValidation(w, user.Password, action) {return false}
 
 	// Email form validation
-	if !EmailFormValidation(w, user.Email) {return false}
+	if !EmailFormValidation(w, user.Email, action) {return false}
 
 	// Organisation form validation
-	if !OrganisationFormValidation(w, user.OrganisationName, "CREATE_USER") {return false}
+	if !OrganisationFormValidation(w, user.OrganisationName, action) {return false}
 
 	// Ensure isActive has values of 0 or 1
 	if user.IsActive != 0 && user.IsActive != 1 {
