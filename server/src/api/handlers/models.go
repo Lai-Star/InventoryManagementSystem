@@ -1,12 +1,12 @@
 package handlers
 
 type User struct {
+	UserId int
 	Username string
-	Password string
 	Email string
-	UserGroup string
-	OrganisationName string
 	IsActive int
+	OrganisationName string
+	UserGroup []string
 	AddedDate string
 	UpdatedDate string
 }

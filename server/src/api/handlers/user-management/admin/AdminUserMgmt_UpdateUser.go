@@ -2,11 +2,10 @@ package handlers_admin
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
-	handlers_user_mgmt "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
+	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
@@ -14,7 +13,7 @@ import (
 func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json");
-	var adminUpdateUser handlers_user_mgmt.AdminUserMgmtJson
+	var adminUpdateUser handlers_user_management.AdminUserMgmtJson
 
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body);
@@ -24,7 +23,8 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 	
 	// Check User Group Admin
-	// if !CheckUserGroupAdmin(w, req) {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {return}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {return}
 
 	// Trim whitespaces (username, password, email, organisation_name)
 	adminUpdateUser = adminUpdateUser.AdminUserMgmtFieldsTrimSpaces()
@@ -43,7 +43,7 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Admin User Form Validation
-	isValidAdminUserForm := handlers_user_mgmt.AdminUserMgmtFormValidation(w, adminUpdateUser, "UPDATE_USER")
+	isValidAdminUserForm := handlers_user_management.AdminUserMgmtFormValidation(w, adminUpdateUser, "UPDATE_USER")
 	if !isValidAdminUserForm {return}
 
 	// Check if email exists
@@ -68,7 +68,7 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Perform user group validation and check if user group exists
-	isValidUserGroup := handlers_user_mgmt.UserGroupFormValidation(w, adminUpdateUser.UserGroup)
+	isValidUserGroup := handlers_user_management.UserGroupFormValidation(w, adminUpdateUser.UserGroup)
 	if !isValidUserGroup {return}
 	
 	// Only generate hash if password is not empty
@@ -93,14 +93,12 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Update user_group_mapping table
-	if len(adminUpdateUser.UserGroup) > 0 {
-		fmt.Println(adminUpdateUser.UserGroup)
-		err = database.UpdateUserGroupMapping(userId, adminUpdateUser.UserGroup)
-		if err != nil {
-			utils.InternalServerError(w, "Internal server error in admin update user_group_mapping table: ", err)
-			return
-		}
+	err = database.UpdateUserGroupMapping(userId, adminUpdateUser.UserGroup)
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in admin update user_group_mapping table: ", err)
+		return
 	}
+	
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully updated user!")
 }

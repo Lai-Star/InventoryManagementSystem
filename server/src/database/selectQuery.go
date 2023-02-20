@@ -7,7 +7,6 @@ import (
 
 var (
 	SQL_SELECT_FROM_USERS = "SELECT %s FROM users WHERE %s = $1;"
-	SQL_SELECT_ALL_FROM_USERS = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM users;"
 	SQL_SELECT_ALL_FROM_USERS_BY_USERNAME = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM users WHERE username = $1;"
 	SQL_SELECT_FROM_ORGANISATIONS = "SELECT %s FROM organisations WHERE %s = $1;"
 	SQL_SELECT_FROM_USERGROUPS = "SELECT COUNT(*) FROM user_groups WHERE %s = $1;"
@@ -15,6 +14,12 @@ var (
 										 LEFT JOIN user_group_mapping ugm 
 										 ON ugm.user_group_id = ug.user_group_id 
 										 WHERE ugm.user_id = (SELECT user_id FROM users WHERE username = $1);`
+	SQL_SELECT_ALL_USERS = `SELECT u.user_id, u.username, u.email, u.is_active, o.organisation_name, ug.user_group, u.added_date, u.updated_date FROM users u 
+							LEFT JOIN user_organisation_mapping uom ON u.user_id = uom.user_id
+							LEFT JOIN organisations o ON uom.organisation_id = o.organisation_id
+							LEFT JOIN user_group_mapping ugm ON u.user_id = ugm.user_id
+							LEFT JOIN user_groups ug ON ugm.user_group_id = ug.user_group_id
+							ORDER BY user_id ASC;` 
 )
 
 var (
@@ -75,13 +80,6 @@ func GetUserGroupsByUsername(username string) (*sql.Rows, error) {
 	return rows, err
 }
 
-// func GetUserGroupByUsername(username string) (string, error) {
-// 	var userGroup string
-// 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "user_group", "username"), username)
-// 	err := row.Scan(&userGroup)
-// 	return userGroup, err
-// }
-
 func GetUserGroupCount(usergroup string) (int, error) {
 	var count int
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERGROUPS, "user_group"), usergroup)
@@ -97,7 +95,7 @@ func GetOrganisationNameCount(organisationName string) (int, error) {
 }
 
 func GetUsers() (*sql.Rows, error) {
-	row, err := db.Query(SQL_SELECT_ALL_FROM_USERS)
+	row, err := db.Query(SQL_SELECT_ALL_USERS)
 	return row, err
 }
 
