@@ -12,14 +12,9 @@ func CheckLengthRange(str string, minLength int, maxLength int) bool {
 	return true
 }
 
-// Returns true if the maximum length is met (inclusive)
-func CheckMaxLength(str string, maxLength int) bool {
-	return len(str) <= maxLength
-}
-
-// Returns true if the minimum length is met (inclusive)
-func CheckMinLength(str string, minLength int) bool {
-	return len(str) >= minLength
+// Returns true if field is blank
+func CheckBlankField(str string) bool {
+    return len(str) == 0
 }
 
 func CheckWhiteSpaces(str string) bool {

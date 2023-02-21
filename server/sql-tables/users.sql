@@ -1,7 +1,4 @@
--- Create users table
-/*
-    Table Description: Stores the user accounts details.
-*/
+-- Table `users`: Stores the user accounts details.
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -12,10 +9,7 @@ CREATE TABLE users (
     updated_date TIMESTAMP DEFAULT NOW()
 );
 
--- Create organisations table
-/*
-	Table Description: To store the different organisations that register with IMS.
-*/
+-- Table `organisations`: To store the different organisations that register with IMS.
 CREATE TABLE organisations (
 	organisation_id SERIAL PRIMARY KEY,
 	organisation_name VARCHAR(255) NOT NULL,
@@ -23,18 +17,7 @@ CREATE TABLE organisations (
 	updated_date TIMESTAMP DEFAULT NOW()
 );
 
-
--- Create user_organisation_mapping table
-CREATE TABLE user_organisation_mapping (
-    user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    organisation_id INT NOT NULL REFERENCES organisations(organisation_id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, organisation_id)
-);
-
--- Create user_groups table
-/*
-	Table Description: To store the different user groups for the users (e.g., Operations, IMS User)
-*/
+-- Table `user_groups`: To store the user groups for the differnet users.
 CREATE TABLE user_groups (
 	user_group_id SERIAL PRIMARY KEY,
     user_group VARCHAR(255) NOT NULL UNIQUE,
@@ -43,7 +26,12 @@ CREATE TABLE user_groups (
     updated_date TIMESTAMP DEFAULT NOW()
 );
 
--- Create user_group_mapping table
+CREATE TABLE user_organisation_mapping (
+    user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    organisation_id INT NOT NULL REFERENCES organisations(organisation_id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, organisation_id)
+);
+
 CREATE TABLE user_group_mapping (
     user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     user_group_id INT NOT NULL REFERENCES user_groups(user_group_id) ON DELETE CASCADE,

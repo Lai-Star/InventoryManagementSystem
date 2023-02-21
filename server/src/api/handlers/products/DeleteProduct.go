@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/go-chi/chi"
@@ -16,7 +17,8 @@ func DeleteProduct(w http.ResponseWriter, req *http.Request) {
 	var deleteProduct DeleteProductJson
 
 	// CheckUserGroup: IMS User and Operations
-	if !CheckProductsUserGroup(w, req) {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {return}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {return}
 
 	// Get productid from url params
 	productIdStr := chi.URLParam(req, "product_id")

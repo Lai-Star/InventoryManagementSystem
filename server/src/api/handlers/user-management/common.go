@@ -70,7 +70,7 @@ func (user SignUpJson) UserFieldsTrimSpaces() (SignUpJson) {
 // Form Validation: Username
 func UsernameFormValidation(w http.ResponseWriter, username string) bool {
 	// Ensure username is not blank
-	if !utils.CheckMinLength(username, 0) {
+	if utils.CheckBlankField(username) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username cannot be blank. Please try again.")
 		return false
 	}
@@ -93,7 +93,7 @@ func UsernameFormValidation(w http.ResponseWriter, username string) bool {
 func PasswordFormValidation(w http.ResponseWriter, password, action string) bool {
 	// Ensure password is not blank
 	if action == "CREATE_USER" {
-		if !utils.CheckMinLength(password, 0) {
+		if utils.CheckBlankField(password) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Password cannot be blank. Please try again.")
 			return false
 		}
@@ -121,7 +121,7 @@ func PasswordFormValidation(w http.ResponseWriter, password, action string) bool
 func EmailFormValidation(w http.ResponseWriter, email, action string) bool {
 	// Email cannot be blank
 	if action == "CREATE_USER" {
-		if !utils.CheckMinLength(email, 0) {
+		if utils.CheckBlankField(email) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Email address cannot be blank. Please try again.")
 			return false
 		}
@@ -129,7 +129,7 @@ func EmailFormValidation(w http.ResponseWriter, email, action string) bool {
 
 	if action == "CREATE_USER" || (action == "UPDATE_USER" && len(email) > 0) {
 		// Ensure email has a maximum length of 255 characters.
-		if !utils.CheckMaxLength(email, 255) {
+		if !utils.CheckLengthRange(email, 1, 255) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Email address has a maximum length of 255 characters. Please try again.")
 			return false
 		}
@@ -147,7 +147,7 @@ func EmailFormValidation(w http.ResponseWriter, email, action string) bool {
 // Form Validation: Organisation
 func OrganisationFormValidation(w http.ResponseWriter, organisationName, action string) bool {
 
-	if (action == "CREATE_USER" || action == "CREATE_ORGANISATION") && !utils.CheckMinLength(organisationName, 0) {
+	if (action == "CREATE_USER" || action == "CREATE_ORGANISATION") && utils.CheckBlankField(organisationName) {
 		if action == "CREATE_ORGANISATION" {
 			utils.ResponseJson(w, http.StatusBadRequest, "Please provide an organisation name.")
 			return false
@@ -159,7 +159,7 @@ func OrganisationFormValidation(w http.ResponseWriter, organisationName, action 
 
 	// Ensure organisation name has a maximum length of 255 characters
 	if (action == "CREATE_USER" || action == "CREATE_ORGANISATION" || (action == "UPDATE_USER" && len(organisationName) > 0)) {
-		if !utils.CheckMaxLength(organisationName, 255) {
+		if !utils.CheckLengthRange(organisationName, 1, 255) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Organisation name has a maximum length of 255 characters. Please try again.")
 			return false
 		}

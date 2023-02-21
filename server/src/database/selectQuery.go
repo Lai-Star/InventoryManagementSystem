@@ -7,7 +7,6 @@ import (
 
 var (
 	SQL_SELECT_FROM_USERS = "SELECT %s FROM users WHERE %s = $1;"
-	SQL_SELECT_ALL_FROM_USERS_BY_USERNAME = "SELECT username, password, email, user_group, company_name, is_active, added_date, updated_date FROM users WHERE username = $1;"
 	SQL_SELECT_FROM_ORGANISATIONS = "SELECT %s FROM organisations WHERE %s = $1;"
 	SQL_SELECT_FROM_USERGROUPS = "SELECT COUNT(*) FROM user_groups WHERE %s = $1;"
 	SQL_SELECT_USERGROUPS_BY_USERNAME = `SELECT ug.user_group FROM user_groups ug
@@ -68,7 +67,7 @@ func GetActiveStatusByUsername(username string) (int, error) {
 	return isActive, err
 }
 
-func GetCompanyNameByUsername(username string) (string, error) {
+func GetOrganisationNameByUsername(username string) (string, error) {
 	var companyName string
 	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "company_name", "username"), username)
 	err := row.Scan(&companyName)
@@ -97,11 +96,6 @@ func GetOrganisationNameCount(organisationName string) (int, error) {
 func GetUsers() (*sql.Rows, error) {
 	row, err := db.Query(SQL_SELECT_ALL_USERS)
 	return row, err
-}
-
-func GetUserByUsername(username string) *sql.Row {
-	row := db.QueryRow(SQL_SELECT_ALL_FROM_USERS_BY_USERNAME, username)
-	return row
 }
 
 func ProductIdExists(product_id int) bool {
