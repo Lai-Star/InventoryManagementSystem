@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
@@ -31,41 +32,63 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	// Product Form Validation
 	if !ProductFormValidation(w, newProduct) {return}
 
-	// // Check User Organisation
-	// username := w.Header().Get("username")
-	// userOrganisation, err := database.GetOrganisationNameByUsername(username)
-	// if err != nil {
-	// 	utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
-	// 	return
-	// }
+	// Check User Organisation
+	username := w.Header().Get("username")
+	organisationName, userId, err := database.GetOrganisationNameByUsername(username)
+	if err != nil {
+		utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
+		return
+	}
 
-	// // Check Product Sku to see if it exists in database (cannot have duplicates within the same organisation)
-	// // if user belongs to "IMSer" means it is a regular user, check for existing product sku based on username
-	// if userOrganisation == "IMSer" {
-	// 	// isExistProductSku := database.ProductSkuExists(newProduct.ProductSku)
-	// 	// if isExistProductSku {
-	// 	// 	utils.ResponseJson(w, http.StatusBadRequest, "Product Sku already exists. Please try again.")
-	// 	// 	return
-	// 	// }
-	// } else {
-	// 	// user does not belong to "IMSer", user belongs to specific organisation
-	// }
+	// Check Product Sku to see if it exists in database (cannot have duplicates within the same organisation)
+	var count int
+	if organisationName == "InvenNexus" {
+		// check the product sku for duplicates based on username
+		count, err = database.GetProductSkuCountByUsername(username, newProduct.ProductSku)
+	} else {
+		// check the product sku for duplicates based on organisation name
+		count, err = database.GetProductSkuCountByOrganisation(organisationName, newProduct.ProductSku)
+	}
 
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in getting product sku count by username: ", err)
+		return
+	}
+	if count >= 1 {
+		utils.ResponseJson(w, http.StatusBadRequest, "Product Sku already exists. Please try again.")
+		return
+	}
 
-	// // Insert new product into products table
-	// productId, err := database.InsertNewProduct(createProduct.ProductName, createProduct.ProductDescription, createProduct.ProductSku, createProduct.ProductColour, createProduct.ProductCategory, createProduct.ProductBrand, createProduct.ProductCost)
-	// if err != nil {
-	// 	utils.InternalServerError(w, "Internal Server Error in InsertNewProduct: ", err)
-	// 	return
-	// }
+	// Insert product details to `products` table
+	productId, err := database.InsertNewProduct(newProduct.ProductName, newProduct.ProductDescription, newProduct.ProductSku, newProduct.ProductCost)
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in inserting new product into products table: ", err)
+		return
+	}
 
-	// var isValidFormValidation bool
-	// // Check if user provided a size
-	// if len(createProduct.Sizes) > 0 {
-	// 	// Trim White Spaces in each size, make all size name uppercase and check format provided.
-	// 	isValidFormValidation, createProduct.Sizes = ValidateAndInsertSize(w, createProduct.Sizes, productId)
-	// 	if !isValidFormValidation {return}
-	// }
+	// Insert to `sizes` table if user has input for size name and size quantity
+	if len(newProduct.Sizes) >= 1 {
+		// Insert into sizes table
+		for _, size := range(newProduct.Sizes) {
+			sizeName := size.SizeName
+			sizeQuantity := size.SizeQuantity
+
+			err = database.InsertIntoProductSizesMapping(sizeName, sizeQuantity, productId)
+			if err != nil {
+				utils.InternalServerError(w, "Internal server error in inserting new size: ", err)
+				return
+			}
+		}
+	}
+
+	// Insert to product_user_mapping or product_organisation_mapping table
+	if organisationName == "InvenNexus" {
+		err = database.InsertIntoProductUserMapping(productId, userId, newProduct.ProductColour, newProduct.ProductCategory, newProduct.ProductBrand)
+		if err != nil {
+			utils.InternalServerError(w, "Internal server error in inserting into product_user_mapping table: ", err)
+			return
+		}
+	} 
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully created a new product!")
 }

@@ -25,10 +25,10 @@ func DeleteProduct(w http.ResponseWriter, req *http.Request) {
 	deleteProduct.ProductId, _ = strconv.Atoi(productIdStr)
 
 	// Check if product exists in database
-	if !database.ProductIdExists(deleteProduct.ProductId) {
-		utils.ResponseJson(w, http.StatusNotFound, "Product does not exist in database. Please try again.")
-		return
-	}
+	// if !database.ProductIdExists(deleteProduct.ProductId) {
+	// 	utils.ResponseJson(w, http.StatusNotFound, "Product does not exist in database. Please try again.")
+	// 	return
+	// }
 
 	err := database.DeleteProductFromProducts(deleteProduct.ProductId)
 	if err != nil {

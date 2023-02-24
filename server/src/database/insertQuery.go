@@ -19,12 +19,6 @@ var (
 	SQL_INSERT_INTO_USER_GROUPS = "INSERT INTO user_groups (user_group, description, added_date, updated_date) VALUES ($1, $2, now(), now());"
 )
 
-var (
-	SQL_INSERT_INTO_PRODUCTS = "INSERT INTO products (product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost, added_date, updated_date) VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now()) RETURNING product_id"
-	SQL_INSERT_INTO_SIZES = "INSERT INTO sizes (size_name, size_quantity, added_date, updated_date) VALUES ($1, $2, now(), now()) RETURNING size_id;"
-	SQL_INSERT_INTO_PRODUCT_SIZES = "INSERT INTO product_sizes (product_id, size_id) VALUES ($1, $2);"
-)
-
 func InsertNewUser(username, password, email string, isActive int) (int, error) {
 	var user_id int
 	err := db.QueryRow(SQL_INSERT_INTO_USERS, username, password, email, isActive).Scan(&user_id)
@@ -58,31 +52,5 @@ func InsertIntoOrganisations(organisationName string) error {
 
 func InsertIntoUserGroups(userGroup, description string) error {
 	_, err := db.Exec(SQL_INSERT_INTO_USER_GROUPS, userGroup, description)
-	return err
-}
-
-func InsertNewProduct(product_name, product_description, product_sku, product_colour, product_category, product_brand string, product_cost float32) (int32, error) {
-	var productId int32
-	err := db.QueryRow(SQL_INSERT_INTO_PRODUCTS, product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost).Scan(&productId)
-	if err != nil {
-		log.Println("Error inserting new product: ", err)
-	}
-	return productId, err
-}
-
-func InsertNewSize(size_name string, size_quantity int) (int32, error) {
-	var sizeId int32
-	err := db.QueryRow(SQL_INSERT_INTO_SIZES, size_name, size_quantity).Scan(&sizeId)
-	if err != nil {
-		log.Println("Error inserting new size: ", err)
-	}
-	return sizeId, err
-}
-
-func InsertNewProductSizes(product_id, size_id int32) error {
-	_, err := db.Exec(SQL_INSERT_INTO_PRODUCT_SIZES, product_id, size_id)
-	if err != nil {
-		log.Println("Error inserting productid and sizeid to product_sizes table: ", err)
-	}
 	return err
 }

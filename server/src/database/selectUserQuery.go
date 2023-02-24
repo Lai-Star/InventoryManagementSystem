@@ -7,28 +7,29 @@ import (
 
 var (
 	SQL_SELECT_FROM_USERS = "SELECT %s FROM users WHERE %s = $1;"
+
 	SQL_SELECT_FROM_ORGANISATIONS = "SELECT %s FROM organisations WHERE %s = $1;"
+
 	SQL_SELECT_FROM_USERGROUPS = "SELECT COUNT(*) FROM user_groups WHERE %s = $1;"
+
+	SQL_SELECT_ORGANISATION_NAME_BY_USERNAME = `SELECT o.organisation_name, u.user_id FROM organisations o
+												INNER JOIN user_organisation_mapping uom
+												ON o.organisation_id = uom.organisation_id
+												INNER JOIN users u
+												ON uom.user_id = u.user_id
+												WHERE u.username = $1;`
+
 	SQL_SELECT_USERGROUPS_BY_USERNAME = `SELECT ug.user_group FROM user_groups ug
 										 LEFT JOIN user_group_mapping ugm 
 										 ON ugm.user_group_id = ug.user_group_id 
 										 WHERE ugm.user_id = (SELECT user_id FROM users WHERE username = $1);`
+										 
 	SQL_SELECT_ALL_USERS = `SELECT u.user_id, u.username, u.email, u.is_active, o.organisation_name, ug.user_group, u.added_date, u.updated_date FROM users u 
 							LEFT JOIN user_organisation_mapping uom ON u.user_id = uom.user_id
 							LEFT JOIN organisations o ON uom.organisation_id = o.organisation_id
 							LEFT JOIN user_group_mapping ugm ON u.user_id = ugm.user_id
 							LEFT JOIN user_groups ug ON ugm.user_group_id = ug.user_group_id
 							ORDER BY user_id ASC;` 
-)
-
-var (
-	SQL_SELECT_FROM_PRODUCTS = "SELECT %s FROM products WHERE %s = $1;"
-	SQL_SELECT_ALL_FROM_PRODUCTS = "SELECT p.product_name, p.product_description, p.product_sku, p.product_colour, p.product_category, p.product_brand, p.product_cost, s.size_name, s.size_quantity " +
-									 "FROM products p " + 
-									 "LEFT JOIN product_sizes ps ON p.product_id = ps.product_id " +
-									 "LEFT JOIN sizes s ON s.size_id = ps.size_id;"
-	SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID = "SELECT product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost" + 
-													"FROM products WHERE product_id = $1;"
 )
 
 func GetUsername(username string) bool {
@@ -67,11 +68,11 @@ func GetActiveStatusByUsername(username string) (int, error) {
 	return isActive, err
 }
 
-func GetOrganisationNameByUsername(username string) (string, error) {
-	var companyName string
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "company_name", "username"), username)
-	err := row.Scan(&companyName)
-	return companyName, err
+func GetOrganisationNameByUsername(username string) (string, int, error) {
+	var organisationName string
+	var userId int
+	err := db.QueryRow(SQL_SELECT_ORGANISATION_NAME_BY_USERNAME, username).Scan(&organisationName, &userId)
+	return organisationName, userId, err
 }
 
 func GetUserGroupsByUsername(username string) (*sql.Rows, error) {
@@ -96,25 +97,4 @@ func GetOrganisationNameCount(organisationName string) (int, error) {
 func GetUsers() (*sql.Rows, error) {
 	row, err := db.Query(SQL_SELECT_ALL_USERS)
 	return row, err
-}
-
-func ProductIdExists(product_id int) bool {
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_PRODUCTS, "product_id", "product_id"), product_id)
-	return row.Scan() != sql.ErrNoRows
-}
-
-func ProductSkuExistsByUsername(product_sku, username string) bool {
-
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_PRODUCTS, "product_sku", "product_sku"), product_sku)
-	return row.Scan() != sql.ErrNoRows
-}
-
-func GetProducts() (*sql.Rows, error) {
-	rows, err := db.Query(SQL_SELECT_ALL_FROM_PRODUCTS)
-	return rows, err
-}
-
-func GetProductByProductId(product_id int) *sql.Row {
-	row := db.QueryRow(SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID, product_id)
-	return row
 }

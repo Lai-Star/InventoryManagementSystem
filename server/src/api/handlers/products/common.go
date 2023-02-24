@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
@@ -147,7 +146,10 @@ func ProductSizeFormValidation(w http.ResponseWriter, product ProductJson) bool 
 		if size.SizeQuantity < 0 {
 			utils.ResponseJson(w, http.StatusBadRequest, "Size Quantity cannot be negative. Please try again.")
 			return false
-		} 
+		}
+
+		// Check if size name is valid
+		
 	}
 	return true
 }
@@ -209,18 +211,18 @@ func ValidateAndInsertSize(w http.ResponseWriter, sizes []Size, productId int32)
 		}
 
 		// Insert Size to sizes table
-		sizeId, err := database.InsertNewSize(size.SizeName, size.SizeQuantity)
-		if err != nil {
-			utils.InternalServerError(w, "Error in inserting new size to sizes table: ", err)
-			return false, sizes
-		}
+		// sizeId, err := database.InsertNewSize(size.SizeName, size.SizeQuantity)
+		// if err != nil {
+		// 	utils.InternalServerError(w, "Error in inserting new size to sizes table: ", err)
+		// 	return false, sizes
+		// }
 
-		// Insert product_id and size_id to product_sizes table
-		err = database.InsertNewProductSizes(productId, sizeId)
-		if err != nil {
-			utils.InternalServerError(w, "Error in inserting new productsizes into product_sizes table: ", err)
-			return false, sizes
-		}
+		// // Insert product_id and size_id to product_sizes table
+		// err = database.InsertNewProductSizes(productId, sizeId)
+		// if err != nil {
+		// 	utils.InternalServerError(w, "Error in inserting new productsizes into product_sizes table: ", err)
+		// 	return false, sizes
+		// }
 	}
 
 	return true, sizes

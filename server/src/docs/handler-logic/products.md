@@ -27,9 +27,9 @@
 - Get the Organisation Name from the username (using SQL Query)
 - Check if user belongs to organisation "InvenNexus" (duplicate product_sku not allowed)
     - If Yes:
-        - check the product_sku of the product based on the **user_id**.
+        - check the product_sku of the product based on the **user_id** to see if it has already been taken.
     - If No:
-        - check the product_sku of the product based on the **organisation_id**.
+        - check the product_sku of the product based on the **organisation_id** to see if it has already been taken.
         - to ensure that different users in the same organisation see the same products.
 - Insert product to `products` table. (return product_id).
 - Check if user has input for size_name and quantity
