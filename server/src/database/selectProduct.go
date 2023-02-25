@@ -25,6 +25,12 @@ var (
 
 	SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID = "SELECT product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost" + 
 													"FROM products WHERE product_id = $1;"
+
+	SQL_SELECT_COUNT_FROM_USER_BRANDS = `SELECT COUNT(*) FROM user_brands WHERE user_id = $1;`
+	SQL_SELECT_COUNT_FROM_ORGANISATION_BRANDS = `SELECT COUNT(*) FROM organisation_brands ob
+												INNER JOIN organisations o
+												ON o.organisation_id = ob.organisation_id
+												WHERE o.organisation_name = $1;`
 )
 
 func GetProductSkuCountByUsername(username, productSku string) (int, error) {
@@ -54,4 +60,16 @@ func GetProducts() (*sql.Rows, error) {
 func GetProductByProductId(product_id int) *sql.Row {
 	row := db.QueryRow(SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID, product_id)
 	return row
+}
+
+func GetBrandNameCountByUsername(userId int, brandName string) (int, error) {
+	var count int
+	err := db.QueryRow(SQL_SELECT_COUNT_FROM_USER_BRANDS, userId).Scan(&count)
+	return count, err
+}
+
+func GetBrandNameCountByOrganisation(organisationName, brandName string) (int, error) {
+	var count int
+	err := db.QueryRow(SQL_SELECT_COUNT_FROM_ORGANISATION_BRANDS, organisationName).Scan(&count)
+	return count, err
 }

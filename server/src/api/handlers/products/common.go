@@ -30,85 +30,85 @@ type DeleteProductJson struct {
 	ProductId int
 }
 
-func ProductNameFormValidation(w http.ResponseWriter, product ProductJson) bool {
+func ProductNameFormValidation(w http.ResponseWriter, productName string) bool {
 	// Check if product name is empty
-	if utils.CheckBlankField(product.ProductName) {
+	if utils.CheckBlankField(productName) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Name cannot be empty. Please try again.")
 		return false
 	}
 
 	// Check Product Name (Length 1 - 255)
-	if !utils.CheckLengthRange(product.ProductName, 1, 255) {
+	if !utils.CheckLengthRange(productName, 1, 255) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Name must have a length of 1 - 255 characters.")
 		return false
 	}
 	return true
 }
 
-func ProductSkuFormValidation(w http.ResponseWriter, product ProductJson) bool {
+func ProductSkuFormValidation(w http.ResponseWriter, productSku string) bool {
 	// Check if product sku is empty
-	if utils.CheckBlankField(product.ProductSku) {
+	if utils.CheckBlankField(productSku) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Sku cannot be empty. Please try again.")
 		return false
 	}
 
 	// Check Product Sku (Length 1 - 50, must be unique)
-	if !utils.CheckLengthRange(product.ProductSku, 1, 50) {
+	if !utils.CheckLengthRange(productSku, 1, 50) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Sku must have a length of 1 - 50 characters.")
 		return false
 	}
 	return true
 }
 
-func ProductBrandFormValidation(w http.ResponseWriter, product ProductJson) bool {
+func ProductBrandFormValidation(w http.ResponseWriter, productBrand string) bool {
 	// Check if product brand is empty
-	if utils.CheckBlankField(product.ProductBrand) {
+	if utils.CheckBlankField(productBrand) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Brand cannot be empty. Please try again.")
 		return false
 	}
 
 	// Check Product Brand (Length 1 - 50)
-	if !utils.CheckLengthRange(product.ProductBrand, 1, 50) {
+	if !utils.CheckLengthRange(productBrand, 1, 50) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Brand must have a length of 1 - 50 characters.")
 		return false
 	}
 	return true
 }
 
-func ProductColourFormValidation(w http.ResponseWriter, product ProductJson) bool {
+func ProductColourFormValidation(w http.ResponseWriter, productColour string) bool {
 	// Check if product colour is empty
-	if utils.CheckBlankField(product.ProductColour) {
+	if utils.CheckBlankField(productColour) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Colour cannot be empty. Please try again.")
 		return false
 	}
 
 	// Check Product Colour (Length 1 - 7)
-	if !utils.CheckLengthRange(product.ProductColour, 1, 7) {
+	if !utils.CheckLengthRange(productColour, 1, 7) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Colour must have a length of 1 - 7 characters.")
 		return false
 	}
 	return true
 }
 
-func ProductCategoryFormValidation(w http.ResponseWriter, product ProductJson) bool {
+func ProductCategoryFormValidation(w http.ResponseWriter, productCategory string) bool {
 	// Check if product category is empty
-	if utils.CheckBlankField(product.ProductCategory) {
+	if utils.CheckBlankField(productCategory) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Category cannot be empty. Please try again.")
 		return false
 	}
 
 	// Check Product Category (Length 1 - 20)
-	if !utils.CheckLengthRange(product.ProductCategory, 1, 20) {
+	if !utils.CheckLengthRange(productCategory, 1, 20) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Category must have a length of 1 - 20 characters.")
 		return false
 	}
 	return true
 }
 
-func ProductCostFormValidation(w http.ResponseWriter, product ProductJson) bool {
+func ProductCostFormValidation(w http.ResponseWriter, productCost float32) bool {
 	// Check Product Cost (Decimal(10, 2))
-	productCost := strconv.FormatFloat(float64(product.ProductCost), 'f', -1, 32)
-	isValidProductCost, _ := regexp.MatchString(`^[0-9]{1,10}(\.[0-9]{1,2})?$`, productCost)
+	convertedProductCost := strconv.FormatFloat(float64(productCost), 'f', -1, 32)
+	isValidProductCost, _ := regexp.MatchString(`^[0-9]{1,10}(\.[0-9]{1,2})?$`, convertedProductCost)
 	if !isValidProductCost {
 		utils.ResponseJson(w, http.StatusBadRequest, "Product Cost must have a maximum of 8 digits and 2 decimal places.")
 		return false
@@ -156,12 +156,12 @@ func ProductSizeFormValidation(w http.ResponseWriter, product ProductJson) bool 
 
 func ProductFormValidation(w http.ResponseWriter, product ProductJson) bool {
 
-	if !ProductNameFormValidation(w, product) {return false}
-	if !ProductSkuFormValidation(w, product) {return false}
-	if !ProductBrandFormValidation(w, product) {return false}
-	if !ProductColourFormValidation(w, product) {return false}
-	if !ProductCategoryFormValidation(w, product) {return false}
-	if !ProductCostFormValidation(w, product) {return false}
+	if !ProductNameFormValidation(w, product.ProductName) {return false}
+	if !ProductSkuFormValidation(w, product.ProductSku) {return false}
+	if !ProductBrandFormValidation(w, product.ProductBrand) {return false}
+	if !ProductColourFormValidation(w, product.ProductColour) {return false}
+	if !ProductCategoryFormValidation(w, product.ProductCategory) {return false}
+	if !ProductCostFormValidation(w, product.ProductCost) {return false}
 	if !ProductSizeFormValidation(w, product) {return false}
 	
 	return true

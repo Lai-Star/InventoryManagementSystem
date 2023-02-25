@@ -51,7 +51,7 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting product sku count by username: ", err)
+		utils.InternalServerError(w, "Internal server error in getting product sku count: ", err)
 		return
 	}
 	if count >= 1 {

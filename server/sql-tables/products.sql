@@ -8,8 +8,17 @@ CREATE TABLE products (
     updated_date TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE sizes (
+CREATE TABLE organisation_sizes (
     size_id SERIAL PRIMARY KEY,
+    organisation_id INT NOT NULL,
+    size_name VARCHAR(5) NOT NULL,
+    added_date TIMESTAMP DEFAULT NOW(),
+    updated_date TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE user_sizes (
+    size_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
     size_name VARCHAR(5) NOT NULL,
     added_date TIMESTAMP DEFAULT NOW(),
     updated_date TIMESTAMP DEFAULT NOW()
@@ -36,7 +45,16 @@ CREATE TABLE categories (
     updated_date TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE brands (
+CREATE TABLE user_brands (
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    brand_id SERIAL PRIMARY KEY,
+    brand_name VARCHAR(60) NOT NULL,
+    added_date TIMESTAMP DEFAULT NOW(),
+    updated_date TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE organisation_brands (
+    organisation_id INT REFERENCES organisations(organisation_id) ON DELETE CASCADE,
     brand_id SERIAL PRIMARY KEY,
     brand_name VARCHAR(60) NOT NULL,
     added_date TIMESTAMP DEFAULT NOW(),
