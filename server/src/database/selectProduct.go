@@ -43,6 +43,12 @@ var (
 												INNER JOIN organisations o
 												ON o.organisation_id = oc.organisation_id
 												WHERE o.organisation_name = $1 AND oc.colour_name = $2;`
+
+	SQL_SELECT_COUNT_FROM_USER_SIZES = `SELECT COUNT(*) FROM user_sizes WHERE user_id = $1 AND size_name = $2;`
+	SQL_SELECT_COUNT_FROM_ORGANISATION_SIZES = `SELECT COUNT(*) FROM organisation_sizes os
+												INNER JOIN organisations o
+												ON o.organisation_id = oc.organisation_id
+												WHERE o.organisation_name = $1 AND os.size_name = $2;`
 )
 
 func GetProductSkuCountByUsername(username, productSku string) (int, error) {
@@ -107,6 +113,18 @@ func GetColourNameCountByUsername(userId int, colourName string) (int, error) {
 func GetColourNameCountByOrganisation(organisationName, colourName string) (int, error) {
 	var count int
 	err := db.QueryRow(SQL_SELECT_COUNT_FROM_ORGANISATION_COLOURS, organisationName, colourName).Scan(&count)
+	return count, err
+}
+
+func GetSizeNameCountByUsername(userId int, sizeName string) (int, error) {
+	var count int
+	err := db.QueryRow(SQL_SELECT_COUNT_FROM_USER_SIZES, userId, sizeName).Scan(&count)
+	return count, err
+}
+
+func GetSizeNameCountByOrganisation(organisationName, sizeName string) (int, error) {
+	var count int
+	err := db.QueryRow(SQL_SELECT_COUNT_FROM_ORGANISATION_SIZES, organisationName, sizeName).Scan(&count)
 	return count, err
 }
 

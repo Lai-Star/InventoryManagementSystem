@@ -8,17 +8,17 @@ CREATE TABLE products (
     updated_date TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE organisation_sizes (
+CREATE TABLE user_sizes (
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
     size_id SERIAL PRIMARY KEY,
-    organisation_id INT NOT NULL,
     size_name VARCHAR(5) NOT NULL,
     added_date TIMESTAMP DEFAULT NOW(),
     updated_date TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE user_sizes (
+CREATE TABLE organisation_sizes (
+    organisation_id INT REFERENCES organisations(organisation_id) ON DELETE CASCADE,
     size_id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL,
     size_name VARCHAR(5) NOT NULL,
     added_date TIMESTAMP DEFAULT NOW(),
     updated_date TIMESTAMP DEFAULT NOW()

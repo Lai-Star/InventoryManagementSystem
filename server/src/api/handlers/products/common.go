@@ -116,8 +116,7 @@ func ProductCostFormValidation(w http.ResponseWriter, productCost float32) bool 
 	return true
 }
 
-func ProductSizeFormValidation(w http.ResponseWriter, product ProductJson) bool {
-	sizes := product.Sizes
+func SizeNameQuantityFormValidation(w http.ResponseWriter, sizes []Size) bool {
 	for idx, size := range(sizes) {
 		// trim white spaces for size name
 		sizes[idx].SizeName = strings.TrimSpace(size.SizeName)
@@ -154,6 +153,21 @@ func ProductSizeFormValidation(w http.ResponseWriter, product ProductJson) bool 
 	return true
 }
 
+func SizeNameFormValidation(w http.ResponseWriter, sizeName string) bool {
+	// Check if size name is empty
+	if utils.CheckBlankField(sizeName) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Size Name cannot be empty. Please try again.")
+		return false
+	}
+
+	// Check if size name is within 1 and 5 characters
+	if !utils.CheckLengthRange(sizeName, 1, 5) {
+		utils.ResponseJson(w, http.StatusBadRequest, "Size Name must be within 1 - 5 characters. Please try again.")
+		return false
+	}
+	return true
+}
+
 func ProductFormValidation(w http.ResponseWriter, product ProductJson) bool {
 
 	if !ProductNameFormValidation(w, product.ProductName) {return false}
@@ -162,7 +176,7 @@ func ProductFormValidation(w http.ResponseWriter, product ProductJson) bool {
 	if !ProductColourFormValidation(w, product.ProductColour) {return false}
 	if !ProductCategoryFormValidation(w, product.ProductCategory) {return false}
 	if !ProductCostFormValidation(w, product.ProductCost) {return false}
-	if !ProductSizeFormValidation(w, product) {return false}
+	if !SizeNameQuantityFormValidation(w, product.Sizes) {return false}
 	
 	return true
 }

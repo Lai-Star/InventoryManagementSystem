@@ -25,6 +25,10 @@ var (
 	SQL_INSERT_INTO_USER_COLOURS = `INSERT INTO user_colours (user_id, colour_name) VALUES ($1, $2);`
 	SQL_INSERT_INTO_ORGANISATION_COLOURS = `INSERT INTO organisation_colours (organisation_id, colour_name VALUES 
 											((SELECT organisation_id from organisations WHERE organisation_name = $1), $2);`
+
+	SQL_INSERT_INTO_USER_SIZES = `INSERT INTO user_sizes (user_id, size_name) VALUES ($1, $2);`
+	SQL_INSERT_INTO_ORGANISATION_SIZES = `INSERT INTO organisation_sizes (organisation_id, size_name VALUES 
+											((SELECT organisation_id from organisations WHERE organisation_name = $1), $2);`
 )
 
 func InsertNewProduct(productName, productDescription, productSku string, productCost float32) (int, error) {
@@ -70,6 +74,16 @@ func InsertIntoUserColours(userId int, colourName string) error {
 
 func InsertIntoOrganisationColours(organisationName, colourName string) error {
 	_, err := db.Exec(SQL_INSERT_INTO_ORGANISATION_COLOURS, organisationName, colourName)
+	return err
+}
+
+func InsertIntoUserSizes(userId int, sizeName string) error {
+	_, err := db.Exec(SQL_INSERT_INTO_USER_SIZES, userId, sizeName)
+	return err
+}
+
+func InsertIntoOrganisationSizes(organisationName, sizeName string) error {
+	_, err := db.Exec(SQL_INSERT_INTO_ORGANISATION_SIZES, organisationName, sizeName)
 	return err
 }
 
