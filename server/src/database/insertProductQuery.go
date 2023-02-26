@@ -21,6 +21,10 @@ var (
 	SQL_INSERT_INTO_USER_CATEGORIES = `INSERT INTO user_categories (user_id, category_name) VALUES ($1, $2);`
 	SQL_INSERT_INTO_ORGANISATION_CATEGORIES = `INSERT INTO organisation_categories (organisation_id, category_name VALUES 
 											((SELECT organisation_id from organisations WHERE organisation_name = $1), $2);`
+
+	SQL_INSERT_INTO_USER_COLOURS = `INSERT INTO user_colours (user_id, colour_name) VALUES ($1, $2);`
+	SQL_INSERT_INTO_ORGANISATION_COLOURS = `INSERT INTO organisation_colours (organisation_id, colour_name VALUES 
+											((SELECT organisation_id from organisations WHERE organisation_name = $1), $2);`
 )
 
 func InsertNewProduct(productName, productDescription, productSku string, productCost float32) (int, error) {
@@ -49,13 +53,23 @@ func InsertIntoOrganisationBrands(organisationName, brandName string) error {
 	return err
 }
 
-func InsertIntoUserCategories(userId int, brandName string) error {
-	_, err := db.Exec(SQL_INSERT_INTO_USER_CATEGORIES, userId, brandName)
+func InsertIntoUserCategories(userId int, categoryName string) error {
+	_, err := db.Exec(SQL_INSERT_INTO_USER_CATEGORIES, userId, categoryName)
 	return err
 }
 
-func InsertIntoOrganisationCategories(organisationName, brandName string) error {
-	_, err := db.Exec(SQL_INSERT_INTO_ORGANISATION_CATEGORIES, organisationName, brandName)
+func InsertIntoOrganisationCategories(organisationName, categoryName string) error {
+	_, err := db.Exec(SQL_INSERT_INTO_ORGANISATION_CATEGORIES, organisationName, categoryName)
+	return err
+}
+
+func InsertIntoUserColours(userId int, colourName string) error {
+	_, err := db.Exec(SQL_INSERT_INTO_USER_COLOURS, userId, colourName)
+	return err
+}
+
+func InsertIntoOrganisationColours(organisationName, colourName string) error {
+	_, err := db.Exec(SQL_INSERT_INTO_ORGANISATION_COLOURS, organisationName, colourName)
 	return err
 }
 

@@ -47,13 +47,21 @@ CREATE TABLE organisation_categories (
     updated_date TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE colours (
+CREATE TABLE user_colours (
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
     colour_id SERIAL PRIMARY KEY,
     colour_name VARCHAR(60) NOT NULL,
     added_date TIMESTAMP DEFAULT NOW(),
     updated_date TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE organisation_colours (
+    organisation_id INT REFERENCES organisations(organisation_id) ON DELETE CASCADE,
+    colour_id SERIAL PRIMARY KEY,
+    colour_name VARCHAR(60) NOT NULL,
+    added_date TIMESTAMP DEFAULT NOW(),
+    updated_date TIMESTAMP DEFAULT NOW()
+);
 
 CREATE TABLE user_brands (
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,

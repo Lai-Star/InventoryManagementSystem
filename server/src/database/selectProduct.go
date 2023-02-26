@@ -26,17 +26,23 @@ var (
 	SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID = "SELECT product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost" + 
 													"FROM products WHERE product_id = $1;"
 
-	SQL_SELECT_COUNT_FROM_USER_BRANDS = `SELECT COUNT(*) FROM user_brands WHERE user_id = $1;`
+	SQL_SELECT_COUNT_FROM_USER_BRANDS = `SELECT COUNT(*) FROM user_brands WHERE user_id = $1 AND brand_name = $2;`
 	SQL_SELECT_COUNT_FROM_ORGANISATION_BRANDS = `SELECT COUNT(*) FROM organisation_brands ob
 												INNER JOIN organisations o
 												ON o.organisation_id = ob.organisation_id
-												WHERE o.organisation_name = $1;`
+												WHERE o.organisation_name = $1 AND ob.brand_name = $2;`
 
-	SQL_SELECT_COUNT_FROM_USER_CATEGORIES = `SELECT COUNT(*) FROM user_categories WHERE user_id = $1;`
+	SQL_SELECT_COUNT_FROM_USER_CATEGORIES = `SELECT COUNT(*) FROM user_categories WHERE user_id = $1 AND category_name = $2;`
 	SQL_SELECT_COUNT_FROM_ORGANISATION_CATEGORIES = `SELECT COUNT(*) FROM organisation_categories oc
 												INNER JOIN organisations o
 												ON o.organisation_id = oc.organisation_id
-												WHERE o.organisation_name = $1;`
+												WHERE o.organisation_name = $1 AND oc.category_name = $2;`
+
+	SQL_SELECT_COUNT_FROM_USER_COLOURS = `SELECT COUNT(*) FROM user_colours WHERE user_id = $1 AND colour_name = $2;`
+	SQL_SELECT_COUNT_FROM_ORGANISATION_COLOURS = `SELECT COUNT(*) FROM organisation_colours oc
+												INNER JOIN organisations o
+												ON o.organisation_id = oc.organisation_id
+												WHERE o.organisation_name = $1 AND oc.colour_name = $2;`
 )
 
 func GetProductSkuCountByUsername(username, productSku string) (int, error) {
@@ -70,24 +76,37 @@ func GetProductByProductId(product_id int) *sql.Row {
 
 func GetBrandNameCountByUsername(userId int, brandName string) (int, error) {
 	var count int
-	err := db.QueryRow(SQL_SELECT_COUNT_FROM_USER_BRANDS, userId).Scan(&count)
+	err := db.QueryRow(SQL_SELECT_COUNT_FROM_USER_BRANDS, userId, brandName).Scan(&count)
 	return count, err
 }
 
 func GetBrandNameCountByOrganisation(organisationName, brandName string) (int, error) {
 	var count int
-	err := db.QueryRow(SQL_SELECT_COUNT_FROM_ORGANISATION_BRANDS, organisationName).Scan(&count)
+	err := db.QueryRow(SQL_SELECT_COUNT_FROM_ORGANISATION_BRANDS, organisationName, brandName).Scan(&count)
 	return count, err
 }
 
 func GetCategoryNameCountByUsername(userId int, categoryName string) (int, error) {
 	var count int
-	err := db.QueryRow(SQL_SELECT_COUNT_FROM_USER_CATEGORIES, userId).Scan(&count)
+	err := db.QueryRow(SQL_SELECT_COUNT_FROM_USER_CATEGORIES, userId, categoryName).Scan(&count)
 	return count, err
 }
 
 func GetCategoryNameCountByOrganisation(organisationName, categoryName string) (int, error) {
 	var count int
-	err := db.QueryRow(SQL_SELECT_COUNT_FROM_ORGANISATION_CATEGORIES, organisationName).Scan(&count)
+	err := db.QueryRow(SQL_SELECT_COUNT_FROM_ORGANISATION_CATEGORIES, organisationName, categoryName).Scan(&count)
 	return count, err
 }
+
+func GetColourNameCountByUsername(userId int, colourName string) (int, error) {
+	var count int
+	err := db.QueryRow(SQL_SELECT_COUNT_FROM_USER_COLOURS, userId, colourName).Scan(&count)
+	return count, err
+}
+
+func GetColourNameCountByOrganisation(organisationName, colourName string) (int, error) {
+	var count int
+	err := db.QueryRow(SQL_SELECT_COUNT_FROM_ORGANISATION_COLOURS, organisationName, colourName).Scan(&count)
+	return count, err
+}
+

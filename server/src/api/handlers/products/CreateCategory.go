@@ -47,10 +47,10 @@ func CreateCategory(w http.ResponseWriter, req *http.Request) {
 	// Check category name to see if it already exists in database (cannot have duplicates within the same organisation or username)
 	var count int
 	if organisationName == "InvenNexus" {
-		// Check the brand name for duplicates based on username
+		// Check the category name for duplicates based on username
 		count, err = database.GetCategoryNameCountByUsername(userId, newCategory.CategoryName)
 	} else {
-		// Check the brand name for duplicates based on organisation name
+		// Check the category name for duplicates based on organisation name
 		count, err = database.GetCategoryNameCountByOrganisation(organisationName, newCategory.CategoryName)
 	}
 
@@ -63,7 +63,7 @@ func CreateCategory(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Insert brand name to `organisation_sizes` or `user_sizes` tables
+	// Insert category name to `organisation_sizes` or `user_sizes` tables
 	if organisationName == "InvenNexus" {
 		// insert into `user_sizes` table
 		err = database.InsertIntoUserCategories(userId, newCategory.CategoryName)
