@@ -31,6 +31,22 @@ CREATE TABLE product_sizes_mapping (
     PRIMARY KEY (product_id, size_id)  -- composite key
 );
 
+CREATE TABLE user_categories (
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    category_id SERIAL PRIMARY KEY,
+    category_name VARCHAR(60) NOT NULL,
+    added_date TIMESTAMP DEFAULT NOW(),
+    updated_date TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE organisation_categories (
+    organisation_id INT REFERENCES organisations(organisation_id) ON DELETE CASCADE,
+    category_id SERIAL PRIMARY KEY,
+    category_name VARCHAR(60) NOT NULL,
+    added_date TIMESTAMP DEFAULT NOW(),
+    updated_date TIMESTAMP DEFAULT NOW()
+);
+
 CREATE TABLE colours (
     colour_id SERIAL PRIMARY KEY,
     colour_name VARCHAR(60) NOT NULL,
@@ -38,12 +54,6 @@ CREATE TABLE colours (
     updated_date TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE categories (
-    category_id SERIAL PRIMARY KEY,
-    category_name VARCHAR(60) NOT NULL,
-    added_date TIMESTAMP DEFAULT NOW(),
-    updated_date TIMESTAMP DEFAULT NOW()
-);
 
 CREATE TABLE user_brands (
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,

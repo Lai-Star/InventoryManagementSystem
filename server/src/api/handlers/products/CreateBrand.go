@@ -22,7 +22,7 @@ func CreateBrand(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and UnMarshal the body to the CreateBrandJson struct
 	bs, _ := io.ReadAll(req.Body);
 	if err := json.Unmarshal(bs, &newBrand); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in AdminCreateUser route: ", err)
+		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in CreateBrand route: ", err)
 		return;
 	}
 
@@ -63,12 +63,12 @@ func CreateBrand(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Insert brand name to `organisation_sizes` or `user_sizes` tables
+	// Insert brand name to `organisation_brands` or `user_brands` tables
 	if organisationName == "InvenNexus" {
-		// insert into `user_sizes` table
-		err = database.InsertIntoUserSizes(userId, newBrand.BrandName)
+		// insert into `user_brands` table
+		err = database.InsertIntoUserBrands(userId, newBrand.BrandName)
 	} else {
-		err = database.InsertIntoOrganisationSizes(organisationName, newBrand.BrandName)
+		err = database.InsertIntoOrganisationBrands(organisationName, newBrand.BrandName)
 	}
 
 	if err != nil {
