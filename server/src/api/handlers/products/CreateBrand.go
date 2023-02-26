@@ -70,4 +70,11 @@ func CreateBrand(w http.ResponseWriter, req *http.Request) {
 	} else {
 		err = database.InsertIntoOrganisationSizes(organisationName, newBrand.BrandName)
 	}
+
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in inserting brand name into database: ", err)
+		return
+	}
+
+	utils.ResponseJson(w, http.StatusOK, "Successfully created a brand!")
 }
