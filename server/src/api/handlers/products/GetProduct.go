@@ -28,7 +28,20 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
 	var sizeName sql.NullString
 	var sizeQuantity sql.NullInt32
 
-	rows, err := database.GetProducts()
+	// Check User Organisation
+	username := w.Header().Get("username")
+	organisationName, _, err := database.GetOrganisationNameByUsername(username)
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in getting company name from database: ", err)
+		return
+	}
+
+	var rows *sql.Rows
+	if organisationName == "InvenNexus" {
+		rows, err = database.GetProducts("user_sizes")
+	} else {
+		rows, err = database.GetProducts("organisation_sizes")
+	}
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in GetProducts: ", err)
 		return

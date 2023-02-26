@@ -66,19 +66,80 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Insert to `sizes` table if user has input for size name and size quantity
+	// Insert to `user_sizes` or `organisation_sizes` table if user has input for size name and size quantity
 	if len(newProduct.Sizes) >= 1 {
-		// Insert into sizes table
 		for _, size := range(newProduct.Sizes) {
 			sizeName := size.SizeName
 			sizeQuantity := size.SizeQuantity
 
-			err = database.InsertIntoProductSizesMapping(sizeName, sizeQuantity, productId)
+			var count int
+			var err error
+			
+			if organisationName == "InvenNexus" {
+				count, err = database.GetSizeNameCountByUsername(userId, sizeName)
+			} else {
+				count, err = database.GetSizeNameCountByOrganisation(organisationName, sizeName)
+			}
+			if err != nil {
+				utils.InternalServerError(w, "Internal server error in getting size count: ", err)
+				return
+			}
+			if count == 0 {
+				utils.ResponseJson(w, http.StatusNotFound, "The size name does not exist. Please try again.")
+				return
+			}
+			
+			var insertFunc func(string, int, int) error
+			if organisationName == "InvenNexus" {
+				insertFunc = database.InsertIntoUserProductSizesMapping
+			} else {
+				insertFunc = database.InsertIntoOrganisationProductSizesMapping
+			}
+			err = insertFunc(sizeName, sizeQuantity, productId)
 			if err != nil {
 				utils.InternalServerError(w, "Internal server error in inserting new size: ", err)
 				return
 			}
 		}
+	}
+
+	// Check if brand, category or colour exists
+	var brandCount, categoryCount, colourCount int
+	var errBrand, errCategory, errColour error
+	if organisationName == "InvenNexus" {
+		brandCount, errBrand = database.GetBrandNameCountByUsername(userId, newProduct.ProductBrand)
+		colourCount, errCategory = database.GetColourNameCountByUsername(userId, newProduct.ProductColour)
+		categoryCount, errColour = database.GetCategoryNameCountByUsername(userId, newProduct.ProductCategory)
+	} else {
+		brandCount, errBrand = database.GetBrandNameCountByOrganisation(organisationName, newProduct.ProductBrand)
+		colourCount, errCategory = database.GetColourNameCountByOrganisation(organisationName, newProduct.ProductColour)
+		categoryCount, errColour = database.GetCategoryNameCountByOrganisation(organisationName, newProduct.ProductCategory)
+	}
+
+	if errBrand != nil {
+		utils.InternalServerError(w, "Internal server error in getting brand name by count: ", err)
+		return
+	}
+	if errCategory != nil {
+		utils.InternalServerError(w, "Internal server error in getting category name by count: ", err)
+		return
+	}
+	if errColour != nil {
+		utils.InternalServerError(w, "Internal server error in getting colour name by count: ", err)
+		return
+	}
+
+	if brandCount == 0 {
+		utils.ResponseJson(w, http.StatusNotFound, "Brand name does not exist. Please try again.")
+		return
+	}
+	if colourCount == 0 {
+		utils.ResponseJson(w, http.StatusNotFound, "Colour does not exist. Please try again.")
+		return
+	}
+	if categoryCount == 0 {
+		utils.ResponseJson(w, http.StatusNotFound, "Category does not exist. Please try again.")
+		return
 	}
 
 	// Insert to product_user_mapping or product_organisation_mapping table
@@ -88,7 +149,13 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 			utils.InternalServerError(w, "Internal server error in inserting into product_user_mapping table: ", err)
 			return
 		}
-	} 
+	} else {
+		err = database.InsertIntoProductOrganisationMapping(productId, organisationName, newProduct.ProductColour, newProduct.ProductCategory, newProduct.ProductBrand)
+		if err != nil {
+			utils.InternalServerError(w, "Internal server error in inserting into product_organisation_mapping table: ", err)
+			return
+		}
+	}
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully created a new product!")
 }

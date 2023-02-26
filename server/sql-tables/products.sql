@@ -24,9 +24,16 @@ CREATE TABLE organisation_sizes (
     updated_date TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE product_sizes_mapping (
+CREATE TABLE user_product_sizes_mapping (
     product_id INT REFERENCES products(product_id) ON DELETE CASCADE,
-    size_id INT REFERENCES sizes(size_id) ON DELETE CASCADE,
+    size_id INT REFERENCES user_sizes(size_id) ON DELETE CASCADE,
+    size_quantity INT DEFAULT 0,
+    PRIMARY KEY (product_id, size_id)  -- composite key
+);
+
+CREATE TABLE organisation_product_sizes_mapping (
+    product_id INT REFERENCES products(product_id) ON DELETE CASCADE,
+    size_id INT REFERENCES organisation_sizes(size_id) ON DELETE CASCADE,
     size_quantity INT DEFAULT 0,
     PRIMARY KEY (product_id, size_id)  -- composite key
 );
@@ -82,9 +89,9 @@ CREATE TABLE organisation_brands (
 CREATE TABLE product_user_mapping (
     product_id INT REFERENCES products(product_id) ON DELETE CASCADE,
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    colour_id INT REFERENCES colours(colour_id) ON DELETE CASCADE,
-    category_id INT REFERENCES categories(category_id) ON DELETE CASCADE,
-    brand_id INT REFERENCES brands(brand_id) ON DELETE CASCADE,
+    colour_id INT REFERENCES user_colours(colour_id) ON DELETE CASCADE,
+    category_id INT REFERENCES user_categories(category_id) ON DELETE CASCADE,
+    brand_id INT REFERENCES user_brands(brand_id) ON DELETE CASCADE,
     added_date TIMESTAMP DEFAULT NOW(),
     updated_date TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (product_id)
@@ -92,9 +99,9 @@ CREATE TABLE product_user_mapping (
 
 CREATE TABLE product_organisation_mapping (
     product_id INT REFERENCES products(product_id) ON DELETE CASCADE,
-    colour_id INT REFERENCES colours(colour_id) ON DELETE CASCADE,
-    category_id INT REFERENCES categories(category_id) ON DELETE CASCADE,
-    brand_id INT REFERENCES brands(brand_id) ON DELETE CASCADE,
+    colour_id INT REFERENCES organisation_colours(colour_id) ON DELETE CASCADE,
+    category_id INT REFERENCES organisation_categories(category_id) ON DELETE CASCADE,
+    brand_id INT REFERENCES organisation_brands(brand_id) ON DELETE CASCADE,
     organisation_id INT REFERENCES organisations(organisation_id) ON DELETE CASCADE,
     added_date TIMESTAMP DEFAULT NOW(),
     updated_date TIMESTAMP DEFAULT NOW(),
