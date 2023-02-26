@@ -59,50 +59,6 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Insert product details to `products` table
-	productId, err := database.InsertNewProduct(newProduct.ProductName, newProduct.ProductDescription, newProduct.ProductSku, newProduct.ProductCost)
-	if err != nil {
-		utils.InternalServerError(w, "Internal server error in inserting new product into products table: ", err)
-		return
-	}
-
-	// Insert to `user_sizes` or `organisation_sizes` table if user has input for size name and size quantity
-	if len(newProduct.Sizes) >= 1 {
-		for _, size := range(newProduct.Sizes) {
-			sizeName := size.SizeName
-			sizeQuantity := size.SizeQuantity
-
-			var count int
-			var err error
-			
-			if organisationName == "InvenNexus" {
-				count, err = database.GetSizeNameCountByUsername(userId, sizeName)
-			} else {
-				count, err = database.GetSizeNameCountByOrganisation(organisationName, sizeName)
-			}
-			if err != nil {
-				utils.InternalServerError(w, "Internal server error in getting size count: ", err)
-				return
-			}
-			if count == 0 {
-				utils.ResponseJson(w, http.StatusNotFound, "The size name does not exist. Please try again.")
-				return
-			}
-			
-			var insertFunc func(string, int, int) error
-			if organisationName == "InvenNexus" {
-				insertFunc = database.InsertIntoUserProductSizesMapping
-			} else {
-				insertFunc = database.InsertIntoOrganisationProductSizesMapping
-			}
-			err = insertFunc(sizeName, sizeQuantity, productId)
-			if err != nil {
-				utils.InternalServerError(w, "Internal server error in inserting new size: ", err)
-				return
-			}
-		}
-	}
-
 	// Check if brand, category or colour exists
 	var brandCount, categoryCount, colourCount int
 	var errBrand, errCategory, errColour error
@@ -140,6 +96,54 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	if categoryCount == 0 {
 		utils.ResponseJson(w, http.StatusNotFound, "Category does not exist. Please try again.")
 		return
+	}
+
+	// Check if size name exists
+	if len(newProduct.Sizes) >= 1 {
+		for _, size := range(newProduct.Sizes) {
+			sizeName := size.SizeName
+
+			var count int
+			var err error
+			
+			if organisationName == "InvenNexus" {
+				count, err = database.GetSizeNameCountByUsername(userId, sizeName)
+			} else {
+				count, err = database.GetSizeNameCountByOrganisation(organisationName, sizeName)
+			}
+			if err != nil {
+				utils.InternalServerError(w, "Internal server error in getting size count: ", err)
+				return
+			}
+			if count == 0 {
+				utils.ResponseJson(w, http.StatusNotFound, "The size name does not exist. Please try again.")
+				return
+			}
+		}
+	}
+
+	// Insert product details to `products` table
+	productId, err := database.InsertNewProduct(newProduct.ProductName, newProduct.ProductDescription, newProduct.ProductSku, newProduct.ProductCost)
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in inserting new product into products table: ", err)
+		return
+	}
+
+	for _, size := range(newProduct.Sizes) {
+		sizeName := size.SizeName
+		sizeQuantity := size.SizeQuantity
+		
+		var insertFunc func(string, int, int) error
+		if organisationName == "InvenNexus" {
+			insertFunc = database.InsertIntoUserProductSizesMapping
+		} else {
+			insertFunc = database.InsertIntoOrganisationProductSizesMapping
+		}
+		err = insertFunc(sizeName, sizeQuantity, productId)
+		if err != nil {
+			utils.InternalServerError(w, "Internal server error in inserting new size: ", err)
+			return
+		}
 	}
 
 	// Insert to product_user_mapping or product_organisation_mapping table

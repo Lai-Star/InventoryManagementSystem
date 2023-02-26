@@ -18,10 +18,27 @@ var (
 											INNER JOIN organisations o ON pom.organisation_id = o.organisation_id
 											WHERE o.organisation_name = $1 AND p.product_sku = $2;`
 
-	SQL_SELECT_ALL_FROM_PRODUCTS = "SELECT p.product_name, p.product_description, p.product_sku, p.product_colour, p.product_category, p.product_brand, p.product_cost, s.size_name, s.size_quantity " +
-									 "FROM products p " + 
-									 "LEFT JOIN product_sizes ps ON p.product_id = ps.product_id " +
-									 "LEFT JOIN %s s ON s.size_id = ps.size_id;"
+	SQL_SELECT_ALL_FROM_PRODUCTS_BY_USERNAME = `SELECT p.product_name, p.product_description, p.product_sku, uc.colour_name, uctg.category_name,
+									ub.brand_name, p.product_cost, us.size_name, upsm.size_quantity FROM products p
+									INNER JOIN product_user_mapping pum ON p.product_id = pum.product_id
+									LEFT JOIN user_product_sizes_mapping upsm ON p.product_id = upsm.product_id
+									LEFT JOIN user_brands ub ON pum.brand_id = ub.brand_id
+									LEFT JOIN user_colours uc ON pum.colour_id = uc.colour_id
+									LEFT JOIN user_categories uctg ON pum.category_id = uctg.category_id
+									LEFT JOIN user_sizes us ON upsm.size_id = us.size_id
+									WHERE pum.user_id = $1
+									ORDER BY p.added_date ASC`
+
+	SQL_SELECT_ALL_FROM_PRODUCTS_BY_ORGANISATION = `SELECT p.product_name, p.product_description, p.product_sku, oc.colour_name, octg.category_name,
+										ob.brand_name, p.product_cost, os.size_name, opsm.size_quantity FROM products p
+										INNER JOIN product_organisation_mapping pom ON p.product_id = pom.product_id
+										LEFT JOIN organisation_product_sizes_mapping opsm ON p.product_id = opsm.product_id
+										LEFT JOIN organisation_brands ob ON pom.brand_id = ob.brand_id
+										LEFT JOIN organisation_colours oc ON pom.colour_id = oc.colour_id
+										LEFT JOIN organisation_categories octg ON pom.category_id = octg.category_id
+										LEFT JOIN organisation_sizes os ON opsm.size_id = os.size_id
+										WHERE pom.organisation_id = (SELECT organisation_id from organisations WHERE organisation_name = $1)
+										ORDER BY p.added_date ASC;`
 
 	SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID = "SELECT product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost" + 
 													"FROM products WHERE product_id = $1;"
@@ -70,9 +87,13 @@ func ProductSkuExistsByUsername(product_sku, username string) bool {
 	return row.Scan() != sql.ErrNoRows
 }
 
-func GetProducts(tableName string) (*sql.Rows, error) {
-	query := fmt.Sprintf(SQL_SELECT_ALL_FROM_PRODUCTS, tableName)
-	rows, err := db.Query(query)
+func GetProductsByUsername(userId int) (*sql.Rows, error) {
+	rows, err := db.Query(SQL_SELECT_ALL_FROM_PRODUCTS_BY_USERNAME, userId)
+	return rows, err
+}
+
+func GetProductsByOrganisation(organisationName string) (*sql.Rows, error) {
+	rows, err := db.Query(SQL_SELECT_ALL_FROM_PRODUCTS_BY_ORGANISATION, organisationName)
 	return rows, err
 }
 
