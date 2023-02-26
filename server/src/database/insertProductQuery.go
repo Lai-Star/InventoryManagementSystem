@@ -26,19 +26,19 @@ var (
 													(SELECT brand_id FROM organisation_brands WHERE brand_name = $5), now(), now());`
 
 	SQL_INSERT_INTO_USER_BRANDS = `INSERT INTO user_brands (user_id, brand_name) VALUES ($1, $2);`
-	SQL_INSERT_INTO_ORGANISATION_BRANDS = `INSERT INTO organisation_brands (organisation_id, brand_name VALUES 
+	SQL_INSERT_INTO_ORGANISATION_BRANDS = `INSERT INTO organisation_brands (organisation_id, brand_name) VALUES 
 											((SELECT organisation_id from organisations WHERE organisation_name = $1), $2);`
 
 	SQL_INSERT_INTO_USER_CATEGORIES = `INSERT INTO user_categories (user_id, category_name) VALUES ($1, $2);`
-	SQL_INSERT_INTO_ORGANISATION_CATEGORIES = `INSERT INTO organisation_categories (organisation_id, category_name VALUES 
+	SQL_INSERT_INTO_ORGANISATION_CATEGORIES = `INSERT INTO organisation_categories (organisation_id, category_name) VALUES 
 											((SELECT organisation_id from organisations WHERE organisation_name = $1), $2);`
 
 	SQL_INSERT_INTO_USER_COLOURS = `INSERT INTO user_colours (user_id, colour_name) VALUES ($1, $2);`
-	SQL_INSERT_INTO_ORGANISATION_COLOURS = `INSERT INTO organisation_colours (organisation_id, colour_name VALUES 
+	SQL_INSERT_INTO_ORGANISATION_COLOURS = `INSERT INTO organisation_colours (organisation_id, colour_name) VALUES 
 											((SELECT organisation_id from organisations WHERE organisation_name = $1), $2);`
 
 	SQL_INSERT_INTO_USER_SIZES = `INSERT INTO user_sizes (user_id, size_name) VALUES ($1, $2);`
-	SQL_INSERT_INTO_ORGANISATION_SIZES = `INSERT INTO organisation_sizes (organisation_id, size_name VALUES 
+	SQL_INSERT_INTO_ORGANISATION_SIZES = `INSERT INTO organisation_sizes (organisation_id, size_name) VALUES 
 											((SELECT organisation_id from organisations WHERE organisation_name = $1), $2);`
 )
 

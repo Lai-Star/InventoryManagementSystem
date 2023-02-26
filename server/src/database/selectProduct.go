@@ -15,7 +15,7 @@ var (
 
 	SQL_SELECT_PRODUCT_SKU_BY_ORGANISATION = `SELECT %s FROM products p
 											INNER JOIN product_organisation_mapping pom ON p.product_id = pom.product_id
-											INNER JOIN organisation o ON pon.organisation_id = o.organisation_id
+											INNER JOIN organisations o ON pom.organisation_id = o.organisation_id
 											WHERE o.organisation_name = $1 AND p.product_sku = $2;`
 
 	SQL_SELECT_ALL_FROM_PRODUCTS = "SELECT p.product_name, p.product_description, p.product_sku, p.product_colour, p.product_category, p.product_brand, p.product_cost, s.size_name, s.size_quantity " +
@@ -47,7 +47,7 @@ var (
 	SQL_SELECT_COUNT_FROM_USER_SIZES = `SELECT COUNT(*) FROM user_sizes WHERE user_id = $1 AND size_name = $2;`
 	SQL_SELECT_COUNT_FROM_ORGANISATION_SIZES = `SELECT COUNT(*) FROM organisation_sizes os
 												INNER JOIN organisations o
-												ON o.organisation_id = oc.organisation_id
+												ON o.organisation_id = os.organisation_id
 												WHERE o.organisation_name = $1 AND os.size_name = $2;`
 )
 
