@@ -34,7 +34,7 @@ func CreateColour(w http.ResponseWriter, req *http.Request) {
 	newColour.ColourName = strings.TrimSpace(newColour.ColourName)
 
 	// Colour Name Form Validation
-	if !ProductColourFormValidation(w, newColour.ColourName) {return}
+	if !ProductColourFormValidation(w, newColour.ColourName, "CREATE") {return}
 
 	// Check User Organisation
 	username := w.Header().Get("username")

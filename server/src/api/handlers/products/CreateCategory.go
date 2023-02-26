@@ -34,7 +34,7 @@ func CreateCategory(w http.ResponseWriter, req *http.Request) {
 	newCategory.CategoryName = strings.TrimSpace(newCategory.CategoryName)
 
 	// Category Name Form Validation
-	if !ProductCategoryFormValidation(w, newCategory.CategoryName) {return}
+	if !ProductCategoryFormValidation(w, newCategory.CategoryName, "CREATE") {return}
 
 	// Check User Organisation
 	username := w.Header().Get("username")

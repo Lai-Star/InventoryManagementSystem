@@ -29,7 +29,7 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
     var productName, productDescription, productSku, productColour, productCategory, productBrand sql.NullString
     var productCost sql.NullFloat64
     var sizeName sql.NullString
-    var userId, sizeQuantity sql.NullInt32
+    var productId, userId, sizeQuantity sql.NullInt32
 
     // Check User Organisation
     username := w.Header().Get("username")
@@ -57,7 +57,7 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
     addedProducts := make(map[string]bool)
 
     for rows.Next() {
-        err = rows.Scan(&productName, &productDescription, &productSku, &productColour, &productCategory, &productBrand, &productCost, &sizeName, &sizeQuantity)
+        err = rows.Scan(&productId, &productName, &productDescription, &productSku, &productColour, &productCategory, &productBrand, &productCost, &sizeName, &sizeQuantity)
         if err != nil {
             utils.InternalServerError(w, "Internal Server Error in Scanning GetProducts: ", err)
             return
@@ -65,6 +65,7 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
 
         if !addedProducts[productSku.String] {
             product := handlers.Product{
+                ProductId: int(productId.Int32),
                 ProductName:        productName.String,
                 ProductDescription: productDescription.String,
                 ProductSku:         productSku.String,

@@ -12,6 +12,7 @@ type User struct {
 }
 
 type Product struct {
+	ProductId int
 	ProductName string
 	ProductDescription string
 	ProductSku string

@@ -34,7 +34,7 @@ func CreateBrand(w http.ResponseWriter, req *http.Request) {
 	newBrand.BrandName = strings.TrimSpace(newBrand.BrandName)
 
 	// Brand Name Form Validation
-	if !ProductBrandFormValidation(w, newBrand.BrandName) {return}
+	if !ProductBrandFormValidation(w, newBrand.BrandName, "CREATE") {return}
 
 	// Check User Organisation
 	username := w.Header().Get("username")

@@ -30,7 +30,7 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	newProduct = newProduct.ProductFieldsTrimSpaces()
 	
 	// Product Form Validation
-	if !ProductFormValidation(w, newProduct) {return}
+	if !ProductFormValidation(w, newProduct, "CREATE") {return}
 
 	// Check User Organisation
 	username := w.Header().Get("username")
