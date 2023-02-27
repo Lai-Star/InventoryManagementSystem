@@ -129,20 +129,22 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	for _, size := range(newProduct.Sizes) {
-		sizeName := size.SizeName
-		sizeQuantity := size.SizeQuantity
-		
-		var insertFunc func(string, int, int) error
-		if organisationName == "InvenNexus" {
-			insertFunc = database.InsertIntoUserProductSizesMapping
-		} else {
-			insertFunc = database.InsertIntoOrganisationProductSizesMapping
-		}
-		err = insertFunc(sizeName, sizeQuantity, productId)
-		if err != nil {
-			utils.InternalServerError(w, "Internal server error in inserting new size: ", err)
-			return
+	if len(newProduct.Sizes) >= 1 {
+		for _, size := range(newProduct.Sizes) {
+			sizeName := size.SizeName
+			sizeQuantity := size.SizeQuantity
+			
+			var insertFunc func(string, int, int) error
+			if organisationName == "InvenNexus" {
+				insertFunc = database.InsertIntoUserProductSizesMapping
+			} else {
+				insertFunc = database.InsertIntoOrganisationProductSizesMapping
+			}
+			err = insertFunc(sizeName, sizeQuantity, productId)
+			if err != nil {
+				utils.InternalServerError(w, "Internal server error in inserting new size: ", err)
+				return
+			}
 		}
 	}
 

@@ -49,15 +49,15 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	
 	// Check if product id exists for the user or organisation
 	if organisationName == "InvenNexus" {
-		count, currentProductSku, err = database.GetCountByUserIdAndProductId(userId, updateProduct.ProductId)
+		count, currentProductSku, _ = database.GetCountByUserIdAndProductId(userId, updateProduct.ProductId)
 	} else {
-		count, currentProductSku, err = database.GetCountByOrganisationAndProductId(organisationName, updateProduct.ProductId)
+		count, currentProductSku, _ = database.GetCountByOrganisationAndProductId(organisationName, updateProduct.ProductId)
 	}
 
-	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting count by product id: ", err)
-		return
-	}
+	// if err != nil {
+	// 	utils.InternalServerError(w, "Internal server error in getting count by product id: ", err)
+	// 	return
+	// }
 	if count == 0 {
 		utils.ResponseJson(w, http.StatusNotFound, "This product does not exist. Please try again.")
 		return
@@ -125,14 +125,14 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Check that the size name is exists/valid
+	// Check that the size name is exists/valid for the product
 	if len(updateProduct.Sizes) >= 1 {
 		for _, size := range(updateProduct.Sizes) {
 			sizeName := size.SizeName
 
 			var count int
 			var err error
-			
+
 			if organisationName == "InvenNexus" {
 				count, err = database.GetSizeNameCountByUsername(userId, sizeName)
 			} else {
@@ -143,7 +143,21 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 			if count == 0 {
-				utils.ResponseJson(w, http.StatusNotFound, sizeName + " size name does not exist. Please try again.")
+				utils.ResponseJson(w, http.StatusNotFound, sizeName + " size name does not exist. Please create this size or try again.")
+				return
+			}
+			
+			if organisationName == "InvenNexus" {
+				count, err = database.GetSizeNameCountByUserIdAndProductId(updateProduct.ProductId, userId, sizeName)
+			} else {
+				count, err = database.GetSizeNameCountByOrganisationIdAndProductId(updateProduct.ProductId, organisationName, sizeName)
+			}
+			if err != nil {
+				utils.InternalServerError(w, "Internal server error in getting size count by product id: ", err)
+				return
+			}
+			if count == 0 {
+				utils.ResponseJson(w, http.StatusNotFound, sizeName + " size name does not exist for this product. Please try again.")
 				return
 			}
 		}
@@ -169,8 +183,24 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 		utils.InternalServerError(w, "Internal server error in updating product user/organisation mapping table: ", err)
 		return
 	}
-	
+
 	// Update user_product_sizes_mapping or organisation_product_sizes_mapping
+	for _, size := range(updateProduct.Sizes) {
+		sizeName := size.SizeName
+		sizeQuantity := size.SizeQuantity
+		
+		var updateFunc func(int, int, string) error
+		if organisationName == "InvenNexus" {
+			updateFunc = database.UpdateUserProductSizesMapping
+		} else {
+			updateFunc = database.UpdateOrganisationProductSizesMapping
+		}
+		err = updateFunc(sizeQuantity, updateProduct.ProductId, sizeName)
+		if err != nil {
+			utils.InternalServerError(w, "Internal server error in inserting new size: ", err)
+			return
+		}
+	}
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully updated the product!")
 }

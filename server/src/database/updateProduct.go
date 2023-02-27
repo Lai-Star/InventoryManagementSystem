@@ -1,7 +1,5 @@
 package database
 
-import "fmt"
-
 var (
 	SQL_UPDATE_PRODUCTS_BY_PRODUCTID = `UPDATE products SET product_name = $1, product_description = $2, product_sku = $3, product_cost = $4, updated_date = NOW()
 							WHERE product_id = $5;`
@@ -22,6 +20,14 @@ var (
 												INNER JOIN organisation_categories AS ocat ON ocat.organisation_id = pom_sub.organisation_id AND ocat.category_name = COALESCE(NULLIF($4,''), ocat.category_name)
 												INNER JOIN organisation_brands AS ob ON ob.organisation_id = pom_sub.organisation_id AND ob.brand_name = COALESCE(NULLIF($5,''), ob.brand_name)
 												WHERE pom.product_id = pom_sub.product_id;`
+
+	SQL_UPDATE_USER_PRODUCT_SIZES_MAPPING = `UPDATE user_product_sizes_mapping SET
+												size_quantity = $1 WHERE product_id = $2
+												AND size_id = (SELECT size_id FROM user_sizes WHERE size_name = $3);`
+
+	SQL_UPDATE_ORGANISATION_PRODUCT_SIZES_MAPPING = `UPDATE organisation_product_sizes_mapping SET
+														size_quantity = $1 WHERE product_id = $2
+														AND size_id = (SELECT size_id FROM organisation_sizes WHERE size_name = $3);`
 )
 
 func UpdateProductsByProductID(productName, productDesc, productSku string, productCost float32, productId int) error {
@@ -35,7 +41,16 @@ func UpdateProductUserMapping(userId, productId int, colourName, categoryName, b
 }
 
 func UpdateProductOrganisationMapping(productId int, organisationName, colourName, categoryName, brandName string) error {
-	fmt.Println(productId, organisationName, colourName, categoryName, brandName)
 	_, err := db.Exec(SQL_UPDATE_PRODUCT_ORGANISATION_MAPPING, organisationName, productId, colourName, categoryName, brandName)
+	return err
+}
+
+func UpdateUserProductSizesMapping(sizeQuantity, productId int, sizeName string) error {
+	_, err := db.Exec(SQL_UPDATE_USER_PRODUCT_SIZES_MAPPING, sizeQuantity, productId, sizeName)
+	return err
+}
+
+func UpdateOrganisationProductSizesMapping(sizeQuantity, productId int, sizeName string) error {
+	_, err := db.Exec(SQL_UPDATE_ORGANISATION_PRODUCT_SIZES_MAPPING, sizeQuantity, productId, sizeName)
 	return err
 }
