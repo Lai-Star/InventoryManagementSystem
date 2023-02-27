@@ -99,10 +99,10 @@ CREATE TABLE IF NOT EXISTS product_user_mapping (
 
 CREATE TABLE IF NOT EXISTS product_organisation_mapping (
     product_id INT REFERENCES products(product_id) ON DELETE CASCADE,
+    organisation_id INT REFERENCES organisations(organisation_id) ON DELETE CASCADE,
     colour_id INT REFERENCES organisation_colours(colour_id) ON DELETE CASCADE,
     category_id INT REFERENCES organisation_categories(category_id) ON DELETE CASCADE,
     brand_id INT REFERENCES organisation_brands(brand_id) ON DELETE CASCADE,
-    organisation_id INT REFERENCES organisations(organisation_id) ON DELETE CASCADE,
     added_date TIMESTAMP DEFAULT NOW(),
     updated_date TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (product_id)

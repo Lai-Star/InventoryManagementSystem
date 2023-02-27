@@ -86,9 +86,91 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
+	// Check if brand, category or colour exists
+	var brandCount, categoryCount, colourCount int
+	var errBrand, errCategory, errColour error
+	if organisationName == "InvenNexus" {
+		brandCount, errBrand = database.GetBrandNameCountByUsername(userId, updateProduct.ProductBrand)
+		colourCount, errCategory = database.GetColourNameCountByUsername(userId, updateProduct.ProductColour)
+		categoryCount, errColour = database.GetCategoryNameCountByUsername(userId, updateProduct.ProductCategory)
+	} else {
+		brandCount, errBrand = database.GetBrandNameCountByOrganisation(organisationName, updateProduct.ProductBrand)
+		colourCount, errCategory = database.GetColourNameCountByOrganisation(organisationName, updateProduct.ProductColour)
+		categoryCount, errColour = database.GetCategoryNameCountByOrganisation(organisationName, updateProduct.ProductCategory)
+	}
+
+	if errBrand != nil {
+		utils.InternalServerError(w, "Internal server error in getting brand name by count: ", err)
+		return
+	}
+	if errCategory != nil {
+		utils.InternalServerError(w, "Internal server error in getting category name by count: ", err)
+		return
+	}
+	if errColour != nil {
+		utils.InternalServerError(w, "Internal server error in getting colour name by count: ", err)
+		return
+	}
+
+	if brandCount == 0 {
+		utils.ResponseJson(w, http.StatusNotFound, "Brand name does not exist. Please try again.")
+		return
+	}
+	if colourCount == 0 {
+		utils.ResponseJson(w, http.StatusNotFound, "Colour does not exist. Please try again.")
+		return
+	}
+	if categoryCount == 0 {
+		utils.ResponseJson(w, http.StatusNotFound, "Category does not exist. Please try again.")
+		return
+	}
+
 	// Check that the size name is exists/valid
+	if len(updateProduct.Sizes) >= 1 {
+		for _, size := range(updateProduct.Sizes) {
+			sizeName := size.SizeName
+
+			var count int
+			var err error
+			
+			if organisationName == "InvenNexus" {
+				count, err = database.GetSizeNameCountByUsername(userId, sizeName)
+			} else {
+				count, err = database.GetSizeNameCountByOrganisation(organisationName, sizeName)
+			}
+			if err != nil {
+				utils.InternalServerError(w, "Internal server error in getting size count: ", err)
+				return
+			}
+			if count == 0 {
+				utils.ResponseJson(w, http.StatusNotFound, sizeName + " size name does not exist. Please try again.")
+				return
+			}
+		}
+	}
+
+	// Update products in the products table by product id
+	err = database.UpdateProductsByProductID(updateProduct.ProductName, updateProduct.ProductDescription, updateProduct.ProductSku, updateProduct.ProductCost, updateProduct.ProductId)
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in updating products table: ", err)
+		return
+	}
+
+	// Update product_user_mapping or product_organisation_mapping table
+	if organisationName == "InvenNexus" {
+		// regular user update
+		err = database.UpdateProductUserMapping(userId, updateProduct.ProductId, updateProduct.ProductColour, updateProduct.ProductCategory, updateProduct.ProductBrand)
+	} else {
+		// organisation update
+		err = database.UpdateProductOrganisationMapping(updateProduct.ProductId, organisationName, updateProduct.ProductColour, updateProduct.ProductCategory, updateProduct.ProductBrand)
+	}
+
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in updating product user/organisation mapping table: ", err)
+		return
+	}
 	
-	
+	// Update user_product_sizes_mapping or organisation_product_sizes_mapping
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully updated the product!")
 }

@@ -1,9 +1,6 @@
 package database
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/lib/pq"
 )
 
@@ -25,10 +22,6 @@ var (
 									"SELECT user_group_id FROM user_group_mapping ugm WHERE ugm.user_id = $1 AND ugm.user_group_id = ng.user_group_id);"
 )
 
-var (
-	SQL_UPDATE_PRODUCTS = "UPDATE products SET %s = $1, %s = $2, %s = $3, %s = $4, %s = $5, %s = $6, %s = $7, updated_date = now() WHERE %s = $8;"
-)
-
 func UpdateUsers(username, password, email string, isActive int) (int, error) {
 	var userId int
 	err := db.QueryRow(SQL_UPDATE_USERS, username, password, email, isActive).Scan(&userId)
@@ -43,15 +36,6 @@ func UpdateUserOrganisationMapping(userId int, organisationName string) error {
 func UpdateUserGroupMapping(userId int, userGroups []string) error {
 	args := []interface{}{userId, pq.Array(userGroups)}
 	_, err := db.Exec(SQL_UPDATE_USER_GROUP_MAPPING, args...)
-	return err
-}
-
-func UpdateProduct(product_id int, product_name, product_description, product_sku, product_colour, product_category, product_brand string, product_cost float32) error  {
-	query := fmt.Sprintf(SQL_UPDATE_PRODUCTS, "product_name", "product_description", "product_sku", "product_colour", "product_category", "product_brand", "product_cost", "product_id")
-	_, err := db.Exec(query, product_name, product_description, product_sku, product_colour, product_category, product_brand, product_cost, product_id)
-	if err != nil {
-		log.Println("Error in Updating product: ", err)
-	}
 	return err
 }
 
