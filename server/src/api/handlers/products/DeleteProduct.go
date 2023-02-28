@@ -14,7 +14,6 @@ func DeleteProduct(w http.ResponseWriter, req *http.Request) {
 	
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json")
-	var deleteProduct DeleteProductJson
 
 	// CheckUserGroup: IMS User and Operations
 	if !handlers_user_management.RetrieveIssuer(w, req) {return}
@@ -22,22 +21,40 @@ func DeleteProduct(w http.ResponseWriter, req *http.Request) {
 
 	// Get productid from url params
 	productIdStr := chi.URLParam(req, "product_id")
-	deleteProduct.ProductId, _ = strconv.Atoi(productIdStr)
+	productId, _ := strconv.Atoi(productIdStr)
 
-	// Check if product exists in database
-	// if !database.ProductIdExists(deleteProduct.ProductId) {
-	// 	utils.ResponseJson(w, http.StatusNotFound, "Product does not exist in database. Please try again.")
-	// 	return
-	// }
-
-	err := database.DeleteProductFromProducts(deleteProduct.ProductId)
+	// Check User Organisation
+	username := w.Header().Get("username")
+	organisationName, userId, err := database.GetOrganisationNameByUsername(username)
 	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in deleting product from products table: ", err)
+		utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
+		return
+	}
+
+	var count int
+	// Check if product exists in database
+	if organisationName == "InvenNexus" {
+		count, err = database.GetCountByUserIdAndProductId(userId, productId)
+	} else {
+		count, err = database.GetCountByOrganisationNameAndProductId(organisationName, productId)
+	}
+
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in getting count by organisation/user id and product id: ", err)
+		return
+	}
+	if count == 0 {
+		utils.ResponseJson(w, http.StatusNotFound, "There is no such product. Please try again.")
+		return	}
+
+	// Delete product from products table
+	err = database.DeleteProduct(productId)
+	if err != nil {
+		utils.InternalServerError(w, "Internal server error in deleting product by product id: ", err)
 		return
 	}
 	
 	utils.ResponseJson(w, http.StatusOK, "Successfully Deleted Product!")
-
 }
 
 

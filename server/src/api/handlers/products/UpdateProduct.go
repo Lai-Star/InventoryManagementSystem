@@ -49,9 +49,9 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	
 	// Check if product id exists for the user or organisation
 	if organisationName == "InvenNexus" {
-		count, currentProductSku, _ = database.GetCountByUserIdAndProductId(userId, updateProduct.ProductId)
+		count, currentProductSku, _ = database.GetCountProductSkuByUserIdAndProductId(userId, updateProduct.ProductId)
 	} else {
-		count, currentProductSku, _ = database.GetCountByOrganisationAndProductId(organisationName, updateProduct.ProductId)
+		count, currentProductSku, _ = database.GetCountProductSkuByOrganisationAndProductId(organisationName, updateProduct.ProductId)
 	}
 
 	// if err != nil {
