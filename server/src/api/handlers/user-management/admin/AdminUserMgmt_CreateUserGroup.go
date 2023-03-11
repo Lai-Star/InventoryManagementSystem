@@ -65,7 +65,7 @@ func AdminCreateUserGroup(w http.ResponseWriter, req *http.Request) {
 func UserGroupValidation(w http.ResponseWriter, userGroup string) bool {
 		
 	// Check if user group is empty.
-	if len(userGroup) == 0 {
+	if utils.IsBlankField(userGroup) {
 		utils.ResponseJson(w, http.StatusBadRequest, "User Group cannot be empty. Please try again.")
 		return false
 	}

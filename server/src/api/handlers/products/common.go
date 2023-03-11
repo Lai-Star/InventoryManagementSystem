@@ -34,7 +34,7 @@ type DeleteProductJson struct {
 func ProductNameFormValidation(w http.ResponseWriter, productName, action string) bool {
 	if action == "CREATE" {
 		// Check if product name is empty
-		if utils.CheckBlankField(productName) {
+		if utils.IsBlankField(productName) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Product Name cannot be empty. Please try again.")
 			return false
 		}
@@ -54,7 +54,7 @@ func ProductNameFormValidation(w http.ResponseWriter, productName, action string
 func ProductSkuFormValidation(w http.ResponseWriter, productSku, action string) bool {
 	if action == "CREATE" {
 		// Check if product sku is empty
-		if utils.CheckBlankField(productSku) {
+		if utils.IsBlankField(productSku) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Product Sku cannot be empty. Please try again.")
 			return false
 		}
@@ -74,7 +74,7 @@ func ProductSkuFormValidation(w http.ResponseWriter, productSku, action string) 
 func ProductBrandFormValidation(w http.ResponseWriter, productBrand, action string) bool {
 	if action == "CREATE" {
 		// Check if product brand is empty
-		if utils.CheckBlankField(productBrand) {
+		if utils.IsBlankField(productBrand) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Product Brand cannot be empty. Please try again.")
 			return false
 		}
@@ -94,7 +94,7 @@ func ProductBrandFormValidation(w http.ResponseWriter, productBrand, action stri
 func ProductColourFormValidation(w http.ResponseWriter, productColour, action string) bool {
 	if action == "CREATE" {
 		// Check if product colour is empty
-		if utils.CheckBlankField(productColour) {
+		if utils.IsBlankField(productColour) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Product Colour cannot be empty. Please try again.")
 			return false
 		}
@@ -114,7 +114,7 @@ func ProductColourFormValidation(w http.ResponseWriter, productColour, action st
 func ProductCategoryFormValidation(w http.ResponseWriter, productCategory, action string) bool {
 	if action == "CREATE" {
 		// Check if product category is empty
-		if utils.CheckBlankField(productCategory) {
+		if utils.IsBlankField(productCategory) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Product Category cannot be empty. Please try again.")
 			return false
 		}
@@ -154,7 +154,7 @@ func SizeNameQuantityFormValidation(w http.ResponseWriter, sizes []Size) bool {
 		sizes[idx].SizeName = strings.TrimSpace(size.SizeName)
 
 		// Check if size name is empty
-		if utils.CheckBlankField(size.SizeName) {
+		if utils.IsBlankField(size.SizeName) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Size Name cannot be empty. Please try again.")
 			return false
 		}
@@ -187,7 +187,7 @@ func SizeNameQuantityFormValidation(w http.ResponseWriter, sizes []Size) bool {
 
 func SizeNameFormValidation(w http.ResponseWriter, sizeName string) bool {
 	// Check if size name is empty
-	if utils.CheckBlankField(sizeName) {
+	if utils.IsBlankField(sizeName) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Size Name cannot be empty. Please try again.")
 		return false
 	}

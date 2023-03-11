@@ -70,7 +70,7 @@ func (user SignUpJson) UserFieldsTrimSpaces() (SignUpJson) {
 // Form Validation: Username
 func UsernameFormValidation(w http.ResponseWriter, username string) bool {
 	// Ensure username is not blank
-	if utils.CheckBlankField(username) {
+	if utils.IsBlankField(username) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username cannot be blank. Please try again.")
 		return false
 	}
@@ -93,7 +93,7 @@ func UsernameFormValidation(w http.ResponseWriter, username string) bool {
 func PasswordFormValidation(w http.ResponseWriter, password, action string) bool {
 	// Ensure password is not blank
 	if action == "CREATE_USER" {
-		if utils.CheckBlankField(password) {
+		if utils.IsBlankField(password) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Password cannot be blank. Please try again.")
 			return false
 		}
@@ -121,7 +121,7 @@ func PasswordFormValidation(w http.ResponseWriter, password, action string) bool
 func EmailFormValidation(w http.ResponseWriter, email, action string) bool {
 	// Email cannot be blank
 	if action == "CREATE_USER" {
-		if utils.CheckBlankField(email) {
+		if utils.IsBlankField(email) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Email address cannot be blank. Please try again.")
 			return false
 		}
@@ -147,7 +147,7 @@ func EmailFormValidation(w http.ResponseWriter, email, action string) bool {
 // Form Validation: Organisation
 func OrganisationFormValidation(w http.ResponseWriter, organisationName, action string) bool {
 
-	if (action == "CREATE_USER" || action == "CREATE_ORGANISATION") && utils.CheckBlankField(organisationName) {
+	if (action == "CREATE_USER" || action == "CREATE_ORGANISATION") && utils.IsBlankField(organisationName) {
 		if action == "CREATE_ORGANISATION" {
 			utils.ResponseJson(w, http.StatusBadRequest, "Please provide an organisation name.")
 			return false

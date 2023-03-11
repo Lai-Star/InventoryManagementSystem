@@ -12,17 +12,19 @@ func CheckLengthRange(str string, minLength int, maxLength int) bool {
 	return true
 }
 
-// Returns true if field is blank
-func CheckBlankField(str string) bool {
+// Returns true if the string has white spaces
+func HasWhiteSpaces(str string) bool {
+    whiteSpaceRegex := regexp.MustCompile(`^\S*$`)
+
+    return whiteSpaceRegex.MatchString(str)
+}
+
+// Returns true if string field is blank
+func IsBlankField(str string) bool {
     return len(str) == 0
 }
 
-func CheckWhiteSpaces(str string) bool {
-	whiteSpaceRegex := regexp.MustCompile(`^\S*$`)
-
-	return whiteSpaceRegex.MatchString(str)
-}
-
+// Returns true if username contains regular alphabets, numbers and no special characters except underscore
 func CheckUsernameSpecialChar(str string) bool {
 	specialCharRegex := regexp.MustCompile(`^[a-zA-Z0-9_]*$`)
 
@@ -54,8 +56,6 @@ func CheckPasswordSpecialChar(str string) bool {
     // Password meets all criteria
     return true
 }
-
-
 
 func CheckEmailAddress(email string) bool {
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`)

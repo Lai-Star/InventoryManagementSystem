@@ -26,7 +26,7 @@ func Test_Length(t *testing.T) {
 	}
 }
 
-func Test_CheckWhiteSpaces(t *testing.T) {
+func Test_HasWhiteSpaces(t *testing.T) {
 	whiteSpacesTests := []struct {
 		testName string
 		str string
@@ -40,15 +40,35 @@ func Test_CheckWhiteSpaces(t *testing.T) {
 	}
 
 	for _, e := range whiteSpacesTests {
-		result := CheckWhiteSpaces(e.str)
+		result := HasWhiteSpaces(e.str)
 		if e.expected && !result {
 			t.Errorf("%s: expected true but got %v", e.testName, result)
 		}
 	}
 }
 
-func Test_CheckSpecialChar(t *testing.T) {
-	specialCharTests := []struct {
+func Test_IsBlankField(t *testing.T) {
+	blankFieldTests := []struct {
+		testName string
+		str string
+		expected bool
+	} {
+		{"Empty String", "", true},
+		{"String with blank spaces but no words", "   ", false},
+		{"String with blank spaces", "  Hello   ", false},
+		{"Regular string with no blank spaces", "Hello world", false},
+	}
+
+	for _, e := range blankFieldTests {
+		result := IsBlankField(e.str)
+		if e.expected && !result {
+			t.Errorf("%s: expected true but got %v", e.testName, result)
+		}
+	}
+}
+
+func Test_CheckUsernameSpecialChar(t *testing.T) {
+	usernameSpecialCharTests := []struct {
 		testName string
 		str string
 		expected bool
@@ -61,13 +81,35 @@ func Test_CheckSpecialChar(t *testing.T) {
 		{"correct format", "abcABC1234_", true},
 	}
 
-	for _, e := range specialCharTests {
+	for _, e := range usernameSpecialCharTests {
 		result := CheckUsernameSpecialChar(e.str)
 		if e.expected && !result {
 			t.Errorf("%s: expected true but got %v", e.testName, result)
 		}
 	}
 }
+
+func Test_CheckPasswordSpecialChar(t *testing.T) {
+	passwordSpecialCharTests := []struct {
+		testName string
+		str string
+		expected bool 
+	} {
+		{"Contains lowercase, uppercase, number, and special character", "p@ssw0rdTest", true},
+		{"Contains lowercase and uppercase letters only", "passwordTest", false},
+		{"Contains lowercase letters and numbers only", "password123", false},
+		{"Contains uppercase letters and special characters only", "PASSWORD!@#", false},
+		{"Missing special character", "Password123", false},
+	}
+
+	for _, e := range passwordSpecialCharTests {
+		result := CheckPasswordSpecialChar(e.str)
+		if e.expected != result {
+			t.Errorf("%s: expected %v but got %v", e.testName, e.expected, result)
+		}
+	}
+}
+
 
 func Test_CheckEmailAddress(t *testing.T) {
 	emailAddressTests := []struct {

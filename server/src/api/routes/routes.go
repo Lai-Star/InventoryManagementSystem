@@ -23,22 +23,26 @@ func Routes() http.Handler {
 	mux.Post("/signup", handlers_auth.SignUp)
 
 	// Admin Management Routes
-	mux.Post("/admin-create-user", handlers_admin.AdminCreateUser)
-	mux.Get("/admin-get-users", handlers_admin.AdminGetUsers)
-	mux.Patch("/admin-update-user", handlers_admin.AdminUpdateUser)
-	mux.Delete("/admin-delete-user", handlers_admin.AdminDeleteUser)
-	mux.Post("/admin-create-user-group", handlers_admin.AdminCreateUserGroup)
-	mux.Post("/admin-create-organisation", handlers_admin.AdminCreateOrganisation)
+	mux.Route("/admin", func (mux chi.Router) {
+		mux.Post("/create-user", handlers_admin.AdminCreateUser)
+		mux.Get("/users", handlers_admin.AdminGetUsers)
+		mux.Patch("/update-user", handlers_admin.AdminUpdateUser)
+		mux.Delete("/delete-user", handlers_admin.AdminDeleteUser)
+		mux.Post("/create-user-group", handlers_admin.AdminCreateUserGroup)
+		mux.Post("/create-organisation", handlers_admin.AdminCreateOrganisation)
+	})
 
 	// Product Routes
-	mux.Post("/create-product", handlers_products.CreateProduct)
-	mux.Get("/get-products", handlers_products.GetProducts)
-	mux.Patch("/update-product/{product_id}", handlers_products.UpdateProduct)
-	mux.Delete("/delete-product/{product_id}", handlers_products.DeleteProduct)
-	mux.Post("/create-brand", handlers_products.CreateBrand)
-	mux.Post("/create-colour", handlers_products.CreateColour)
-	mux.Post("/create-category", handlers_products.CreateCategory)
-	mux.Post("/create-size", handlers_products.CreateSize)
+	mux.Route("/product", func(mux chi.Router) {
+		mux.Post("/create", handlers_products.CreateProduct)
+		mux.Get("/products", handlers_products.GetProducts)
+		mux.Patch("/update/{product_id}", handlers_products.UpdateProduct)
+		mux.Delete("/delete/{product_id}", handlers_products.DeleteProduct)
+		mux.Post("/create-brand", handlers_products.CreateBrand)
+		mux.Post("/create-colour", handlers_products.CreateColour)
+		mux.Post("/create-category", handlers_products.CreateCategory)
+		mux.Post("/create-size", handlers_products.CreateSize)
+	})
 
 	return mux
 }

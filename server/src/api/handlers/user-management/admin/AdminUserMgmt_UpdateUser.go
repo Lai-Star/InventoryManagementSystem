@@ -30,7 +30,7 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	adminUpdateUser = adminUpdateUser.AdminUserMgmtFieldsTrimSpaces()
 	
 	// Check if username field is empty (mandatory field to update user, others can be empty)
-	if len(adminUpdateUser.Username) == 0 {
+	if utils.IsBlankField(adminUpdateUser.Username) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Please enter a username.")
 		return
 	}
