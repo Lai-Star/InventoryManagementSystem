@@ -10,9 +10,9 @@ import (
 func Generate2FA() (string) {
 	// Use Cryptographically Secure Pseudorandom Number Generator (CSPRNG)
 
-	// To generate 5 random alphabets (lower/upper) using CSPRNG
+	// To generate 4 random alphabets (lower/upper) using CSPRNG
 	var otpAlphabets []byte
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 4; i++ {
 		n, err := rand.Int(rand.Reader, big.NewInt(52))
 		if err != nil {
 			log.Println("Error in generating random number for otp: ", err)
