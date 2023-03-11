@@ -55,7 +55,7 @@ func Test_InternalServerError(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	// Calling the function
-	InternalServerError(w, "Internal Server Error (testing): ", err)
+	InternalServerError(w, "Internal Server Error (testing):", err)
 	actualOutput := buf.String()
 
 	// Get date time to compare with logs
