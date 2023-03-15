@@ -16,19 +16,23 @@ type AdminCreateOrganisationJson struct {
 }
 
 func AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "application/json");
+	w.Header().Set("Content-Type", "application/json")
 	var organisation AdminCreateOrganisationJson
 
 	// Reading the request body and UnMarshal the body to the AdminCreateOrganisationJson struct
-	bs, _ := io.ReadAll(req.Body);
+	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &organisation); err != nil {
 		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in AdminCreateUser route: ", err)
-		return;
+		return
 	}
 
 	// Check User Group Admin
-	if !handlers_user_management.RetrieveIssuer(w, req) {return}
-	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {
+		return
+	}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {
+		return
+	}
 
 	organisationName := organisation.OrganisationName
 
@@ -37,7 +41,9 @@ func AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) {
 
 	// Organisation form validation
 	isValidOrganisationName := handlers_user_management.OrganisationFormValidation(w, organisationName, "CREATE_ORGANISATION")
-	if !isValidOrganisationName {return}
+	if !isValidOrganisationName {
+		return
+	}
 
 	// Check if organisation name already exists
 	count, err := database.GetOrganisationNameCount(organisationName)
@@ -46,7 +52,7 @@ func AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if count == 1 {
-		utils.ResponseJson(w, http.StatusBadRequest, organisationName + " already exists. Please try again.")
+		utils.ResponseJson(w, http.StatusBadRequest, organisationName+" already exists. Please try again.")
 		return
 	}
 

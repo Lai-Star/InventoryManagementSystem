@@ -2,21 +2,20 @@ package utils
 
 import (
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 )
 
 func ResponseJson(w http.ResponseWriter, Code int, Message string) {
 	jsonStatus := struct {
-		Code int `json:"code"`
+		Code    int    `json:"code"`
 		Message string `json:"message"`
 	}{
 		Message: Message,
-		Code: Code,
+		Code:    Code,
 	}
 
-	bs, err := json.Marshal(jsonStatus);
+	bs, err := json.Marshal(jsonStatus)
 	if err != nil {
 		log.Println("Error in Marshal JSON in ResponseJson: ", err)
 	}
@@ -27,10 +26,11 @@ func ResponseJson(w http.ResponseWriter, Code int, Message string) {
 	// CheckError(err)
 	// io.WriteString(w, string(signature));
 
-	io.WriteString(w, string(bs));
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(bs)
 }
 
 func InternalServerError(w http.ResponseWriter, message string, err error) {
 	log.Println(message, err)
-	ResponseJson(w, http.StatusInternalServerError, "An Internal Server Error Occurred.");
+	ResponseJson(w, http.StatusInternalServerError, "An Internal Server Error Occurred.")
 }

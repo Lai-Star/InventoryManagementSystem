@@ -1,15 +1,4 @@
 mode: set
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/passwordHash.go:9.45,12.16 2 1
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/passwordHash.go:16.2,16.21 1 1
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/passwordHash.go:12.16,14.3 1 0
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/passwordHash.go:19.63,22.2 2 1
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/responseJson.go:10.68,20.16 3 1
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/responseJson.go:30.2,30.31 1 1
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/responseJson.go:20.16,22.3 1 0
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/responseJson.go:33.76,36.2 2 1
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/smtp.go:17.54,79.19 12 0
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/smtp.go:79.19,81.6 1 0
-github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/smtp.go:84.33,93.2 1 0
 github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/checkFormat.go:8.70,9.52 1 1
 github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/checkFormat.go:12.2,12.13 1 1
 github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/checkFormat.go:9.52,11.3 1 1
@@ -47,3 +36,14 @@ github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/g
 github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/generate2FA.go:21.21,23.4 1 1
 github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/generate2FA.go:23.9,25.4 1 1
 github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/generate2FA.go:32.16,34.3 1 0
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/passwordHash.go:9.45,12.16 2 1
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/passwordHash.go:16.2,16.21 1 1
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/passwordHash.go:12.16,14.3 1 0
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/passwordHash.go:19.63,22.2 2 1
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/responseJson.go:10.68,27.16 3 1
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/responseJson.go:27.16,32.3 4 0
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/responseJson.go:32.8,35.3 2 1
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/responseJson.go:39.76,42.2 2 1
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/smtp.go:17.54,79.19 12 0
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/smtp.go:79.19,81.6 1 0
+github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils/smtp.go:84.33,93.2 1 0

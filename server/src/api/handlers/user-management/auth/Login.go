@@ -19,22 +19,22 @@ type LoginJson struct {
 }
 
 func Login(w http.ResponseWriter, req *http.Request) {
-	
+
 	// Set Headers
-	w.Header().Set("Content-Type", "application/json");
+	w.Header().Set("Content-Type", "application/json")
 	var user LoginJson
-	
+
 	// Reading the request body and UnMarshal the body to the LoginJson struct
-	bs, _ := io.ReadAll(req.Body);
+	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &user); err != nil {
 		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in Login route: ", err)
-		return;
+		return
 	}
-	
+
 	// Check if username exists in database
-	if (!database.GetUsername(user.Username)) {
+	if !database.GetUsername(user.Username) {
 		utils.ResponseJson(w, http.StatusUnauthorized, "You have entered an incorrect username and/or password. Please try again.")
-		return;
+		return
 	}
 
 	// Compare password with hashed password in database
@@ -43,10 +43,10 @@ func Login(w http.ResponseWriter, req *http.Request) {
 		utils.InternalServerError(w, "Internal server error in getting password in login route: ", err)
 		return
 	}
-	isValidPassword := utils.CompareHash(dbPassword, user.Password);
-	if (!isValidPassword) {
+	isValidPassword := utils.CompareHash(dbPassword, user.Password)
+	if !isValidPassword {
 		utils.ResponseJson(w, http.StatusUnauthorized, "You have entered an incorrect username and/or password. Please try again.")
-		return;
+		return
 	}
 
 	// Check User Status (active/inactive)
@@ -55,42 +55,42 @@ func Login(w http.ResponseWriter, req *http.Request) {
 		utils.InternalServerError(w, "Internal server error in getting active status in login route: ", err)
 		return
 	}
-	if (dbStatus != 1) {
+	if dbStatus != 1 {
 		utils.ResponseJson(w, http.StatusForbidden, "Your account has been disabled. Please contact the IMS Administrator.")
 		return
 	}
 
 	// Generate Token with Claims
 	tokenExpireTime := time.Now().Add(1 * time.Hour)
-	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims {
-		Issuer: user.Username,
+	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
+		Issuer:    user.Username,
 		ExpiresAt: jwt.NewNumericDate(tokenExpireTime), // 1 hour
 	})
 
-	// Signing the jwt token with a secret key 
+	// Signing the jwt token with a secret key
 	signedToken, err := generateToken.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in signing jwt token: ", err)
-		return;
+		return
 	}
 
-	c := &http.Cookie {
-		Name: "leon-jwt-token",
-		Value: signedToken,
-		MaxAge: 3600,
-		Path: "/",
-		Domain: "localhost",
-		Secure: false,
+	c := &http.Cookie{
+		Name:     "leon-jwt-token",
+		Value:    signedToken,
+		MaxAge:   3600,
+		Path:     "/",
+		Domain:   "localhost",
+		Secure:   false,
 		HttpOnly: true,
 	}
 
 	// Setting a cookie with the signed jwt-token
 	http.SetCookie(w, c)
 
-	utils.ResponseJson(w, http.StatusOK, "Successfully Logged In!");
+	utils.ResponseJson(w, http.StatusOK, "Successfully Logged In!")
 
 	// Retrieve user's email to send OTP
-	dbEmail, _ := database.GetEmailByUsername(user.Username)
-	go utils.SMTP(user.Username, dbEmail, utils.Generate2FA())
+	// dbEmail, _ := database.GetEmailByUsername(user.Username)
+	// go utils.SMTP(user.Username, dbEmail, utils.Generate2FA())
 
 }

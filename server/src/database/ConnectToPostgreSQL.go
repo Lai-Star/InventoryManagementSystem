@@ -13,9 +13,9 @@ import (
 // For querying in other files inside database folder
 var db *sql.DB
 
-func ConnectToPostgreSQL() *sql.DB {
+func ConnectToPostgreSQL() (*sql.DB, error) {
 	// Loading the .env file in the config folder
-	err := godotenv.Load("./config/.env");
+	err := godotenv.Load("./config/.env")
 	if err != nil {
 		log.Println("Error loading .env file when connecting to PostgreSQL: ", err)
 	}
@@ -27,13 +27,13 @@ func ConnectToPostgreSQL() *sql.DB {
 	dbname := os.Getenv("POSTGRESQL_DB")
 
 	pgsqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-	host, port, user, password, dbname)
+		host, port, user, password, dbname)
 
 	db, err = sql.Open("postgres", pgsqlInfo)
 	if err != nil {
 		log.Println("Error opening PostgreSQL: ", err)
 	}
-	
+
 	// Test the connection to the database
 	err = db.Ping()
 	if err != nil {
@@ -44,5 +44,5 @@ func ConnectToPostgreSQL() *sql.DB {
 		fmt.Println("Successfully connected to PostgreSQL database!")
 	}
 
-	return db
+	return db, err
 }

@@ -14,13 +14,13 @@ import (
 
 func Test_ResponseJson(t *testing.T) {
 	responseJsonTests := []struct {
-		testName string
-		code int
-		message string
+		testName             string
+		code                 int
+		message              string
 		expectedJsonResponse string
-	} {
+	}{
 		{"Successful Login", http.StatusOK, "Successfully Logged In!", `{"code":200,"message":"Successfully Logged In!"}`},
-		{"Duplicate username", http.StatusBadRequest, "Username already exists. Please try again.", `{"code":400,"message":"Username already exists. Please try again."}`},
+		{"Existing username", http.StatusBadRequest, "Username already exists. Please try again.", `{"code":400,"message":"Username already exists. Please try again."}`},
 	}
 
 	for _, e := range responseJsonTests {
@@ -41,12 +41,8 @@ func Test_ResponseJson(t *testing.T) {
 }
 
 func Test_InternalServerError(t *testing.T) {
-	// Create a new bytes.Buffer to capture the log output
-	var buf bytes.Buffer
 
-	// Redirect log output to a different destination set as a buffer
-	// By default, log message are written to the standard error stream os.Stderr
-	log.SetOutput(&buf)
+	actualOutput := GenerateLogOutput("Internal Server Error (testing):", "test error")
 
 	/* Reset the log output destination back to os.Stderr
 	 * In the test function, we redirect the log output to a buffer so that we can capture
@@ -55,23 +51,34 @@ func Test_InternalServerError(t *testing.T) {
 	 * messages in the test suite are written to the standard error stream instead of to the buffer. */
 	defer func() {
 		log.SetOutput(os.Stderr)
-	} ()
-
-	// Generate an error
-	err := errors.New("test error")
-
-	w := httptest.NewRecorder()
-
-	// Calling the function
-	InternalServerError(w, "Internal Server Error (testing):", err)
-	actualOutput := buf.String()
+	}()
 
 	// Get date time to compare with logs
 	dt := time.Now()
 	dtString := dt.Format("2006/01/02 15:04:05")
 	expectedOutput := dtString + " Internal Server Error (testing): test error\n"
-	
+
 	if actualOutput != expectedOutput {
 		t.Errorf("Incorrect Internal Server Error: expected %q but got %q", expectedOutput, actualOutput)
 	}
+}
+
+func GenerateLogOutput(message string, errorMessage string) string {
+	// Create a new bytes.Buffer to capture the log output
+	var buf bytes.Buffer
+
+	// Redirect log output to a different destination set as a buffer
+	// By default, log message are written to the standard error stream os.Stderr
+	log.SetOutput(&buf)
+
+	// Generate an error
+	err := errors.New(errorMessage)
+
+	w := httptest.NewRecorder()
+
+	// Calling the function
+	InternalServerError(w, message, err)
+	actualOutput := buf.String()
+
+	return actualOutput
 }

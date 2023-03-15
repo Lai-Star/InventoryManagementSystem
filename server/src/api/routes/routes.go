@@ -6,6 +6,7 @@ import (
 	handlers_products "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/products"
 	handlers_admin "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/admin"
 	handlers_auth "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
+	app_middleware "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/appMiddleware"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
@@ -16,6 +17,8 @@ func Routes() http.Handler {
 
 	// Register middleware
 	mux.Use(middleware.Recoverer)
+	mux.Use(app_middleware.AddIPToContext)
+	mux.Use(app_middleware.RequestMiddleware)
 
 	// User Management Routes
 	mux.Post("/login", handlers_auth.Login)
@@ -23,7 +26,7 @@ func Routes() http.Handler {
 	mux.Post("/signup", handlers_auth.SignUp)
 
 	// Admin Management Routes
-	mux.Route("/admin", func (mux chi.Router) {
+	mux.Route("/admin", func(mux chi.Router) {
 		mux.Post("/create-user", handlers_admin.AdminCreateUser)
 		mux.Get("/users", handlers_admin.AdminGetUsers)
 		mux.Patch("/update-user", handlers_admin.AdminUpdateUser)

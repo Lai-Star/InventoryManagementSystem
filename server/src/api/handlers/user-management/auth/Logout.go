@@ -15,17 +15,17 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in retrieving cookie: ", err)
-		return;
+		return
 	}
 	cookie.Value = ""
 
-	cookie = &http.Cookie {
-		Name: "leon-jwt-token",
-		Value: "",
-		MaxAge: -1,
-		Path: "",
-		Domain: "",
-		Secure: false,
+	cookie = &http.Cookie{
+		Name:     "leon-jwt-token",
+		Value:    "",
+		MaxAge:   -1,
+		Path:     "",
+		Domain:   "",
+		Secure:   false,
 		HttpOnly: true,
 	}
 

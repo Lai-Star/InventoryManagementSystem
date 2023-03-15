@@ -16,8 +16,10 @@ import (
 
 func main() {
 
-	db := database.ConnectToPostgreSQL();
-
+	db, err := database.ConnectToPostgreSQL();
+	if err != nil {
+		log.Fatalln("Unable to connect to PostgreSQL:", err)
+	}
 	// Close the database to prevent data leak
 	defer db.Close()
 
@@ -29,7 +31,7 @@ func main() {
 	mux := routes.Routes()
 
 	// Loading the .env file in the config folder
-	err := godotenv.Load("./config/.env");
+	err = godotenv.Load("./config/.env");
 	if err != nil {
 		log.Println("Error loading .env file in main.go: ", err)
 	}
