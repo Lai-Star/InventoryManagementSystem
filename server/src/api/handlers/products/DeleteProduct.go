@@ -1,4 +1,4 @@
-package handlers_products
+package products
 
 import (
 	"net/http"
@@ -11,13 +11,17 @@ import (
 )
 
 func DeleteProduct(w http.ResponseWriter, req *http.Request) {
-	
+
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json")
 
 	// CheckUserGroup: IMS User and Operations
-	if !handlers_user_management.RetrieveIssuer(w, req) {return}
-	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {
+		return
+	}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {
+		return
+	}
 
 	// Get productid from url params
 	productIdStr := chi.URLParam(req, "product_id")
@@ -25,7 +29,7 @@ func DeleteProduct(w http.ResponseWriter, req *http.Request) {
 
 	// Check User Organisation
 	username := w.Header().Get("username")
-	organisationName, userId, err := database.GetOrganisationNameByUsername(username)
+	organisationName, userId, err := database.GetOrganisationNameAndUserIdByUsername(username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
 		return
@@ -45,17 +49,15 @@ func DeleteProduct(w http.ResponseWriter, req *http.Request) {
 	}
 	if count == 0 {
 		utils.ResponseJson(w, http.StatusNotFound, "There is no such product. Please try again.")
-		return	}
+		return
+	}
 
 	// Delete product from products table
-	err = database.DeleteProduct(productId)
+	err = database.DeleteProductByID(productId)
 	if err != nil {
 		utils.InternalServerError(w, "Internal server error in deleting product by product id: ", err)
 		return
 	}
-	
+
 	utils.ResponseJson(w, http.StatusOK, "Successfully Deleted Product!")
 }
-
-
-

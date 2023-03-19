@@ -1,4 +1,4 @@
-package handlers_products
+package products
 
 import (
 	"encoding/json"
@@ -16,29 +16,35 @@ type CreateColourJson struct {
 }
 
 func CreateColour(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "application/json");
+	w.Header().Set("Content-Type", "application/json")
 	var newColour CreateColourJson
 
 	// Reading the request body and UnMarshal the body to the CreateColourJson struct
-	bs, _ := io.ReadAll(req.Body);
+	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &newColour); err != nil {
 		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in CreateColour route: ", err)
-		return;
+		return
 	}
 
 	// CheckUserGroup: IMS User and Operations
-	if !handlers_user_management.RetrieveIssuer(w, req) {return}
-	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {
+		return
+	}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {
+		return
+	}
 
 	// Trim White Spaces in colour name
 	newColour.ColourName = strings.TrimSpace(newColour.ColourName)
 
 	// Colour Name Form Validation
-	if !ProductColourFormValidation(w, newColour.ColourName, "CREATE") {return}
+	if !ProductColourFormValidation(w, newColour.ColourName, "CREATE") {
+		return
+	}
 
 	// Check User Organisation
 	username := w.Header().Get("username")
-	organisationName, userId, err := database.GetOrganisationNameByUsername(username)
+	organisationName, userId, err := database.GetOrganisationNameAndUserIdByUsername(username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal server error in getting company name from database: ", err)
 		return

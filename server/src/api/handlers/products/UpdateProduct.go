@@ -1,4 +1,4 @@
-package handlers_products
+package products
 
 import (
 	"encoding/json"
@@ -25,13 +25,17 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// CheckUserGroup: IMS User and Operations
-	if !handlers_user_management.RetrieveIssuer(w, req) {return}
-	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {
+		return
+	}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {
+		return
+	}
 
 	// Get product id from url params
 	productIdStr := chi.URLParam(req, "product_id")
 	updateProduct.ProductId, _ = strconv.Atoi(productIdStr)
-	
+
 	// Trim white spaces in product fields (except sizeName)
 	updateProduct = updateProduct.ProductFieldsTrimSpaces()
 
@@ -41,12 +45,12 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 
 	// Check User Organisation
 	username := w.Header().Get("username")
-	organisationName, userId, err := database.GetOrganisationNameByUsername(username)
+	organisationName, userId, err := database.GetOrganisationNameAndUserIdByUsername(username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
 		return
 	}
-	
+
 	// Check if product id exists for the user or organisation
 	if organisationName == "InvenNexus" {
 		count, currentProductSku, _ = database.GetCountProductSkuByUserIdAndProductId(userId, updateProduct.ProductId)
@@ -64,7 +68,9 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Product Form Validation
-	if !ProductFormValidation(w, updateProduct, "UPDATE") {return}
+	if !ProductFormValidation(w, updateProduct, "UPDATE") {
+		return
+	}
 
 	// check if updated product sku is equal to the current product sku in db
 	if currentProductSku != updateProduct.ProductSku {
@@ -127,7 +133,7 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 
 	// Check that the size name is exists/valid for the product
 	if len(updateProduct.Sizes) >= 1 {
-		for _, size := range(updateProduct.Sizes) {
+		for _, size := range updateProduct.Sizes {
 			sizeName := size.SizeName
 
 			var count int
@@ -143,10 +149,10 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 			if count == 0 {
-				utils.ResponseJson(w, http.StatusNotFound, sizeName + " size name does not exist. Please create this size or try again.")
+				utils.ResponseJson(w, http.StatusNotFound, sizeName+" size name does not exist. Please create this size or try again.")
 				return
 			}
-			
+
 			if organisationName == "InvenNexus" {
 				count, err = database.GetSizeNameCountByUserIdAndProductId(updateProduct.ProductId, userId, sizeName)
 			} else {
@@ -157,7 +163,7 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 			if count == 0 {
-				utils.ResponseJson(w, http.StatusNotFound, sizeName + " size name does not exist for this product. Please try again.")
+				utils.ResponseJson(w, http.StatusNotFound, sizeName+" size name does not exist for this product. Please try again.")
 				return
 			}
 		}
@@ -185,10 +191,10 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Update user_product_sizes_mapping or organisation_product_sizes_mapping
-	for _, size := range(updateProduct.Sizes) {
+	for _, size := range updateProduct.Sizes {
 		sizeName := size.SizeName
 		sizeQuantity := size.SizeQuantity
-		
+
 		var updateFunc func(int, int, string) error
 		if organisationName == "InvenNexus" {
 			updateFunc = database.UpdateUserProductSizesMapping

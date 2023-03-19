@@ -1,10 +1,17 @@
 package database
 
-var (
-	SQL_DELETE_FROM_PRODUCTS = `DELETE FROM products WHERE product_id = $1;`
+import (
+	"context"
+	"fmt"
 )
 
-func DeleteProduct(productId int) error {
-	_, err := db.Exec(SQL_DELETE_FROM_PRODUCTS, productId)
-	return err
+var (
+	SQL_DELETE_FROM_PRODUCTS_BY_ID = `DELETE FROM products WHERE product_id = $1;`
+)
+
+func DeleteProductByID(productId int) error {
+	if _, err := conn.Exec(context.Background(), SQL_DELETE_FROM_PRODUCTS_BY_ID, productId); err != nil {
+		return fmt.Errorf("conn.Exec in DeleteProductByID: %w", err)
+	}
+	return nil
 }

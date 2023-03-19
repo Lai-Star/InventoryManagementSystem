@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,12 +17,15 @@ import (
 
 func main() {
 
-	db, err := database.ConnectToPostgreSQL();
+	conn, err := database.ConnectToPostgreSQL()
 	if err != nil {
 		log.Fatalln("Unable to connect to PostgreSQL:", err)
 	}
 	// Close the database to prevent data leak
-	defer db.Close()
+	defer func() {
+		conn.Close(context.Background())
+		fmt.Println("Closed database connection.")
+	}()
 
 	// Generating & validating the public and private keys for signed Json
 	// keys.GenerateKeys()
@@ -31,7 +35,7 @@ func main() {
 	mux := routes.Routes()
 
 	// Loading the .env file in the config folder
-	err = godotenv.Load("./config/.env");
+	err = godotenv.Load("./config/.env")
 	if err != nil {
 		log.Println("Error loading .env file in main.go: ", err)
 	}
@@ -47,7 +51,7 @@ func main() {
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
 		AllowedHeaders:   []string{"Content-Type"},
-		ExposedHeaders: []string{"Content-Length"},
+		ExposedHeaders:   []string{"Content-Length"},
 		AllowOriginFunc: func(origin string) bool {
 			return origin == clientOrigin
 		},
@@ -57,6 +61,6 @@ func main() {
 
 	err = http.ListenAndServe(port, handler)
 	if err != nil {
-		log.Println("Error in listening to port in main.go: ",err)
+		log.Println("Error in listening to port in main.go: ", err)
 	}
 }

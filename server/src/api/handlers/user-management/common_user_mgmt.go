@@ -18,12 +18,12 @@ type SignUpJson struct {
 }
 
 type AdminUserMgmtJson struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	UserGroup []string `json:"user_groups"`
-	OrganisationName string `json:"organisation_name"`
-	IsActive int `json:"is_active"`
+	Username         string   `json:"username"`
+	Password         string   `json:"password"`
+	Email            string   `json:"email"`
+	UserGroup        []string `json:"user_groups"`
+	OrganisationName string   `json:"organisation_name"`
+	IsActive         int      `json:"is_active"`
 }
 
 type AdminCreateUserGroupJson struct {
@@ -32,12 +32,12 @@ type AdminCreateUserGroupJson struct {
 
 func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
 
-	w.Header().Set("Content-Type", "application/json");
+	w.Header().Set("Content-Type", "application/json")
 
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
-		utils.ResponseJson(w, http.StatusUnauthorized, "Access Denied: You are unauthorized.");
-		return false;
+		utils.ResponseJson(w, http.StatusUnauthorized, "Access Denied: You are unauthorized.")
+		return false
 	}
 
 	// Parses the cookie jwt claims using the secret key to verify
@@ -59,7 +59,7 @@ func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
 	return true
 }
 
-func (user SignUpJson) UserFieldsTrimSpaces() (SignUpJson) {
+func (user SignUpJson) UserFieldsTrimSpaces() SignUpJson {
 	user.Username = strings.TrimSpace(user.Username)
 	user.Password = strings.TrimSpace(user.Password)
 	user.Email = strings.TrimSpace(user.Email)
@@ -105,10 +105,10 @@ func PasswordFormValidation(w http.ResponseWriter, password, action string) bool
 			utils.ResponseJson(w, http.StatusBadRequest, "Password must have a length of 8 - 20 characters. Please try again.")
 			return false
 		}
-	
+
 		// Check if password contains the correct format
 		isValidPasswordCharacters := utils.CheckPasswordSpecialChar(password)
-		if (!isValidPasswordCharacters) {
+		if !isValidPasswordCharacters {
 			utils.ResponseJson(w, http.StatusBadRequest, "Password must contain at least one lowercase, uppercase, numbers and special character.")
 			return false
 		}
@@ -133,7 +133,7 @@ func EmailFormValidation(w http.ResponseWriter, email, action string) bool {
 			utils.ResponseJson(w, http.StatusBadRequest, "Email address has a maximum length of 255 characters. Please try again.")
 			return false
 		}
-	
+
 		// Ensure email address is in the correct format
 		if !CheckEmailAddressFormat(email) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Email address is not in the correct format. Please try again.")
@@ -158,7 +158,7 @@ func OrganisationFormValidation(w http.ResponseWriter, organisationName, action 
 	}
 
 	// Ensure organisation name has a maximum length of 255 characters
-	if (action == "CREATE_USER" || action == "CREATE_ORGANISATION" || (action == "UPDATE_USER" && len(organisationName) > 0)) {
+	if action == "CREATE_USER" || action == "CREATE_ORGANISATION" || (action == "UPDATE_USER" && len(organisationName) > 0) {
 		if !utils.CheckLengthRange(organisationName, 1, 255) {
 			utils.ResponseJson(w, http.StatusBadRequest, "Organisation name has a maximum length of 255 characters. Please try again.")
 			return false
@@ -171,19 +171,25 @@ func OrganisationFormValidation(w http.ResponseWriter, organisationName, action 
 func SignUpFormValidation(w http.ResponseWriter, user SignUpJson) bool {
 
 	// Username form validation
-	if !UsernameFormValidation(w, user.Username) {return false}
+	if !UsernameFormValidation(w, user.Username) {
+		return false
+	}
 
 	// Password form validation
-	if !PasswordFormValidation(w, user.Password, "CREATE_USER") {return false}
+	if !PasswordFormValidation(w, user.Password, "CREATE_USER") {
+		return false
+	}
 
 	// Email form validation
-	if !EmailFormValidation(w, user.Email, "CREATE_USER") {return false}
+	if !EmailFormValidation(w, user.Email, "CREATE_USER") {
+		return false
+	}
 
 	return true
 }
 
 // Returns true if email address is in the correct format
-func CheckEmailAddressFormat (email string) bool {
+func CheckEmailAddressFormat(email string) bool {
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`)
 	return emailRegex.MatchString(email)
 }
@@ -201,16 +207,24 @@ func (user AdminUserMgmtJson) AdminUserMgmtFieldsTrimSpaces() AdminUserMgmtJson 
 func AdminUserMgmtFormValidation(w http.ResponseWriter, user AdminUserMgmtJson, action string) bool {
 
 	// Username form validation
-	if !UsernameFormValidation(w, user.Username) {return false}
+	if !UsernameFormValidation(w, user.Username) {
+		return false
+	}
 
 	// Password form validation
-	if !PasswordFormValidation(w, user.Password, action) {return false}
+	if !PasswordFormValidation(w, user.Password, action) {
+		return false
+	}
 
 	// Email form validation
-	if !EmailFormValidation(w, user.Email, action) {return false}
+	if !EmailFormValidation(w, user.Email, action) {
+		return false
+	}
 
 	// Organisation form validation
-	if !OrganisationFormValidation(w, user.OrganisationName, action) {return false}
+	if !OrganisationFormValidation(w, user.OrganisationName, action) {
+		return false
+	}
 
 	// Ensure isActive has values of 0 or 1
 	if user.IsActive != 0 && user.IsActive != 1 {
@@ -224,7 +238,7 @@ func AdminUserMgmtFormValidation(w http.ResponseWriter, user AdminUserMgmtJson, 
 func UserGroupFormValidation(w http.ResponseWriter, userGroups []string) bool {
 
 	// iterate over the user groups array
-	for idx, ug := range(userGroups) {
+	for idx, ug := range userGroups {
 		// trim user group
 		userGroups[idx] = strings.TrimSpace(ug)
 
@@ -233,7 +247,7 @@ func UserGroupFormValidation(w http.ResponseWriter, userGroups []string) bool {
 			utils.ResponseJson(w, http.StatusBadRequest, "User Group cannot have a length of more than 255 characters. Please try again.")
 			return false
 		}
-		
+
 		// check if user group belongs in the group of user groups
 		count, err := database.GetUserGroupCount(ug)
 		if err != nil {
@@ -241,7 +255,7 @@ func UserGroupFormValidation(w http.ResponseWriter, userGroups []string) bool {
 			return false
 		}
 		if count == 0 {
-			utils.ResponseJson(w, http.StatusNotFound, ug + " does not exist. Please try again.")
+			utils.ResponseJson(w, http.StatusNotFound, ug+" does not exist. Please try again.")
 			return false
 		}
 	}

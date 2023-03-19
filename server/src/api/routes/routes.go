@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	handlers_products "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/products"
+	products "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/products"
 	handlers_admin "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/admin"
 	handlers_auth "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
 	app_middleware "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/appMiddleware"
@@ -37,14 +37,14 @@ func Routes() http.Handler {
 
 	// Product Routes
 	mux.Route("/product", func(mux chi.Router) {
-		mux.Post("/create", handlers_products.CreateProduct)
-		mux.Get("/products", handlers_products.GetProducts)
-		mux.Patch("/update/{product_id}", handlers_products.UpdateProduct)
-		mux.Delete("/delete/{product_id}", handlers_products.DeleteProduct)
-		mux.Post("/create-brand", handlers_products.CreateBrand)
-		mux.Post("/create-colour", handlers_products.CreateColour)
-		mux.Post("/create-category", handlers_products.CreateCategory)
-		mux.Post("/create-size", handlers_products.CreateSize)
+		mux.Post("/create", products.CreateProduct)
+		mux.Get("/products", products.GetProducts)
+		mux.Patch("/update/{product_id}", products.UpdateProduct)
+		mux.Delete("/delete/{product_id}", products.DeleteProduct)
+		mux.Post("/create-brand", products.CreateBrand)
+		mux.Post("/create-colour", products.CreateColour)
+		mux.Post("/create-category", products.CreateCategory)
+		mux.Post("/create-size", products.CreateSize)
 	})
 
 	return mux

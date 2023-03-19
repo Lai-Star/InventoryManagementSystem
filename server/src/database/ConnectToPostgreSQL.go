@@ -1,48 +1,51 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 
+	"context"
+
+	"github.com/jackc/pgx/v4"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 // For querying in other files inside database folder
-var db *sql.DB
+var conn *pgx.Conn
 
-func ConnectToPostgreSQL() (*sql.DB, error) {
+func ConnectToPostgreSQL() (*pgx.Conn, error) {
 	// Loading the .env file in the config folder
-	err := godotenv.Load("./config/.env")
-	if err != nil {
+	if err := godotenv.Load("./config/.env"); err != nil {
 		log.Println("Error loading .env file when connecting to PostgreSQL: ", err)
 	}
 
-	host := os.Getenv("POSTGRESQL_HOST")
-	port := os.Getenv("POSTGRESQL_PORT")
-	user := os.Getenv("POSTGRESQL_USER")
-	password := os.Getenv("POSTGRESQL_PASSWORD")
-	dbname := os.Getenv("POSTGRESQL_DB")
+	dsn := url.URL{
+		Scheme: "postgres",
+		Host:   fmt.Sprintf("%s:%s", os.Getenv("POSTGRESQL_HOST"), os.Getenv("POSTGRESQL_PORT")),
+		User:   url.UserPassword(os.Getenv("POSTGRESQL_USER"), os.Getenv("POSTGRESQL_PASSWORD")),
+		Path:   os.Getenv("POSTGRESQL_DB"),
+	}
 
-	pgsqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+	q := dsn.Query()
+	q.Add("sslmode", "disable")
 
-	db, err = sql.Open("postgres", pgsqlInfo)
+	dsn.RawQuery = q.Encode()
+
+	var err error
+	conn, err = pgx.Connect(context.Background(), dsn.String())
 	if err != nil {
-		log.Println("Error opening PostgreSQL: ", err)
+		return nil, fmt.Errorf("pgx.Connect %w", err)
 	}
 
-	// Test the connection to the database
-	err = db.Ping()
-	if err != nil {
-		log.Println("Error pinging PostgreSQL: ", err)
+	// Ping the connection to Postgres
+	if err = conn.Ping(context.Background()); err != nil {
+		return nil, fmt.Errorf("conn.Ping %w", err)
 	}
 
-	if err == nil {
-		fmt.Println("Successfully connected to PostgreSQL database!")
-	}
+	fmt.Println("Successfully connected to PostgreSQL!")
 
-	return db, err
+	return conn, err
 }

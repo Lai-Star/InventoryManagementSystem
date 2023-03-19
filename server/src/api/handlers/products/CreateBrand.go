@@ -1,4 +1,4 @@
-package handlers_products
+package products
 
 import (
 	"encoding/json"
@@ -16,29 +16,35 @@ type CreateBrandJson struct {
 }
 
 func CreateBrand(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "application/json");
+	w.Header().Set("Content-Type", "application/json")
 	var newBrand CreateBrandJson
 
 	// Reading the request body and UnMarshal the body to the CreateBrandJson struct
-	bs, _ := io.ReadAll(req.Body);
+	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &newBrand); err != nil {
 		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in CreateBrand route: ", err)
-		return;
+		return
 	}
 
 	// CheckUserGroup: IMS User and Operations
-	if !handlers_user_management.RetrieveIssuer(w, req) {return}
-	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {
+		return
+	}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {
+		return
+	}
 
 	// Trim White Spaces in brand name
 	newBrand.BrandName = strings.TrimSpace(newBrand.BrandName)
 
 	// Brand Name Form Validation
-	if !ProductBrandFormValidation(w, newBrand.BrandName, "CREATE") {return}
+	if !ProductBrandFormValidation(w, newBrand.BrandName, "CREATE") {
+		return
+	}
 
 	// Check User Organisation
 	username := w.Header().Get("username")
-	organisationName, userId, err := database.GetOrganisationNameByUsername(username)
+	organisationName, userId, err := database.GetOrganisationNameAndUserIdByUsername(username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal server error in getting company name from database: ", err)
 		return

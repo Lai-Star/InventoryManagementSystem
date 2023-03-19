@@ -1,14 +1,18 @@
 package database
 
 import (
+	"context"
 	"fmt"
 )
 
 var (
-	SQL_DELETE_FROM_USERS = "DELETE FROM users WHERE %s = $1;"
+	SQL_DELETE_FROM_USERS_BY_ID = `DELETE FROM users WHERE user_id = 
+																(SELECT user_id FROM users WHERE username = $1);`
 )
 
-func DeleteUserFromUsers(username string) error {
-	_, err := db.Exec(fmt.Sprintf(SQL_DELETE_FROM_USERS, "username"), username)
-	return err
+func DeleteUserByID(username string) error {
+	if _, err := conn.Exec(context.Background(), SQL_DELETE_FROM_USERS_BY_ID, username); err != nil {
+		return fmt.Errorf("conn.Exec in DeleteUserByID: %w", err)
+	}
+	return nil
 }

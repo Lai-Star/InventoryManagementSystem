@@ -1,8 +1,11 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+
+	"github.com/jackc/pgx/v4"
 )
 
 var (
@@ -23,78 +26,89 @@ var (
 										 LEFT JOIN user_group_mapping ugm 
 										 ON ugm.user_group_id = ug.user_group_id 
 										 WHERE ugm.user_id = (SELECT user_id FROM users WHERE username = $1);`
-										 
+
 	SQL_SELECT_ALL_USERS = `SELECT u.user_id, u.username, u.email, u.is_active, o.organisation_name, ug.user_group, u.added_date, u.updated_date FROM users u 
 							LEFT JOIN user_organisation_mapping uom ON u.user_id = uom.user_id
 							LEFT JOIN organisations o ON uom.organisation_id = o.organisation_id
 							LEFT JOIN user_group_mapping ugm ON u.user_id = ugm.user_id
 							LEFT JOIN user_groups ug ON ugm.user_group_id = ug.user_group_id
-							ORDER BY user_id ASC;` 
+							ORDER BY user_id ASC;`
 )
 
+func GetConnection() *pgx.Conn {
+	return conn
+}
+
 func GetUsername(username string) bool {
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "username", "username"), username)
+	row := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "username", "username"), username)
 	return row.Scan() != sql.ErrNoRows
 }
 
 func GetEmail(email string) bool {
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "email", "email"), email)
+	row := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "email", "email"), email)
 	return row.Scan() != sql.ErrNoRows
 }
 
 func GetOrganisationName(organisationName string) bool {
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "organisation_name", "organisation_name"), organisationName)
+	row := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "organisation_name", "organisation_name"), organisationName)
 	return row.Scan() != sql.ErrNoRows
 }
 
 func GetPasswordByUsername(username string) (string, error) {
 	var password string
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "password", "username"), username)
-	err := row.Scan(&password)
-	return password, err
+	if err := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "password", "username"), username).Scan(&password); err != nil {
+		return "", fmt.Errorf("conn.QueryRow in GetPasswordByUsername: %w", err)
+	}
+	return password, nil
 }
 
 func GetEmailByUsername(username string) (string, error) {
-    var email string
-    row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "email", "username"), username)
-    err := row.Scan(&email)
-    return email, err
+	var email string
+	if err := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "email", "username"), username).Scan(&email); err != nil {
+		return "", fmt.Errorf("conn.QueryRow in GetEmailByUsername: %w", err)
+	}
+	return email, nil
 }
 
 func GetActiveStatusByUsername(username string) (int, error) {
 	var isActive int
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERS, "is_active", "username"), username)
-	err := row.Scan(&isActive)
-	return isActive, err
+	if err := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "is_active", "username"), username).Scan(&isActive); err != nil {
+		return 0, fmt.Errorf("conn.QueryRow in GetActiveStatusByUsername: %w", err)
+	}
+	return isActive, nil
 }
 
-func GetOrganisationNameByUsername(username string) (string, int, error) {
+func GetOrganisationNameAndUserIdByUsername(username string) (string, int, error) {
 	var organisationName string
 	var userId int
-	err := db.QueryRow(SQL_SELECT_ORGANISATION_NAME_BY_USERNAME, username).Scan(&organisationName, &userId)
-	return organisationName, userId, err
+	if err := conn.QueryRow(context.Background(), SQL_SELECT_ORGANISATION_NAME_BY_USERNAME, username).Scan(&organisationName, &userId); err != nil {
+		return "", 0, fmt.Errorf("conn.QueryRow in GetOrganisationNameAndUserIdByUsername: %w", err)
+	}
+	return organisationName, userId, nil
 }
 
-func GetUserGroupsByUsername(username string) (*sql.Rows, error) {
-	rows, err := db.Query(SQL_SELECT_USERGROUPS_BY_USERNAME, username)
+func GetUserGroupsByUsername(username string) (pgx.Rows, error) {
+	rows, err := conn.Query(context.Background(), SQL_SELECT_USERGROUPS_BY_USERNAME, username)
 	return rows, err
 }
 
 func GetUserGroupCount(usergroup string) (int, error) {
 	var count int
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_USERGROUPS, "user_group"), usergroup)
-	err := row.Scan(&count)
-	return count, err
+	if err := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERGROUPS, "user_group"), usergroup).Scan(&count); err != nil {
+		return 0, fmt.Errorf("conn.QueryRow in GetUserGroupCount: %w", err)
+	}
+	return count, nil
 }
 
 func GetOrganisationNameCount(organisationName string) (int, error) {
 	var count int
-	row := db.QueryRow(fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "COUNT(*)", "organisation_name"), organisationName)
-	err := row.Scan(&count)
-	return count, err
+	if err := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "COUNT(*)", "organisation_name"), organisationName).Scan(&count); err != nil {
+		return 0, fmt.Errorf("conn.QueryRow in GetOrganisationNameCount: %w", err)
+	}
+	return count, nil
 }
 
-func GetUsers() (*sql.Rows, error) {
-	row, err := db.Query(SQL_SELECT_ALL_USERS)
-	return row, err
+func GetUsers() (pgx.Rows, error) {
+	rows, err := conn.Query(context.Background(), SQL_SELECT_ALL_USERS)
+	return rows, err
 }

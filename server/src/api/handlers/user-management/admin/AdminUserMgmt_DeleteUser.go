@@ -41,7 +41,7 @@ func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err := database.DeleteUserFromUsers(username)
+	err := database.DeleteUserByID(username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in deleting user from accounts table: ", err)
 		return

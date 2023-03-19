@@ -1,4 +1,4 @@
-package handlers_products
+package products
 
 import (
 	"net/http"
@@ -11,7 +11,7 @@ import (
 )
 
 type ProductJson struct {
-	ProductId int `json:"product_id"`
+	ProductId          int     `json:"product_id"`
 	ProductName        string  `json:"product_name"`
 	ProductDescription string  `json:"product_description"`
 	ProductSku         string  `json:"product_sku"`
@@ -149,7 +149,7 @@ func ProductCostFormValidation(w http.ResponseWriter, productCost float32) bool 
 }
 
 func SizeNameQuantityFormValidation(w http.ResponseWriter, sizes []Size) bool {
-	for idx, size := range(sizes) {
+	for idx, size := range sizes {
 		// trim white spaces for size name
 		sizes[idx].SizeName = strings.TrimSpace(size.SizeName)
 
@@ -167,12 +167,12 @@ func SizeNameQuantityFormValidation(w http.ResponseWriter, sizes []Size) bool {
 
 		// Check if the type of size quantity is an integer
 		if kind := reflect.TypeOf(size.SizeQuantity).Kind(); kind != reflect.Int &&
-		kind != reflect.Int8 && kind != reflect.Int16 &&
-		kind != reflect.Int32 && kind != reflect.Int64 {
+			kind != reflect.Int8 && kind != reflect.Int16 &&
+			kind != reflect.Int32 && kind != reflect.Int64 {
 			utils.ResponseJson(w, http.StatusBadRequest, "Size Quantity must be an integer value. Please try again.")
 			return false
 		}
-		
+
 		// Check if size quantity is negative
 		if size.SizeQuantity < 0 {
 			utils.ResponseJson(w, http.StatusBadRequest, "Size Quantity cannot be negative. Please try again.")
@@ -180,7 +180,7 @@ func SizeNameQuantityFormValidation(w http.ResponseWriter, sizes []Size) bool {
 		}
 
 		// Check if size name is valid
-		
+
 	}
 	return true
 }
@@ -202,17 +202,31 @@ func SizeNameFormValidation(w http.ResponseWriter, sizeName string) bool {
 
 func ProductFormValidation(w http.ResponseWriter, product ProductJson, action string) bool {
 
-	if !ProductNameFormValidation(w, product.ProductName, action) {return false}
-	if !ProductSkuFormValidation(w, product.ProductSku, action) {return false}
-	if !ProductBrandFormValidation(w, product.ProductBrand, action) {return false}
-	if !ProductColourFormValidation(w, product.ProductColour, action) {return false}
-	if !ProductCategoryFormValidation(w, product.ProductCategory, action) {return false}
-	if !ProductCostFormValidation(w, product.ProductCost) {return false}
+	if !ProductNameFormValidation(w, product.ProductName, action) {
+		return false
+	}
+	if !ProductSkuFormValidation(w, product.ProductSku, action) {
+		return false
+	}
+	if !ProductBrandFormValidation(w, product.ProductBrand, action) {
+		return false
+	}
+	if !ProductColourFormValidation(w, product.ProductColour, action) {
+		return false
+	}
+	if !ProductCategoryFormValidation(w, product.ProductCategory, action) {
+		return false
+	}
+	if !ProductCostFormValidation(w, product.ProductCost) {
+		return false
+	}
 
 	if len(product.Sizes) >= 1 {
-		if !SizeNameQuantityFormValidation(w, product.Sizes) {return false}
+		if !SizeNameQuantityFormValidation(w, product.Sizes) {
+			return false
+		}
 	}
-	
+
 	return true
 }
 
@@ -247,7 +261,7 @@ func ValidateAndInsertSize(w http.ResponseWriter, sizes []Size, productId int32)
 		// Check that this size name is valid (XXS, XS, S, M, L, XL, XXL)
 		isValidSize := IsAllowedProductSize(size.SizeName)
 		if !isValidSize {
-			utils.ResponseJson(w, http.StatusBadRequest, size.SizeName + " is not a valid size name. Please try again.")
+			utils.ResponseJson(w, http.StatusBadRequest, size.SizeName+" is not a valid size name. Please try again.")
 			return false, sizes
 		}
 
@@ -255,7 +269,7 @@ func ValidateAndInsertSize(w http.ResponseWriter, sizes []Size, productId int32)
 		// reflect: inspect and manipulate values of different types dynamically at runtime
 		// reflect.TypeOf gets the value stored in SizeQuantity and .Kind() checks the data type of the value
 		if reflect.TypeOf(size.SizeQuantity).Kind() != reflect.Int {
-			utils.ResponseJson(w, http.StatusBadRequest, strconv.Itoa(size.SizeQuantity) + " is not in the correct Integer format. Please try again!")
+			utils.ResponseJson(w, http.StatusBadRequest, strconv.Itoa(size.SizeQuantity)+" is not in the correct Integer format. Please try again!")
 			return false, sizes
 		}
 
@@ -279,7 +293,7 @@ func ValidateAndInsertSize(w http.ResponseWriter, sizes []Size, productId int32)
 }
 
 func IsAllowedProductSize(size string) bool {
-	allowedSizes := []string {"XXS", "XS", "S", "M", "L", "XL", "XXL"}
+	allowedSizes := []string{"XXS", "XS", "S", "M", "L", "XL", "XXL"}
 	for _, allowedSize := range allowedSizes {
 		if size == allowedSize {
 			return true
@@ -287,7 +301,3 @@ func IsAllowedProductSize(size string) bool {
 	}
 	return false
 }
-
-
-
-

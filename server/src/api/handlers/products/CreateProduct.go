@@ -1,4 +1,4 @@
-package handlers_products
+package products
 
 import (
 	"encoding/json"
@@ -19,22 +19,28 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &newProduct); err != nil {
 		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in CreateProduct route: ", err)
-		return;
+		return
 	}
-	
+
 	// CheckUserGroup: IMS User and Operations
-	if !handlers_user_management.RetrieveIssuer(w, req) {return}
-	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {return}
-	
+	if !handlers_user_management.RetrieveIssuer(w, req) {
+		return
+	}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {
+		return
+	}
+
 	// Trim White Spaces in product fields
 	newProduct = newProduct.ProductFieldsTrimSpaces()
-	
+
 	// Product Form Validation
-	if !ProductFormValidation(w, newProduct, "CREATE") {return}
+	if !ProductFormValidation(w, newProduct, "CREATE") {
+		return
+	}
 
 	// Check User Organisation
 	username := w.Header().Get("username")
-	organisationName, userId, err := database.GetOrganisationNameByUsername(username)
+	organisationName, userId, err := database.GetOrganisationNameAndUserIdByUsername(username)
 	if err != nil {
 		utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
 		return
@@ -100,12 +106,12 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 
 	// Check if size name exists
 	if len(newProduct.Sizes) >= 1 {
-		for _, size := range(newProduct.Sizes) {
+		for _, size := range newProduct.Sizes {
 			sizeName := size.SizeName
 
 			var count int
 			var err error
-			
+
 			if organisationName == "InvenNexus" {
 				count, err = database.GetSizeNameCountByUsername(userId, sizeName)
 			} else {
@@ -130,10 +136,10 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if len(newProduct.Sizes) >= 1 {
-		for _, size := range(newProduct.Sizes) {
+		for _, size := range newProduct.Sizes {
 			sizeName := size.SizeName
 			sizeQuantity := size.SizeQuantity
-			
+
 			var insertFunc func(string, int, int) error
 			if organisationName == "InvenNexus" {
 				insertFunc = database.InsertIntoUserProductSizesMapping
@@ -165,4 +171,3 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully created a new product!")
 }
-
