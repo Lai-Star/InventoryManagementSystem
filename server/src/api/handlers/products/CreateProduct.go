@@ -3,6 +3,7 @@ package products
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 
 	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
@@ -18,7 +19,8 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and Unmarshal the body to the ProductJson struct
 	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &newProduct); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in CreateProduct route: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in UnMarshal JSON body in CreateProduct route:", err)
 		return
 	}
 
@@ -42,7 +44,8 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	username := w.Header().Get("username")
 	organisationName, userId, err := database.GetOrganisationNameAndUserIdByUsername(username)
 	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in getting company name from database:", err)
 		return
 	}
 
@@ -57,7 +60,8 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting product sku count: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting product sku count:", err)
 		return
 	}
 	if count >= 1 {
@@ -79,15 +83,18 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if errBrand != nil {
-		utils.InternalServerError(w, "Internal server error in getting brand name by count: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting brand name by count:", err)
 		return
 	}
 	if errCategory != nil {
-		utils.InternalServerError(w, "Internal server error in getting category name by count: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting category name by count:", err)
 		return
 	}
 	if errColour != nil {
-		utils.InternalServerError(w, "Internal server error in getting colour name by count: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting colour name by count:", err)
 		return
 	}
 
@@ -118,7 +125,8 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 				count, err = database.GetSizeNameCountByOrganisation(organisationName, sizeName)
 			}
 			if err != nil {
-				utils.InternalServerError(w, "Internal server error in getting size count: ", err)
+				utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+				log.Println("Internal server error in getting size count:", err)
 				return
 			}
 			if count == 0 {
@@ -131,7 +139,8 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	// Insert product details to `products` table
 	productId, err := database.InsertNewProduct(newProduct.ProductName, newProduct.ProductDescription, newProduct.ProductSku, newProduct.ProductCost)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in inserting new product into products table: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in inserting new product into products table:", err)
 		return
 	}
 
@@ -148,7 +157,8 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 			}
 			err = insertFunc(sizeName, sizeQuantity, productId)
 			if err != nil {
-				utils.InternalServerError(w, "Internal server error in inserting new size: ", err)
+				utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+				log.Println("Internal server error in inserting new size:", err)
 				return
 			}
 		}
@@ -158,13 +168,15 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	if organisationName == "InvenNexus" {
 		err = database.InsertIntoProductUserMapping(productId, userId, newProduct.ProductColour, newProduct.ProductCategory, newProduct.ProductBrand)
 		if err != nil {
-			utils.InternalServerError(w, "Internal server error in inserting into product_user_mapping table: ", err)
+			utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+			log.Println("Internal server error in inserting into product_user_mapping table:", err)
 			return
 		}
 	} else {
 		err = database.InsertIntoProductOrganisationMapping(productId, organisationName, newProduct.ProductColour, newProduct.ProductCategory, newProduct.ProductBrand)
 		if err != nil {
-			utils.InternalServerError(w, "Internal server error in inserting into product_organisation_mapping table: ", err)
+			utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+			log.Println("Internal server error in inserting into product_organisation_mapping table:", err)
 			return
 		}
 	}

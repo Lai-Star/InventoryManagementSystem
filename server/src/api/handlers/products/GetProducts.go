@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers"
@@ -36,7 +37,8 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
 	username := w.Header().Get("username")
 	organisationName, userID, err := database.GetOrganisationNameAndUserIdByUsername(username)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting company name from database: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting company name from database:", err)
 		return
 	}
 	userId.Int32 = int32(userID)
@@ -48,7 +50,8 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
 		rows, err = database.GetProductsByOrganisation(organisationName)
 	}
 	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in GetProducts: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in GetProducts:", err)
 		return
 	}
 
@@ -60,7 +63,8 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
 	for rows.Next() {
 		err = rows.Scan(&productId, &productName, &productDescription, &productSku, &productColour, &productCategory, &productBrand, &productCost, &sizeName, &sizeQuantity)
 		if err != nil {
-			utils.InternalServerError(w, "Internal Server Error in Scanning GetProducts: ", err)
+			utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+			log.Println("Internal Server Error in Scanning GetProducts:", err)
 			return
 		}
 
@@ -102,7 +106,8 @@ func GetProducts(w http.ResponseWriter, req *http.Request) {
 
 	bs, err := json.Marshal(jsonStatus)
 	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in Marshal JSON body in GetProducts: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in Marshal JSON body in GetProducts:", err)
 		return
 	}
 

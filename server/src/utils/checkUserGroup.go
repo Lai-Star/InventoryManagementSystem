@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -13,7 +14,8 @@ func CheckUserGroup(w http.ResponseWriter, username string, userGroups ...string
 	rows, err := database.GetUserGroupsByUsername(username)
 
 	if err != nil {
-		InternalServerError(w, "Internal server error in check user group: ", err)
+		ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in check user group:", err)
 		return false
 	}
 
@@ -22,7 +24,8 @@ func CheckUserGroup(w http.ResponseWriter, username string, userGroups ...string
 	for rows.Next() {
 		err = rows.Scan(&userGroup)
 		if err != nil {
-			InternalServerError(w, "Internal server error in scanning user groups in check user group function: ", err)
+			ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+			log.Println("Internal server error in scanning user groups in check user group function:", err)
 			return false
 		}
 

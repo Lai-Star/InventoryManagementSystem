@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 
 	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
@@ -19,7 +20,8 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and UnMarshal the body to the LoginJson struct
 	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &newUser); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in SignUp route: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in UnMarshal JSON body in SignUp route:", err)
 		return
 	}
 
@@ -56,7 +58,9 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := database.SignUpTransaction(ctx, newUser.Username, hashedPassword, newUser.Email, organisationName, userGroup, isActive); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in inserting new user to database:", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Error in SignUp Transaction", err)
+		return
 	}
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully Created User!")

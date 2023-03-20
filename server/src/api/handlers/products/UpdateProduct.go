@@ -3,6 +3,7 @@ package products
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -20,7 +21,8 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and Unmarshal the body to the ProductJson struct
 	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &updateProduct); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in Unmarshal JSON body in UpdateProduct route", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in Unmarshal JSON body in UpdateProduct route:", err)
 		return
 	}
 
@@ -47,7 +49,8 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	username := w.Header().Get("username")
 	organisationName, userId, err := database.GetOrganisationNameAndUserIdByUsername(username)
 	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in getting company name from database:", err)
 		return
 	}
 
@@ -58,10 +61,6 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 		count, currentProductSku, _ = database.GetCountProductSkuByOrganisationAndProductId(organisationName, updateProduct.ProductId)
 	}
 
-	// if err != nil {
-	// 	utils.InternalServerError(w, "Internal server error in getting count by product id: ", err)
-	// 	return
-	// }
 	if count == 0 {
 		utils.ResponseJson(w, http.StatusNotFound, "This product does not exist. Please try again.")
 		return
@@ -83,7 +82,8 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 			count, err = database.GetProductSkuCountByOrganisation(organisationName, updateProduct.ProductSku)
 		}
 		if err != nil {
-			utils.InternalServerError(w, "Internal server error in getting product sku count: ", err)
+			utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+			log.Println("Internal server error in getting product sku count:", err)
 			return
 		}
 		if count >= 1 {
@@ -106,15 +106,18 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if errBrand != nil {
-		utils.InternalServerError(w, "Internal server error in getting brand name by count: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting brand name by count:", err)
 		return
 	}
 	if errCategory != nil {
-		utils.InternalServerError(w, "Internal server error in getting category name by count: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting category name by count:", err)
 		return
 	}
 	if errColour != nil {
-		utils.InternalServerError(w, "Internal server error in getting colour name by count: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting colour name by count:", err)
 		return
 	}
 
@@ -145,7 +148,8 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 				count, err = database.GetSizeNameCountByOrganisation(organisationName, sizeName)
 			}
 			if err != nil {
-				utils.InternalServerError(w, "Internal server error in getting size count: ", err)
+				utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+				log.Println("Internal server error in getting size count:", err)
 				return
 			}
 			if count == 0 {
@@ -159,7 +163,8 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 				count, err = database.GetSizeNameCountByOrganisationIdAndProductId(updateProduct.ProductId, organisationName, sizeName)
 			}
 			if err != nil {
-				utils.InternalServerError(w, "Internal server error in getting size count by product id: ", err)
+				utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+				log.Println("Internal server error in getting size count by product id:", err)
 				return
 			}
 			if count == 0 {
@@ -172,7 +177,8 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	// Update products in the products table by product id
 	err = database.UpdateProductsByProductID(updateProduct.ProductName, updateProduct.ProductDescription, updateProduct.ProductSku, updateProduct.ProductCost, updateProduct.ProductId)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in updating products table: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in updating products table:", err)
 		return
 	}
 
@@ -186,7 +192,8 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in updating product user/organisation mapping table: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in updating product user/organisation mapping table:", err)
 		return
 	}
 
@@ -203,7 +210,8 @@ func UpdateProduct(w http.ResponseWriter, req *http.Request) {
 		}
 		err = updateFunc(sizeQuantity, updateProduct.ProductId, sizeName)
 		if err != nil {
-			utils.InternalServerError(w, "Internal server error in inserting new size: ", err)
+			utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+			log.Println("Internal server error in inserting new size:", err)
 			return
 		}
 	}

@@ -3,6 +3,7 @@ package products
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 
@@ -22,7 +23,8 @@ func CreateColour(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and UnMarshal the body to the CreateColourJson struct
 	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &newColour); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in CreateColour route: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in UnMarshal JSON body in CreateColour route:", err)
 		return
 	}
 
@@ -46,7 +48,8 @@ func CreateColour(w http.ResponseWriter, req *http.Request) {
 	username := w.Header().Get("username")
 	organisationName, userId, err := database.GetOrganisationNameAndUserIdByUsername(username)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting company name from database: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting company name from database:", err)
 		return
 	}
 
@@ -61,7 +64,8 @@ func CreateColour(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting colour name count: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting colour name count:", err)
 		return
 	}
 	if count >= 1 {
@@ -78,7 +82,8 @@ func CreateColour(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in inserting colour name into database: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in inserting colour name into database:", err)
 		return
 	}
 

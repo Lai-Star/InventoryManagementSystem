@@ -3,6 +3,7 @@ package handlers_admin
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 
@@ -22,7 +23,8 @@ func AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and UnMarshal the body to the AdminCreateOrganisationJson struct
 	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &organisation); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in AdminCreateUser route: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in UnMarshal JSON body in AdminCreateUser route:", err)
 		return
 	}
 
@@ -48,7 +50,8 @@ func AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) {
 	// Check if organisation name already exists
 	count, err := database.GetOrganisationNameCount(organisationName)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting organisation count: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting organisation count:", err)
 		return
 	}
 	if count == 1 {
@@ -59,7 +62,8 @@ func AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) {
 	// Insert organisation name into organisations table
 	err = database.InsertIntoOrganisations(organisationName)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in inserting into organisations table", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in inserting into organisations table:", err)
 		return
 	}
 

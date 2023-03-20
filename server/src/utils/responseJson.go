@@ -29,8 +29,3 @@ func ResponseJson(w http.ResponseWriter, Code int, Message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(bs)
 }
-
-func InternalServerError(w http.ResponseWriter, message string, err error) {
-	log.Println(message, err)
-	ResponseJson(w, http.StatusInternalServerError, "An Internal Server Error Occurred.")
-}

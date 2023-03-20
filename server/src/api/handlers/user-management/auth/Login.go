@@ -3,6 +3,7 @@ package handlers_user
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -27,7 +28,8 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	// Reading the request body and UnMarshal the body to the LoginJson struct
 	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &user); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in Login route: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in UnMarshal JSON body in Login route:", err)
 		return
 	}
 
@@ -40,7 +42,8 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	// Compare password with hashed password in database
 	dbPassword, err := database.GetPasswordByUsername(user.Username)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting password in login route: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting password in login route:", err)
 		return
 	}
 	isValidPassword := utils.CompareHash(dbPassword, user.Password)
@@ -52,7 +55,8 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	// Check User Status (active/inactive)
 	dbStatus, err := database.GetActiveStatusByUsername(user.Username)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting active status in login route: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting active status in login route:", err)
 		return
 	}
 	if dbStatus != 1 {
@@ -70,7 +74,8 @@ func Login(w http.ResponseWriter, req *http.Request) {
 	// Signing the jwt token with a secret key
 	signedToken, err := generateToken.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in signing jwt token: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in signing jwt token:", err)
 		return
 	}
 

@@ -3,6 +3,7 @@ package handlers_admin
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 
 	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
@@ -12,23 +13,28 @@ import (
 
 func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
-	w.Header().Set("Content-Type", "application/json");
+	w.Header().Set("Content-Type", "application/json")
 	var adminUpdateUser handlers_user_management.AdminUserMgmtJson
 
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
-	bs, _ := io.ReadAll(req.Body);
+	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &adminUpdateUser); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in Unmarshal JSON body in AdminUpdateUser: ", err)
-		return;
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in Unmarshal JSON body in AdminUpdateUser:", err)
+		return
 	}
-	
+
 	// Check User Group Admin
-	if !handlers_user_management.RetrieveIssuer(w, req) {return}
-	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {
+		return
+	}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {
+		return
+	}
 
 	// Trim whitespaces (username, password, email, organisation_name)
 	adminUpdateUser = adminUpdateUser.AdminUserMgmtFieldsTrimSpaces()
-	
+
 	// Check if username field is empty (mandatory field to update user, others can be empty)
 	if utils.IsBlankField(adminUpdateUser.Username) {
 		utils.ResponseJson(w, http.StatusBadRequest, "Please enter a username.")
@@ -37,25 +43,28 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 
 	// Check if username exists in database
 	isExistingUsername := database.GetUsername(adminUpdateUser.Username)
-	if (!isExistingUsername) {
+	if !isExistingUsername {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username does not exist. Please try again.")
 		return
 	}
 
 	// Admin User Form Validation
 	isValidAdminUserForm := handlers_user_management.AdminUserMgmtFormValidation(w, adminUpdateUser, "UPDATE_USER")
-	if !isValidAdminUserForm {return}
+	if !isValidAdminUserForm {
+		return
+	}
 
 	// Check if email exists
 	isExistingEmail := database.GetEmail(adminUpdateUser.Email)
 	userCurrentEmail, err := database.GetEmailByUsername(adminUpdateUser.Username)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting email by username: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting email by username:", err)
 		return
 	}
 	if isExistingEmail {
 		if userCurrentEmail != adminUpdateUser.Email {
-			utils.ResponseJson(w, http.StatusBadRequest, adminUpdateUser.Email + " already exists. Please try again.")
+			utils.ResponseJson(w, http.StatusBadRequest, adminUpdateUser.Email+" already exists. Please try again.")
 			return
 		}
 	}
@@ -69,8 +78,10 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 
 	// Perform user group validation and check if user group exists
 	isValidUserGroup := handlers_user_management.UserGroupFormValidation(w, adminUpdateUser.UserGroup)
-	if !isValidUserGroup {return}
-	
+	if !isValidUserGroup {
+		return
+	}
+
 	// Only generate hash if password is not empty
 	if len(adminUpdateUser.Password) > 0 {
 		adminUpdateUser.Password = utils.GenerateHash(adminUpdateUser.Password)
@@ -79,7 +90,8 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	// Update users table (get user_id)
 	userId, err := database.UpdateUsers(adminUpdateUser.Username, adminUpdateUser.Password, adminUpdateUser.Email, adminUpdateUser.IsActive)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in admin update users table: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in admin update users table:", err)
 		return
 	}
 
@@ -87,7 +99,8 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	if len(adminUpdateUser.OrganisationName) > 0 {
 		err = database.UpdateUserOrganisationMapping(userId, adminUpdateUser.OrganisationName)
 		if err != nil {
-			utils.InternalServerError(w, "Internal server error in admin update user_organisation_mapping table: ", err)
+			utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+			log.Println("Internal server error in admin update user_organisation_mapping table:", err)
 			return
 		}
 	}
@@ -95,10 +108,10 @@ func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
 	// Update user_group_mapping table
 	err = database.UpdateUserGroupMapping(userId, adminUpdateUser.UserGroup)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in admin update user_group_mapping table: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in admin update user_group_mapping table:", err)
 		return
 	}
-	
 
 	utils.ResponseJson(w, http.StatusOK, "Successfully updated user!")
 }

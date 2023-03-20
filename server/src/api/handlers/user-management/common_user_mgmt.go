@@ -1,6 +1,7 @@
 package handlers_user_management
 
 import (
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -45,7 +46,8 @@ func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
 	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in parsing cookie: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in parsing cookie:", err)
 		return false
 	}
 
@@ -251,7 +253,8 @@ func UserGroupFormValidation(w http.ResponseWriter, userGroups []string) bool {
 		// check if user group belongs in the group of user groups
 		count, err := database.GetUserGroupCount(ug)
 		if err != nil {
-			utils.InternalServerError(w, "Internal server error in getting user groups: ", err)
+			utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+			log.Println("Internal server error in getting user groups:", err)
 			return false
 		}
 		if count == 0 {

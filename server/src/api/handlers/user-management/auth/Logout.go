@@ -1,6 +1,7 @@
 package handlers_user
 
 import (
+	"log"
 	"net/http"
 
 	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
@@ -14,7 +15,8 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in retrieving cookie: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in retrieving cookie:", err)
 		return
 	}
 	cookie.Value = ""

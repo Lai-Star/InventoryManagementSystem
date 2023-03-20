@@ -275,16 +275,17 @@ func ValidateAndInsertSize(w http.ResponseWriter, sizes []Size, productId int32)
 
 		// Insert Size to sizes table
 		// sizeId, err := database.InsertNewSize(size.SizeName, size.SizeQuantity)
-		// if err != nil {
-		// 	utils.InternalServerError(w, "Error in inserting new size to sizes table: ", err)
-		// 	return false, sizes
+		// utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		// log.Println("Error in InsertNewSize", err)
+		// return
 		// }
 
 		// // Insert product_id and size_id to product_sizes table
 		// err = database.InsertNewProductSizes(productId, sizeId)
 		// if err != nil {
-		// 	utils.InternalServerError(w, "Error in inserting new productsizes into product_sizes table: ", err)
-		// 	return false, sizes
+		// utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		// log.Println("Error in InsertNewProductSizes", err)
+		// return
 		// }
 	}
 

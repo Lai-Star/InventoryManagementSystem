@@ -3,6 +3,7 @@ package handlers_admin
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 
@@ -12,49 +13,58 @@ import (
 )
 
 type AdminCreateUserGroupJson struct {
-	UserGroup string `json:"user_group"`
+	UserGroup   string `json:"user_group"`
 	Description string `json:"description"`
 }
 
 func AdminCreateUserGroup(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "application/json");
+	w.Header().Set("Content-Type", "application/json")
 	var newUserGroup AdminCreateUserGroupJson
 
 	// Reading the request body and UnMarshal the body to the AdminCreateUserGroup struct
-	bs, _ := io.ReadAll(req.Body);
+	bs, _ := io.ReadAll(req.Body)
 	if err := json.Unmarshal(bs, &newUserGroup); err != nil {
-		utils.InternalServerError(w, "Internal Server Error in UnMarshal JSON body in AdminCreateUser route: ", err)
-		return;
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in UnMarshal JSON body in AdminCreateUser route:", err)
+		return
 	}
 
 	// Check User Group Admin
-	if !handlers_user_management.RetrieveIssuer(w, req) {return}
-	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {return}
+	if !handlers_user_management.RetrieveIssuer(w, req) {
+		return
+	}
+	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {
+		return
+	}
 
 	userGroup := newUserGroup.UserGroup
 
 	// trim user group
 	userGroup = strings.TrimSpace(userGroup)
 
-	// UserGroup form validation 
+	// UserGroup form validation
 	isValidUserGroupValidation := UserGroupValidation(w, userGroup)
-	if !isValidUserGroupValidation {return}
+	if !isValidUserGroupValidation {
+		return
+	}
 
 	// Check if user group already exists
 	count, err := database.GetUserGroupCount(userGroup)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting user group count: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting user group count:", err)
 		return
 	}
 	if count == 1 {
-		utils.ResponseJson(w, http.StatusBadRequest, userGroup + " already exists. Please try again.")
+		utils.ResponseJson(w, http.StatusBadRequest, userGroup+" already exists. Please try again.")
 		return
 	}
 
 	// Insert user group into user_groups table
 	err = database.InsertIntoUserGroups(userGroup, newUserGroup.Description)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in inserting into organisations table", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in inserting into organisations table:", err)
 		return
 	}
 
@@ -63,7 +73,7 @@ func AdminCreateUserGroup(w http.ResponseWriter, req *http.Request) {
 }
 
 func UserGroupValidation(w http.ResponseWriter, userGroup string) bool {
-		
+
 	// Check if user group is empty.
 	if utils.IsBlankField(userGroup) {
 		utils.ResponseJson(w, http.StatusBadRequest, "User Group cannot be empty. Please try again.")

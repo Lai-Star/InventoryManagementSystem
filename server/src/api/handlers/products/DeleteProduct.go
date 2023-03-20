@@ -1,6 +1,7 @@
 package products
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -31,7 +32,8 @@ func DeleteProduct(w http.ResponseWriter, req *http.Request) {
 	username := w.Header().Get("username")
 	organisationName, userId, err := database.GetOrganisationNameAndUserIdByUsername(username)
 	if err != nil {
-		utils.InternalServerError(w, "Internal Server Error in getting company name from database: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in getting company name from database:", err)
 		return
 	}
 
@@ -44,7 +46,8 @@ func DeleteProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in getting count by organisation/user id and product id: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in getting count by organisation/user id and product id:", err)
 		return
 	}
 	if count == 0 {
@@ -55,7 +58,8 @@ func DeleteProduct(w http.ResponseWriter, req *http.Request) {
 	// Delete product from products table
 	err = database.DeleteProductByID(productId)
 	if err != nil {
-		utils.InternalServerError(w, "Internal server error in deleting product by product id: ", err)
+		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal server error in deleting product by product id:", err)
 		return
 	}
 
