@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
+	auth_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
@@ -25,7 +25,7 @@ func CreateProduct(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// CheckUserGroup: IMS User and Operations
-	if !handlers_user_management.RetrieveIssuer(w, req) {
+	if !auth_management.RetrieveIssuer(w, req) {
 		return
 	}
 	if !utils.CheckUserGroup(w, w.Header().Get("username"), "InvenNexus User", "Operations") {

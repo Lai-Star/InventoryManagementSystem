@@ -4,8 +4,9 @@ import (
 	"net/http"
 
 	products "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/products"
-	handlers_admin "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/admin"
+	admin "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/admin"
 	handlers_auth "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/user"
 	app_middleware "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/appMiddleware"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -20,19 +21,21 @@ func Routes() http.Handler {
 	mux.Use(app_middleware.AddIPToContext)
 	mux.Use(app_middleware.RequestMiddleware)
 
-	// User Management Routes
+	// Authentication Routes
 	mux.Post("/login", handlers_auth.Login)
 	mux.Get("/logout", handlers_auth.Logout)
-	mux.Post("/signup", handlers_auth.SignUp)
+
+	// User Management Routes
+	mux.Post("/signup", user.SignUp)
 
 	// Admin Management Routes
 	mux.Route("/admin", func(mux chi.Router) {
-		mux.Post("/create-user", handlers_admin.AdminCreateUser)
-		mux.Get("/users", handlers_admin.AdminGetUsers)
-		mux.Patch("/update-user", handlers_admin.AdminUpdateUser)
-		mux.Delete("/delete-user", handlers_admin.AdminDeleteUser)
-		mux.Post("/create-user-group", handlers_admin.AdminCreateUserGroup)
-		mux.Post("/create-organisation", handlers_admin.AdminCreateOrganisation)
+		mux.Post("/create-user", admin.AdminCreateUser)
+		mux.Get("/users", admin.AdminGetUsers)
+		mux.Patch("/update-user", admin.AdminUpdateUser)
+		mux.Delete("/delete-user", admin.AdminDeleteUser)
+		mux.Post("/create-user-group", admin.AdminCreateUserGroup)
+		mux.Post("/create-organisation", admin.AdminCreateOrganisation)
 	})
 
 	// Product Routes

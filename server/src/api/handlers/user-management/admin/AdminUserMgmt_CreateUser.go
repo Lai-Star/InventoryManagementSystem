@@ -1,4 +1,4 @@
-package handlers_admin
+package admin
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
+	auth_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
@@ -14,7 +14,7 @@ import (
 func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json")
-	var adminNewUser handlers_user_management.AdminUserMgmtJson
+	var adminNewUser auth_management.AdminUserMgmtJson
 
 	// Reading the request body and UnMarshal the body to the AdminUserMgmt struct
 	bs, _ := io.ReadAll(req.Body)
@@ -25,7 +25,7 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check User Group Admin
-	if !handlers_user_management.RetrieveIssuer(w, req) {
+	if !auth_management.RetrieveIssuer(w, req) {
 		return
 	}
 	if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {
@@ -36,7 +36,7 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	adminNewUser = adminNewUser.AdminUserMgmtFieldsTrimSpaces()
 
 	// Validate form inputs
-	if !handlers_user_management.AdminUserMgmtFormValidation(w, adminNewUser, "CREATE_USER") {
+	if !auth_management.AdminUserMgmtFormValidation(w, adminNewUser, "CREATE_USER") {
 		return
 	}
 
@@ -64,7 +64,7 @@ func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if user group is valid and trim user group
-	isValidUserGroup := handlers_user_management.UserGroupFormValidation(w, adminNewUser.UserGroup)
+	isValidUserGroup := auth_management.UserGroupFormValidation(w, adminNewUser.UserGroup)
 	if !isValidUserGroup {
 		return
 	}

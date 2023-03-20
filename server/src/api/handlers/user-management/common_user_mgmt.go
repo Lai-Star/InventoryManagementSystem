@@ -1,4 +1,4 @@
-package handlers_user_management
+package auth_management
 
 import (
 	"log"

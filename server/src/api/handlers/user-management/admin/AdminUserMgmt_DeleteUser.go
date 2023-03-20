@@ -1,4 +1,4 @@
-package handlers_admin
+package admin
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	handlers_user_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
+	auth_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
@@ -29,7 +29,7 @@ func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check User Group Admin
-	if !handlers_user_management.RetrieveIssuer(w, req) {
+	if !auth_management.RetrieveIssuer(w, req) {
 		return
 	}
 	if !utils.CheckUserGroup(w, w.Header().Get("Username"), "Admin") {
@@ -39,7 +39,7 @@ func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
 	username := adminDeleteUser.Username
 
 	// Check username format
-	if !handlers_user_management.UsernameFormValidation(w, username) {
+	if !auth_management.UsernameFormValidation(w, username) {
 		return
 	}
 
