@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
@@ -35,23 +34,19 @@ var (
 							ORDER BY user_id ASC;`
 )
 
-func GetConnection() *pgx.Conn {
-	return conn
-}
-
 func GetUsername(username string) bool {
 	row := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "username", "username"), username)
-	return row.Scan() != sql.ErrNoRows
+	return row.Scan() != pgx.ErrNoRows
 }
 
 func GetEmail(email string) bool {
 	row := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "email", "email"), email)
-	return row.Scan() != sql.ErrNoRows
+	return row.Scan() != pgx.ErrNoRows
 }
 
 func GetOrganisationName(organisationName string) bool {
 	row := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "organisation_name", "organisation_name"), organisationName)
-	return row.Scan() != sql.ErrNoRows
+	return row.Scan() != pgx.ErrNoRows
 }
 
 func GetPasswordByUsername(username string) (string, error) {

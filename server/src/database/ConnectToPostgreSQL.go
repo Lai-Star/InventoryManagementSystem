@@ -49,3 +49,7 @@ func ConnectToPostgreSQL() (*pgx.Conn, error) {
 
 	return conn, err
 }
+
+func GetConnection() *pgx.Conn {
+	return conn
+}

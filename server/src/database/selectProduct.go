@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
@@ -112,7 +111,7 @@ func GetProductSkuCountByOrganisation(organisationName, productSku string) (int,
 
 func ProductSkuExistsByUsername(product_sku, username string) bool {
 	row := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_PRODUCTS, "product_sku", "product_sku"), product_sku)
-	return row.Scan() != sql.ErrNoRows
+	return row.Scan() != pgx.ErrNoRows
 }
 
 func GetProductsByUsername(userId int) (pgx.Rows, error) {
