@@ -1,4 +1,4 @@
-package database
+package dbrepo
 
 import (
 	"context"

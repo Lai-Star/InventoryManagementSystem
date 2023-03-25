@@ -9,23 +9,35 @@ import (
 	"time"
 
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/routes"
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database/repository"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database/repository/dbrepo"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/keys"
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
+type application struct {
+	DB repository.DatabaseRepo
+}
+
 func main() {
 
-	conn, err := database.ConnectToPostgreSQL()
+	// Set up an app config
+	app := application{}
+
+	conn, err := app.connectToDB()
 	if err != nil {
-		log.Fatalln("Unable to connect to PostgreSQL:", err)
+		log.Fatal("Failed to connect to PostgreSQL:", err)
 	}
+
 	// Close the database to prevent data leak
 	defer func() {
 		conn.Close(context.Background())
 		fmt.Println("Closed database connection.")
 	}()
+
+	// Passing the PostgreSQL connection into PostgresDBRepo struct
+	app.DB = &dbrepo.PostgresDBRepo{DB: conn}
 
 	// Generating & validating the public and private keys for signed Json
 	// keys.GenerateKeys()

@@ -1,24 +1,19 @@
-package database
+package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/url"
 	"os"
 
-	"context"
-
 	"github.com/jackc/pgx/v4"
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 )
 
-// For querying in other files inside database folder
-var conn *pgx.Conn
-
-func ConnectToPostgreSQL() (*pgx.Conn, error) {
+func (app *application) connectToDB() (*pgx.Conn, error) {
 	// Loading the .env file in the config folder
-	if err := godotenv.Load("./config/.env"); err != nil {
+	if err := godotenv.Load("~/config/.env"); err != nil {
 		log.Println("Error loading .env file when connecting to PostgreSQL: ", err)
 	}
 
@@ -35,7 +30,7 @@ func ConnectToPostgreSQL() (*pgx.Conn, error) {
 	dsn.RawQuery = q.Encode()
 
 	var err error
-	conn, err = pgx.Connect(context.Background(), dsn.String())
+	conn, err := pgx.Connect(context.Background(), dsn.String())
 	if err != nil {
 		return nil, fmt.Errorf("pgx.Connect %w", err)
 	}
@@ -48,8 +43,4 @@ func ConnectToPostgreSQL() (*pgx.Conn, error) {
 	fmt.Println("Successfully connected to PostgreSQL!")
 
 	return conn, err
-}
-
-func GetConnection() *pgx.Conn {
-	return conn
 }

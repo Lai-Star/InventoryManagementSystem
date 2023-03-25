@@ -1,4 +1,4 @@
-package database
+package dbrepo
 
 import (
 	"context"
@@ -18,7 +18,7 @@ var (
 		"organisation_id = ( " +
 		"SELECT organisation_id FROM organisations WHERE organisation_name = $2) " +
 		"WHERE user_id = $1;"
-		
+
 	SQL_UPDATE_USER_GROUP_MAPPING = "WITH new_groups AS (SELECT user_group_id FROM user_groups WHERE user_group = ANY($2::text[])), " +
 		"deleted_groups AS (DELETE FROM user_group_mapping WHERE user_id = $1 AND user_group_id NOT IN " +
 		"(SELECT user_group_id FROM new_groups)) " +
