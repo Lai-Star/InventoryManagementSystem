@@ -27,25 +27,25 @@ var (
 		"SELECT user_group_id FROM user_group_mapping ugm WHERE ugm.user_id = $1 AND ugm.user_group_id = ng.user_group_id);"
 )
 
-func UpdateUsers(username, password, email string, isActive int) (int, error) {
+func (m *PostgresDBRepo) UpdateUsers(username, password, email string, isActive int) (int, error) {
 	var userId int
-	if err := conn.QueryRow(context.Background(), SQL_UPDATE_USERS, username, password, email, isActive).Scan(&userId); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in UpdateUsers: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_UPDATE_USERS, username, password, email, isActive).Scan(&userId); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in UpdateUsers: %w", err)
 	}
 	return userId, nil
 }
 
-func UpdateUserOrganisationMapping(userId int, organisationName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_UPDATE_USER_ORGANISATION_MAPPING, userId, organisationName); err != nil {
-		return fmt.Errorf("conn.Exec in UpdateUserOrganisationMapping: %w", err)
+func (m *PostgresDBRepo) UpdateUserOrganisationMapping(userId int, organisationName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_UPDATE_USER_ORGANISATION_MAPPING, userId, organisationName); err != nil {
+		return fmt.Errorf("m.DB.Exec in UpdateUserOrganisationMapping: %w", err)
 	}
 	return nil
 }
 
-func UpdateUserGroupMapping(userId int, userGroups []string) error {
+func (m *PostgresDBRepo) UpdateUserGroupMapping(userId int, userGroups []string) error {
 	args := []interface{}{userId, pq.Array(userGroups)}
-	if _, err := conn.Exec(context.Background(), SQL_UPDATE_USER_GROUP_MAPPING, args...); err != nil {
-		return fmt.Errorf("conn.Exec in UpdateUserGroupMapping: %w", err)
+	if _, err := m.DB.Exec(context.Background(), SQL_UPDATE_USER_GROUP_MAPPING, args...); err != nil {
+		return fmt.Errorf("m.DB.Exec in UpdateUserGroupMapping: %w", err)
 	}
 	return nil
 }

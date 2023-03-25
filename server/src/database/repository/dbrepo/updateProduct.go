@@ -35,37 +35,37 @@ var (
 														AND size_id = (SELECT size_id FROM organisation_sizes WHERE size_name = $3);`
 )
 
-func UpdateProductsByProductID(productName, productDesc, productSku string, productCost float32, productId int) error {
-	if _, err := conn.Exec(context.Background(), SQL_UPDATE_PRODUCTS_BY_PRODUCTID, productName, productDesc, productSku, productCost, productId); err != nil {
-		return fmt.Errorf("conn.Exec in UpdateProductsByProductID: %w", err)
+func (m *PostgresDBRepo) UpdateProductsByProductID(productName, productDesc, productSku string, productCost float32, productId int) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_UPDATE_PRODUCTS_BY_PRODUCTID, productName, productDesc, productSku, productCost, productId); err != nil {
+		return fmt.Errorf("m.DB.Exec in UpdateProductsByProductID: %w", err)
 	}
 	return nil
 }
 
-func UpdateProductUserMapping(userId, productId int, colourName, categoryName, brandName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_UPDATE_PRODUCT_USER_MAPPING, userId, productId, colourName, categoryName, brandName); err != nil {
-		return fmt.Errorf("conn.Exec in UpdateProductUserMapping: %w", err)
+func (m *PostgresDBRepo) UpdateProductUserMapping(userId, productId int, colourName, categoryName, brandName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_UPDATE_PRODUCT_USER_MAPPING, userId, productId, colourName, categoryName, brandName); err != nil {
+		return fmt.Errorf("m.DB.Exec in UpdateProductUserMapping: %w", err)
 	}
 	return nil
 }
 
-func UpdateProductOrganisationMapping(productId int, organisationName, colourName, categoryName, brandName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_UPDATE_PRODUCT_ORGANISATION_MAPPING, organisationName, productId, colourName, categoryName, brandName); err != nil {
-		return fmt.Errorf("conn.Exec in UpdateProductOrganisationMapping: %w", err)
+func (m *PostgresDBRepo) UpdateProductOrganisationMapping(productId int, organisationName, colourName, categoryName, brandName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_UPDATE_PRODUCT_ORGANISATION_MAPPING, organisationName, productId, colourName, categoryName, brandName); err != nil {
+		return fmt.Errorf("m.DB.Exec in UpdateProductOrganisationMapping: %w", err)
 	}
 	return nil
 }
 
-func UpdateUserProductSizesMapping(sizeQuantity, productId int, sizeName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_UPDATE_USER_PRODUCT_SIZES_MAPPING, sizeQuantity, productId, sizeName); err != nil {
-		return fmt.Errorf("conn.Exec in UpdateUserProductSizesMapping: %w", err)
+func (m *PostgresDBRepo) UpdateUserProductSizesMapping(sizeQuantity, productId int, sizeName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_UPDATE_USER_PRODUCT_SIZES_MAPPING, sizeQuantity, productId, sizeName); err != nil {
+		return fmt.Errorf("m.DB.Exec in UpdateUserProductSizesMapping: %w", err)
 	}
 	return nil
 }
 
-func UpdateOrganisationProductSizesMapping(sizeQuantity, productId int, sizeName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_UPDATE_ORGANISATION_PRODUCT_SIZES_MAPPING, sizeQuantity, productId, sizeName); err != nil {
-		return fmt.Errorf("conn.Exec in UpdateOrganisationProductSizesMapping: %w", err)
+func (m *PostgresDBRepo) UpdateOrganisationProductSizesMapping(sizeQuantity, productId int, sizeName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_UPDATE_ORGANISATION_PRODUCT_SIZES_MAPPING, sizeQuantity, productId, sizeName); err != nil {
+		return fmt.Errorf("m.DB.Exec in UpdateOrganisationProductSizesMapping: %w", err)
 	}
 	return nil
 }

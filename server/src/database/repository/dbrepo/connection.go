@@ -13,9 +13,6 @@ type PostgresDBRepo struct {
 	DB *pgx.Conn
 }
 
-// For querying in other files inside database folder
-var conn *pgx.Conn
-
 func (m *PostgresDBRepo) Connection() *pgx.Conn {
 	return m.DB
 }

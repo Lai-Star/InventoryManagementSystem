@@ -26,48 +26,48 @@ var (
 	SQL_INSERT_INTO_USER_GROUPS   = "INSERT INTO user_groups (user_group, description, added_date, updated_date) VALUES ($1, $2, now(), now());"
 )
 
-func InsertNewUser(username, password, email string, isActive int) (int, error) {
+func (m *PostgresDBRepo) InsertNewUser(username, password, email string, isActive int) (int, error) {
 	var userId int
-	if err := conn.QueryRow(context.Background(), SQL_INSERT_INTO_USERS, username, password, email, isActive).Scan(&userId); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in InsertNewUser: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_INSERT_INTO_USERS, username, password, email, isActive).Scan(&userId); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in InsertNewUser: %w", err)
 	}
 	return userId, nil
 }
 
-func InsertIntoUserOrganisationMapping(userId int, organisationName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_USER_ORGANISATION_MAPPING, userId, organisationName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoUserOrganisationMapping: %w", err)
+func (m *PostgresDBRepo) InsertIntoUserOrganisationMapping(userId int, organisationName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_USER_ORGANISATION_MAPPING, userId, organisationName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoUserOrganisationMapping: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoUserGroupMapping(userId int, userGroup string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_USER_GROUP_MAPPING, userId, userGroup); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoUserGroupMapping: %w", err)
+func (m *PostgresDBRepo) InsertIntoUserGroupMapping(userId int, userGroup string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_USER_GROUP_MAPPING, userId, userGroup); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoUserGroupMapping: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoOrganisations(organisationName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATIONS, organisationName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoOrganisations: %w", err)
+func (m *PostgresDBRepo) InsertIntoOrganisations(organisationName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATIONS, organisationName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoOrganisations: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoUserGroups(userGroup, description string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_USER_GROUPS, userGroup, description); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoUserGroups: %w", err)
+func (m *PostgresDBRepo) InsertIntoUserGroups(userGroup, description string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_USER_GROUPS, userGroup, description); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoUserGroups: %w", err)
 	}
 	return nil
 }
 
-func SignUpTransaction(ctx context.Context, username, password, email, organisationName, userGroup string, isActive int) error {
+func (m *PostgresDBRepo) SignUpTransaction(ctx context.Context, username, password, email, organisationName, userGroup string, isActive int) error {
 	// Setting timeout context of 2 minutes
 	ctx, cancel := context.WithTimeout(ctx, time.Second*120)
 	defer cancel()
 
-	tx, err := conn.BeginTx(ctx, pgx.TxOptions{})
+	tx, err := m.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return fmt.Errorf("conn.BeginTx: %w", err)
 	}
@@ -79,15 +79,15 @@ func SignUpTransaction(ctx context.Context, username, password, email, organisat
 	var userId int
 
 	if err := tx.QueryRow(ctx, SQL_INSERT_INTO_USERS, username, password, email, isActive, time.Now(), time.Now()).Scan(&userId); err != nil {
-		return fmt.Errorf("conn.QueryRow in InsertNewUser: %w", err)
+		return fmt.Errorf("m.DB.QueryRow in InsertNewUser: %w", err)
 	}
 
 	if _, err := tx.Exec(ctx, SQL_INSERT_INTO_USER_ORGANISATION_MAPPING, userId, organisationName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoUserOrganisationMapping: %w", err)
+		return fmt.Errorf("m.DB.Exec in InsertIntoUserOrganisationMapping: %w", err)
 	}
 
-	if _, err := conn.Exec(ctx, SQL_INSERT_INTO_USER_GROUP_MAPPING, userId, userGroup); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoUserGroupMapping: %w", err)
+	if _, err := m.DB.Exec(ctx, SQL_INSERT_INTO_USER_GROUP_MAPPING, userId, userGroup); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoUserGroupMapping: %w", err)
 	}
 
 	if err := tx.Commit(ctx); err != nil {

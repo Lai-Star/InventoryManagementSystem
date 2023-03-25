@@ -48,94 +48,94 @@ var (
 											((SELECT organisation_id from organisations WHERE organisation_name = $1), $2);`
 )
 
-func InsertNewProduct(productName, productDescription, productSku string, productCost float32) (int, error) {
+func (m *PostgresDBRepo) InsertNewProduct(productName, productDescription, productSku string, productCost float32) (int, error) {
 	var productId int
-	if err := conn.QueryRow(context.Background(), SQL_INSERT_INTO_PRODUCTS, productName, productDescription, productSku, productCost, time.Now(), time.Now()).Scan(&productId); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in InsertNewProduct: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_INSERT_INTO_PRODUCTS, productName, productDescription, productSku, productCost, time.Now(), time.Now()).Scan(&productId); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in InsertNewProduct: %w", err)
 	}
 	return productId, nil
 }
 
-func InsertIntoUserProductSizesMapping(sizeName string, sizeQuantity, productId int) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_USER_PRODUCT_SIZES_MAPPING, productId, sizeQuantity, sizeName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoUserProductSizesMapping: %w", err)
+func (m *PostgresDBRepo) InsertIntoUserProductSizesMapping(sizeName string, sizeQuantity, productId int) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_USER_PRODUCT_SIZES_MAPPING, productId, sizeQuantity, sizeName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoUserProductSizesMapping: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoOrganisationProductSizesMapping(sizeName string, sizeQuantity, productId int) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATION_PRODUCT_SIZES_MAPPING, productId, sizeQuantity, sizeName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoOrganisationProductSizesMapping: %w", err)
+func (m *PostgresDBRepo) InsertIntoOrganisationProductSizesMapping(sizeName string, sizeQuantity, productId int) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATION_PRODUCT_SIZES_MAPPING, productId, sizeQuantity, sizeName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoOrganisationProductSizesMapping: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoProductUserMapping(productId, userId int, productColour, productCategory, productBrand string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_PRODUCT_USER_MAPPING, productId, userId, productColour, productCategory, productBrand); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoProductUserMapping: %w", err)
+func (m *PostgresDBRepo) InsertIntoProductUserMapping(productId, userId int, productColour, productCategory, productBrand string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_PRODUCT_USER_MAPPING, productId, userId, productColour, productCategory, productBrand); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoProductUserMapping: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoProductOrganisationMapping(productId int, organisationName string, productColour, productCategory, productBrand string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_PRODUCT_ORGANISATION_MAPPING, productId, organisationName, productColour, productCategory, productBrand); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoProductOrganisationMapping: %w", err)
+func (m *PostgresDBRepo) InsertIntoProductOrganisationMapping(productId int, organisationName string, productColour, productCategory, productBrand string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_PRODUCT_ORGANISATION_MAPPING, productId, organisationName, productColour, productCategory, productBrand); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoProductOrganisationMapping: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoUserBrands(userId int, brandName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_USER_BRANDS, userId, brandName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoUserBrands: %w", err)
+func (m *PostgresDBRepo) InsertIntoUserBrands(userId int, brandName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_USER_BRANDS, userId, brandName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoUserBrands: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoOrganisationBrands(organisationName, brandName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATION_BRANDS, organisationName, brandName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoOrganisationBrands: %w", err)
+func (m *PostgresDBRepo) InsertIntoOrganisationBrands(organisationName, brandName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATION_BRANDS, organisationName, brandName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoOrganisationBrands: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoUserCategories(userId int, categoryName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_USER_CATEGORIES, userId, categoryName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoUserCategories: %w", err)
+func (m *PostgresDBRepo) InsertIntoUserCategories(userId int, categoryName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_USER_CATEGORIES, userId, categoryName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoUserCategories: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoOrganisationCategories(organisationName, categoryName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATION_CATEGORIES, organisationName, categoryName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoOrganisationCategories: %w", err)
+func (m *PostgresDBRepo) InsertIntoOrganisationCategories(organisationName, categoryName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATION_CATEGORIES, organisationName, categoryName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoOrganisationCategories: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoUserColours(userId int, colourName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_USER_COLOURS, userId, colourName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoUserColours: %w", err)
+func (m *PostgresDBRepo) InsertIntoUserColours(userId int, colourName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_USER_COLOURS, userId, colourName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoUserColours: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoOrganisationColours(organisationName, colourName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATION_COLOURS, organisationName, colourName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoOrganisationColours: %w", err)
+func (m *PostgresDBRepo) InsertIntoOrganisationColours(organisationName, colourName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATION_COLOURS, organisationName, colourName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoOrganisationColours: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoUserSizes(userId int, sizeName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_USER_SIZES, userId, sizeName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoUserSizes: %w", err)
+func (m *PostgresDBRepo) InsertIntoUserSizes(userId int, sizeName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_USER_SIZES, userId, sizeName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoUserSizes: %w", err)
 	}
 	return nil
 }
 
-func InsertIntoOrganisationSizes(organisationName, sizeName string) error {
-	if _, err := conn.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATION_SIZES, organisationName, sizeName); err != nil {
-		return fmt.Errorf("conn.Exec in InsertIntoOrganisationSizes: %w", err)
+func (m *PostgresDBRepo) InsertIntoOrganisationSizes(organisationName, sizeName string) error {
+	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_ORGANISATION_SIZES, organisationName, sizeName); err != nil {
+		return fmt.Errorf("m.DB.Exec in InsertIntoOrganisationSizes: %w", err)
 	}
 	return nil
 }

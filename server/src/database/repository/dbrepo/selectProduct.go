@@ -93,158 +93,158 @@ var (
 															AND product_id = $2;`
 )
 
-func GetProductSkuCountByUsername(username, productSku string) (int, error) {
+func (m *PostgresDBRepo) GetProductSkuCountByUsername(username, productSku string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_PRODUCT_SKU_BY_USERNAME, "COUNT(*)"), username, productSku).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetProductSkuCountByUsername: %w", err)
+	if err := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_PRODUCT_SKU_BY_USERNAME, "COUNT(*)"), username, productSku).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetProductSkuCountByUsername: %w", err)
 	}
 	return count, nil
 }
 
-func GetProductSkuCountByOrganisation(organisationName, productSku string) (int, error) {
+func (m *PostgresDBRepo) GetProductSkuCountByOrganisation(organisationName, productSku string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_PRODUCT_SKU_BY_ORGANISATION, "COUNT(*)"), organisationName, productSku).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetProductSkuCountByOrganisation: %w", err)
+	if err := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_PRODUCT_SKU_BY_ORGANISATION, "COUNT(*)"), organisationName, productSku).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetProductSkuCountByOrganisation: %w", err)
 	}
 	return count, nil
 }
 
-func ProductSkuExistsByUsername(product_sku, username string) bool {
-	row := conn.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_PRODUCTS, "product_sku", "product_sku"), product_sku)
+func (m *PostgresDBRepo) ProductSkuExistsByUsername(product_sku, username string) bool {
+	row := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_PRODUCTS, "product_sku", "product_sku"), product_sku)
 	return row.Scan() != pgx.ErrNoRows
 }
 
-func GetProductsByUsername(userId int) (pgx.Rows, error) {
-	rows, err := conn.Query(context.Background(), SQL_SELECT_ALL_FROM_PRODUCTS_BY_USERNAME, userId)
+func (m *PostgresDBRepo) GetProductsByUsername(userId int) (pgx.Rows, error) {
+	rows, err := m.DB.Query(context.Background(), SQL_SELECT_ALL_FROM_PRODUCTS_BY_USERNAME, userId)
 	if err != nil {
-		return nil, fmt.Errorf("conn.Query in GetProductsByUsername: %w", err)
+		return nil, fmt.Errorf("m.DB.Query in GetProductsByUsername: %w", err)
 	}
 	return rows, nil
 }
 
-func GetProductsByOrganisation(organisationName string) (pgx.Rows, error) {
-	rows, err := conn.Query(context.Background(), SQL_SELECT_ALL_FROM_PRODUCTS_BY_ORGANISATION, organisationName)
+func (m *PostgresDBRepo) GetProductsByOrganisation(organisationName string) (pgx.Rows, error) {
+	rows, err := m.DB.Query(context.Background(), SQL_SELECT_ALL_FROM_PRODUCTS_BY_ORGANISATION, organisationName)
 	if err != nil {
-		return nil, fmt.Errorf("conn.Query in GetProductsByOrganisation: %w", err)
+		return nil, fmt.Errorf("m.DB.Query in GetProductsByOrganisation: %w", err)
 	}
 	return rows, nil
 }
 
-func GetProductByProductId(product_id int) pgx.Row {
-	row := conn.QueryRow(context.Background(), SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID, product_id)
+func (m *PostgresDBRepo) GetProductByProductId(product_id int) pgx.Row {
+	row := m.DB.QueryRow(context.Background(), SQL_SELECT_ALL_FROM_PRODUCTS_BY_PRODUCTID, product_id)
 	return row
 }
 
-func GetBrandNameCountByUsername(userId int, brandName string) (int, error) {
+func (m *PostgresDBRepo) GetBrandNameCountByUsername(userId int, brandName string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_USER_BRANDS, userId, brandName).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetBrandNameCountByUsername: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_USER_BRANDS, userId, brandName).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetBrandNameCountByUsername: %w", err)
 	}
 	return count, nil
 }
 
-func GetBrandNameCountByOrganisation(organisationName, brandName string) (int, error) {
+func (m *PostgresDBRepo) GetBrandNameCountByOrganisation(organisationName, brandName string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_ORGANISATION_BRANDS, organisationName, brandName).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetBrandNameCountByOrganisation: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_ORGANISATION_BRANDS, organisationName, brandName).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetBrandNameCountByOrganisation: %w", err)
 	}
 	return count, nil
 }
 
-func GetCategoryNameCountByUsername(userId int, categoryName string) (int, error) {
+func (m *PostgresDBRepo) GetCategoryNameCountByUsername(userId int, categoryName string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_USER_CATEGORIES, userId, categoryName).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetCategoryNameCountByUsername: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_USER_CATEGORIES, userId, categoryName).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetCategoryNameCountByUsername: %w", err)
 	}
 	return count, nil
 }
 
-func GetCategoryNameCountByOrganisation(organisationName, categoryName string) (int, error) {
+func (m *PostgresDBRepo) GetCategoryNameCountByOrganisation(organisationName, categoryName string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_ORGANISATION_CATEGORIES, organisationName, categoryName).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetCategoryNameCountByOrganisation: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_ORGANISATION_CATEGORIES, organisationName, categoryName).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetCategoryNameCountByOrganisation: %w", err)
 	}
 	return count, nil
 }
 
-func GetColourNameCountByUsername(userId int, colourName string) (int, error) {
+func (m *PostgresDBRepo) GetColourNameCountByUsername(userId int, colourName string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_USER_COLOURS, userId, colourName).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetColourNameCountByUsername: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_USER_COLOURS, userId, colourName).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetColourNameCountByUsername: %w", err)
 	}
 	return count, nil
 }
 
-func GetColourNameCountByOrganisation(organisationName, colourName string) (int, error) {
+func (m *PostgresDBRepo) GetColourNameCountByOrganisation(organisationName, colourName string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_ORGANISATION_COLOURS, organisationName, colourName).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetColourNameCountByOrganisation: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_ORGANISATION_COLOURS, organisationName, colourName).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetColourNameCountByOrganisation: %w", err)
 	}
 	return count, nil
 }
 
-func GetSizeNameCountByUsername(userId int, sizeName string) (int, error) {
+func (m *PostgresDBRepo) GetSizeNameCountByUsername(userId int, sizeName string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_USER_SIZES, userId, sizeName).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetSizeNameCountByUsername: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_USER_SIZES, userId, sizeName).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetSizeNameCountByUsername: %w", err)
 	}
 	return count, nil
 }
 
-func GetSizeNameCountByOrganisation(organisationName, sizeName string) (int, error) {
+func (m *PostgresDBRepo) GetSizeNameCountByOrganisation(organisationName, sizeName string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_ORGANISATION_SIZES, organisationName, sizeName).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetSizeNameCountByOrganisation: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_FROM_ORGANISATION_SIZES, organisationName, sizeName).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetSizeNameCountByOrganisation: %w", err)
 	}
 	return count, nil
 }
 
-func GetSizeNameCountByUserIdAndProductId(productId, userId int, sizeName string) (int, error) {
+func (m *PostgresDBRepo) GetSizeNameCountByUserIdAndProductId(productId, userId int, sizeName string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_SIZES_BY_USERID_AND_PRODUCTID, productId, sizeName, userId).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetSizeNameCountByUserIdAndProductId: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_SIZES_BY_USERID_AND_PRODUCTID, productId, sizeName, userId).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetSizeNameCountByUserIdAndProductId: %w", err)
 	}
 	return count, nil
 }
 
-func GetSizeNameCountByOrganisationIdAndProductId(productId int, sizeName, organisationName string) (int, error) {
+func (m *PostgresDBRepo) GetSizeNameCountByOrganisationIdAndProductId(productId int, sizeName, organisationName string) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_SIZES_BY_ORGANISATIONID_AND_PRODUCTID, productId, sizeName, organisationName).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetSizeNameCountByOrganisationIdAndProductId: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_SIZES_BY_ORGANISATIONID_AND_PRODUCTID, productId, sizeName, organisationName).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetSizeNameCountByOrganisationIdAndProductId: %w", err)
 	}
 	return count, nil
 }
 
-func GetCountProductSkuByUserIdAndProductId(userId, productId int) (int, string, error) {
+func (m *PostgresDBRepo) GetCountProductSkuByUserIdAndProductId(userId, productId int) (int, string, error) {
 	var count int
 	var currentProductSku string
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_PRODUCTSKU_BY_USERID_AND_PRODUCTID, userId, productId).Scan(&count, &currentProductSku); err != nil {
-		return 0, "", fmt.Errorf("conn.QueryRow in GetCountProductSkuByUserIdAndProductId: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_PRODUCTSKU_BY_USERID_AND_PRODUCTID, userId, productId).Scan(&count, &currentProductSku); err != nil {
+		return 0, "", fmt.Errorf("m.DB.QueryRow in GetCountProductSkuByUserIdAndProductId: %w", err)
 	}
 	return count, currentProductSku, nil
 }
 
-func GetCountProductSkuByOrganisationAndProductId(organisationName string, productId int) (int, string, error) {
+func (m *PostgresDBRepo) GetCountProductSkuByOrganisationAndProductId(organisationName string, productId int) (int, string, error) {
 	var count int
 	var currentProductSku string
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_PRODUCTSKU_BY_ORGANISATION_AND_PRODUCTID, organisationName, productId).Scan(&count, &currentProductSku); err != nil {
-		return 0, "", fmt.Errorf("conn.QueryRow in GetCountProductSkuByOrganisationAndProductId: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_PRODUCTSKU_BY_ORGANISATION_AND_PRODUCTID, organisationName, productId).Scan(&count, &currentProductSku); err != nil {
+		return 0, "", fmt.Errorf("m.DB.QueryRow in GetCountProductSkuByOrganisationAndProductId: %w", err)
 	}
 	return count, currentProductSku, nil
 }
 
-func GetCountByUserIdAndProductId(userId, productId int) (int, error) {
+func (m *PostgresDBRepo) GetCountByUserIdAndProductId(userId, productId int) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_BY_USERID_AND_PRODUCTID, userId, productId).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetCountByUserIdAndProductId: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_BY_USERID_AND_PRODUCTID, userId, productId).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetCountByUserIdAndProductId: %w", err)
 	}
 	return count, nil
 }
 
-func GetCountByOrganisationNameAndProductId(organisationName string, productId int) (int, error) {
+func (m *PostgresDBRepo) GetCountByOrganisationNameAndProductId(organisationName string, productId int) (int, error) {
 	var count int
-	if err := conn.QueryRow(context.Background(), SQL_SELECT_COUNT_BY_ORGANISATIONNAME_AND_PRODUCTID, organisationName, productId).Scan(&count); err != nil {
-		return 0, fmt.Errorf("conn.QueryRow in GetCountByOrganisationNameAndProductId: %w", err)
+	if err := m.DB.QueryRow(context.Background(), SQL_SELECT_COUNT_BY_ORGANISATIONNAME_AND_PRODUCTID, organisationName, productId).Scan(&count); err != nil {
+		return 0, fmt.Errorf("m.DB.QueryRow in GetCountByOrganisationNameAndProductId: %w", err)
 	}
 	return count, nil
 }
