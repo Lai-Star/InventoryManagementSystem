@@ -6,6 +6,7 @@ type application struct {
 	DB repository.DatabaseRepo
 }
 
+// Dependency Injection
 func New(app repository.DatabaseRepo) *application {
-	return &application{}
+	return &application{DB: app}
 }
