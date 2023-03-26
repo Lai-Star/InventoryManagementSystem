@@ -10,7 +10,6 @@ import (
 	"time"
 
 	auth "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
@@ -20,7 +19,7 @@ type SignUpJson struct {
 	Email    string `json:"email"`
 }
 
-func SignUp(w http.ResponseWriter, req *http.Request) {
+func (app application) SignUp(w http.ResponseWriter, req *http.Request) {
 	// Set Headers
 	w.Header().Set("Content-Type", "application/json")
 	var newUser auth.SignUpJson
@@ -58,8 +57,8 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 	// hashedPassword := utils.GenerateHash(newUser.Password)
 
 	// Check if username already exists in database (duplicates not allowed)
-	isExistingUsername := database.GetUsername(newUser.Username)
-	if isExistingUsername {
+	userCount, _ := app.DB.GetCountByUsername(newUser.Username)
+	if userCount == 1 {
 		utils.ResponseJson(w, http.StatusBadRequest, "Username has already been taken. Please try again.")
 		return
 	}

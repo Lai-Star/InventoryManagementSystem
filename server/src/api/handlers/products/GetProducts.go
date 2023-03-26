@@ -11,7 +11,7 @@ import (
 	auth_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 )
 
 func GetProducts(w http.ResponseWriter, req *http.Request) {

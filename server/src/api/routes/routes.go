@@ -8,11 +8,12 @@ import (
 	handlers_auth "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/user"
 	app_middleware "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/appMiddleware"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database/repository"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
 
-func Routes() http.Handler {
+func Routes(app repository.DatabaseRepo) http.Handler {
 
 	mux := chi.NewRouter()
 
@@ -26,7 +27,8 @@ func Routes() http.Handler {
 	mux.Get("/logout", handlers_auth.Logout)
 
 	// User Management Routes
-	mux.Post("/signup", user.SignUp)
+	signUpH := user.New(app)
+	mux.Post("/signup", signUpH.SignUp)
 
 	// Admin Management Routes
 	mux.Route("/admin", func(mux chi.Router) {

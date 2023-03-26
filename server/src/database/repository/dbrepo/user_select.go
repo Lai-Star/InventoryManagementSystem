@@ -3,11 +3,14 @@ package dbrepo
 import (
 	"context"
 	"fmt"
+	"log"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 )
 
 var (
+	SQL_GET_COUNT_BY_USERNAME = "SELECT COUNT(*) FROM users WHERE username = $1;"
+
 	SQL_SELECT_FROM_USERS = "SELECT %s FROM users WHERE %s = $1;"
 
 	SQL_SELECT_FROM_ORGANISATIONS = "SELECT %s FROM organisations WHERE %s = $1;"
@@ -34,9 +37,15 @@ var (
 							ORDER BY user_id ASC;`
 )
 
-func (m *PostgresDBRepo) GetUsername(username string) bool {
-	row := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "username", "username"), username)
-	return row.Scan() != pgx.ErrNoRows
+func (m *PostgresDBRepo) GetCountByUsername(username string) (int, error) {
+	var count int
+	err := m.DB.QueryRow(context.Background(), SQL_GET_COUNT_BY_USERNAME, username).Scan(&count)
+	if err != nil {
+		log.Println("QueryRow failed at GetCountByUsername: ", err)
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func (m *PostgresDBRepo) GetEmail(email string) bool {

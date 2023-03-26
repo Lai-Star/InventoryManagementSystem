@@ -43,8 +43,8 @@ func main() {
 	// keys.GenerateKeys()
 	keys.CheckKeys()
 
-	// get application routes
-	mux := routes.Routes()
+	// get application routes (passing in conn for dependency injection)
+	mux := routes.Routes(app.DB)
 
 	// Loading the .env file in the config folder
 	err = godotenv.Load("./config/.env")

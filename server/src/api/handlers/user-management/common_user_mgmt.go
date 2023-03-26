@@ -7,7 +7,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/golang-jwt/jwt/v4"
 )
