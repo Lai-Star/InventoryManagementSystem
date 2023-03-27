@@ -43,13 +43,21 @@ func (app application) SignUp(w http.ResponseWriter, req *http.Request) error {
 	newUser.Password = utils.GenerateHash(newUser.Password)
 
 	// Check if username already exists in database (duplicates not allowed)
-	userCount, _ := app.DB.GetCountByUsername(ctx, newUser.Username)
+	userCount, err := app.DB.GetCountByUsername(ctx, newUser.Username)
+	if err != nil {
+		log.Println("app.DB.GetCountByUsername:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
 	if userCount == 1 {
 		return utils.ApiError{Err: "Username has already been taken. Please try again.", Status: http.StatusBadRequest}
 	}
 
 	// Check if email already exists in database (duplicates not allowed)
-	emailCount, _ := app.DB.GetCountByEmail(ctx, newUser.Email)
+	emailCount, err := app.DB.GetCountByEmail(ctx, newUser.Email)
+	if err != nil {
+		log.Println("app.DB.GetCountByEmail:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
 	if emailCount == 1 {
 		return utils.ApiError{Err: "Email has already been taken. Please try again.", Status: http.StatusBadRequest}
 	}
