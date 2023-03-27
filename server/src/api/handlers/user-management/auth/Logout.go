@@ -15,7 +15,7 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
-		utils.ResponseJson(w, http.StatusInternalServerError, "Internal Server Error")
+		utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
 		log.Println("Internal Server Error in retrieving cookie:", err)
 		return
 	}
@@ -33,5 +33,5 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 
 	http.SetCookie(w, cookie)
 
-	utils.ResponseJson(w, http.StatusOK, "Successfully Logged Out!")
+	utils.WriteJSON(w, http.StatusOK, "Successfully Logged Out!")
 }

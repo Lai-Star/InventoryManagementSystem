@@ -9,6 +9,7 @@ import (
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/user"
 	app_middleware "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/appMiddleware"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database/repository"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
@@ -28,7 +29,7 @@ func Routes(app repository.DatabaseRepo) http.Handler {
 
 	// User Management Routes
 	signUpH := user.New(app)
-	mux.Post("/signup", signUpH.SignUp)
+	mux.Post("/signup", utils.MakeHTTPHandler(signUpH.SignUp))
 
 	// Admin Management Routes
 	mux.Route("/admin", func(mux chi.Router) {

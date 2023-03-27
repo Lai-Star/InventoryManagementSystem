@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func Test_ResponseJson(t *testing.T) {
+func Test_WriteJSON(t *testing.T) {
 	responseJsonTests := []struct {
 		testName             string
 		code                 int
@@ -22,7 +22,7 @@ func Test_ResponseJson(t *testing.T) {
 		// Creating a mock ResponseWriter
 		w := httptest.NewRecorder()
 
-		ResponseJson(w, e.code, e.message)
+		WriteJSON(w, e.code, e.message)
 
 		// Read the response body as a string
 		body, _ := io.ReadAll(w.Result().Body)

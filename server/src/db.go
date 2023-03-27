@@ -13,7 +13,7 @@ import (
 
 func (app *application) connectToDB() (*pgx.Conn, error) {
 	// Loading the .env file in the config folder
-	if err := godotenv.Load("~/config/.env"); err != nil {
+	if err := godotenv.Load("./config/.env"); err != nil {
 		log.Println("Error loading .env file when connecting to PostgreSQL: ", err)
 	}
 

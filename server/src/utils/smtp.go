@@ -8,15 +8,15 @@ import (
 )
 
 type Email struct {
-    From    string
-    To      string
-    Subject string
-    Body    string
+	From    string
+	To      string
+	Subject string
+	Body    string
 }
 
 func SMTP(username string, email string, otp string) {
 
-    var e Email
+	var e Email
 
 	// Retrieve env variables
 	smtpAddress := os.Getenv("SMTP_ADDRESS")
@@ -24,12 +24,12 @@ func SMTP(username string, email string, otp string) {
 	smtpPassword := os.Getenv("SMTP_PASSWORD")
 	smtpHost := os.Getenv("SMTP_HOST")
 
-    auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
+	auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
 
-    e.From = "no-reply@IMS.com"
-    e.To = email
-    e.Subject = "IMS One-Time password"
-    e.Body = `
+	e.From = "no-reply@IMS.com"
+	e.To = email
+	e.Subject = "IMS One-Time password"
+	e.Body = `
         <html>
             <head>
                 <style>
@@ -68,21 +68,21 @@ func SMTP(username string, email string, otp string) {
         </html>
     `
 
-    err := smtp.SendMail(
-        smtpAddress, // mailtrap.io SMTP server and port
-        auth,
-        "no-reply@IMS.com", // sender's email address
-        []string{e.To}, // recipient's email address
-        []byte(e.Message()), // email message
-    )
+	err := smtp.SendMail(
+		smtpAddress, // mailtrap.io SMTP server and port
+		auth,
+		"no-reply@IMS.com",  // sender's email address
+		[]string{e.To},      // recipient's email address
+		[]byte(e.Message()), // email message
+	)
 
-    if err != nil {
-        log.Println("Error in sending mail inside smtp function: ", err)
-    }
+	if err != nil {
+		log.Println("Error in sending mail inside smtp function: ", err)
+	}
 }
 
 func (e Email) Message() string {
-    return fmt.Sprintf(`MIME-version: 1.0;
+	return fmt.Sprintf(`MIME-version: 1.0;
 Content-Type: text/html; charset="UTF-8";
 From: %s
 To: %s
