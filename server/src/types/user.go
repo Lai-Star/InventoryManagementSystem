@@ -15,9 +15,9 @@ type SignUpJSON struct {
 	Email    string `json:"email"`
 }
 
-func (u *SignUpJSON) ReadJSON(r io.Reader) error {
+func (user *SignUpJSON) ReadJSON(r io.Reader) error {
 	e := json.NewDecoder(r)
-	return e.Decode(u)
+	return e.Decode(user)
 }
 
 func (user *SignUpJSON) UserFieldsTrimSpaces() *SignUpJSON {

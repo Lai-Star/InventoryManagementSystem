@@ -1,8 +1,6 @@
-package user
+package auth
 
-import (
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database/repository"
-)
+import "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database/repository"
 
 type application struct {
 	DB repository.DatabaseRepo

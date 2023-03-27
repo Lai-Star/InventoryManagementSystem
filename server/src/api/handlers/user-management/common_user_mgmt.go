@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/types"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -150,26 +149,6 @@ func OrganisationFormValidation(w http.ResponseWriter, organisationName, action 
 			utils.WriteJSON(w, http.StatusBadRequest, "Organisation name has a maximum length of 255 characters. Please try again.")
 			return false
 		}
-	}
-
-	return true
-}
-
-func SignUpFormValidation(w http.ResponseWriter, user types.SignUpJSON) bool {
-
-	// Username form validation
-	if !UsernameFormValidation(w, user.Username) {
-		return false
-	}
-
-	// Password form validation
-	if !PasswordFormValidation(w, user.Password, "CREATE_USER") {
-		return false
-	}
-
-	// Email form validation
-	if !EmailFormValidation(w, user.Email, "CREATE_USER") {
-		return false
 	}
 
 	return true

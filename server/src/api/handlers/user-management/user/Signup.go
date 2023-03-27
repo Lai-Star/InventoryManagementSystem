@@ -25,11 +25,12 @@ func (app application) SignUp(w http.ResponseWriter, req *http.Request) error {
 	var newUser types.SignUpJSON
 
 	if err := newUser.ReadJSON(req.Body); err != nil {
-		return utils.ApiError{Err: "Failed to decode JSON", Status: http.StatusInternalServerError}
+		log.Println("newUser.ReadJSON:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 
 	// Setting timeout to follow SLA
-	ctx := context.Background()
+	ctx := req.Context()
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
@@ -41,7 +42,7 @@ func (app application) SignUp(w http.ResponseWriter, req *http.Request) error {
 
 	newUser.Password = utils.GenerateHash(newUser.Password)
 
-	// // Check if username already exists in database (duplicates not allowed)
+	// Check if username already exists in database (duplicates not allowed)
 	userCount, _ := app.DB.GetCountByUsername(ctx, newUser.Username)
 	if userCount == 1 {
 		return utils.ApiError{Err: "Username has already been taken. Please try again.", Status: http.StatusBadRequest}
@@ -58,5 +59,5 @@ func (app application) SignUp(w http.ResponseWriter, req *http.Request) error {
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 
-	return utils.WriteJSON(w, http.StatusCreated, utils.ApiSuccess{Success: "Successfully created user " + newUser.Username + "!", Status: http.StatusCreated})
+	return utils.WriteJSON(w, http.StatusCreated, utils.ApiSuccess{Success: "User " + newUser.Username + " was successfully created!", Status: http.StatusCreated})
 }

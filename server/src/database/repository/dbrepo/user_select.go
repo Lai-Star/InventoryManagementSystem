@@ -12,6 +12,9 @@ var (
 	SQL_GET_COUNT_BY_USERNAME = "SELECT COUNT(*) FROM users WHERE username = $1;"
 	SQL_GET_COUNT_BY_EMAIL    = "SELECT COUNT(*) FROM users WHERE email = $1;"
 
+	SQL_GET_PASSWORD_BY_USERNAME = "SELECT password FROM users WHERE username = $1;"
+	SQL_GET_ISACTIVE_BY_USERNAME = "SELECT is_active FROM users WHERE username = $1;"
+
 	SQL_SELECT_FROM_USERS = "SELECT %s FROM users WHERE %s = $1;"
 
 	SQL_SELECT_FROM_ORGANISATIONS = "SELECT %s FROM organisations WHERE %s = $1;"
@@ -42,7 +45,7 @@ func (m *PostgresDBRepo) GetCountByUsername(ctx context.Context, username string
 	var count int
 	err := m.DB.QueryRow(ctx, SQL_GET_COUNT_BY_USERNAME, username).Scan(&count)
 	if err != nil {
-		log.Println("QueryRow failed at GetCountByUsername: ", err)
+		log.Println("QueryRow failed at GetCountByUsername:", err)
 		return 0, err
 	}
 	return count, nil
@@ -52,23 +55,32 @@ func (m *PostgresDBRepo) GetCountByEmail(ctx context.Context, email string) (int
 	var count int
 	err := m.DB.QueryRow(ctx, SQL_GET_COUNT_BY_EMAIL, email).Scan(&count)
 	if err != nil {
-		log.Println("QueryRow failed at GetCountByEmail: ", err)
+		log.Println("QueryRow failed at GetCountByEmail:", err)
 		return 0, err
 	}
 	return count, nil
 }
 
+func (m *PostgresDBRepo) GetPasswordByUsername(ctx context.Context, username string) (string, error) {
+	var password string
+	if err := m.DB.QueryRow(ctx, SQL_GET_PASSWORD_BY_USERNAME, username).Scan(&password); err != nil {
+		log.Println("QueryRow failed at GetPasswordByUsername:", err)
+		return "", err
+	}
+	return password, nil
+}
+
+func (m *PostgresDBRepo) GetIsActiveByUsername(ctx context.Context, username string) (int, error) {
+	var isActive int
+	if err := m.DB.QueryRow(ctx, SQL_GET_ISACTIVE_BY_USERNAME, username).Scan(&isActive); err != nil {
+		return 0, err
+	}
+	return isActive, nil
+}
+
 func (m *PostgresDBRepo) GetOrganisationName(organisationName string) bool {
 	row := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "organisation_name", "organisation_name"), organisationName)
 	return row.Scan() != pgx.ErrNoRows
-}
-
-func (m *PostgresDBRepo) GetPasswordByUsername(username string) (string, error) {
-	var password string
-	if err := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "password", "username"), username).Scan(&password); err != nil {
-		return "", fmt.Errorf("m.DB.QueryRow in GetPasswordByUsername: %w", err)
-	}
-	return password, nil
 }
 
 func (m *PostgresDBRepo) GetEmailByUsername(username string) (string, error) {
@@ -77,14 +89,6 @@ func (m *PostgresDBRepo) GetEmailByUsername(username string) (string, error) {
 		return "", fmt.Errorf("m.DB.QueryRow in GetEmailByUsername: %w", err)
 	}
 	return email, nil
-}
-
-func (m *PostgresDBRepo) GetActiveStatusByUsername(username string) (int, error) {
-	var isActive int
-	if err := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "is_active", "username"), username).Scan(&isActive); err != nil {
-		return 0, fmt.Errorf("m.DB.QueryRow in GetActiveStatusByUsername: %w", err)
-	}
-	return isActive, nil
 }
 
 func (m *PostgresDBRepo) GetOrganisationNameAndUserIdByUsername(username string) (string, int, error) {

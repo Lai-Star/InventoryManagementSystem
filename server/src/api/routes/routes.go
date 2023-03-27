@@ -5,10 +5,11 @@ import (
 
 	products "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/products"
 	admin "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/admin"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
 	handlers_auth "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/user"
-	app_middleware "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/appMiddleware"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database/repository"
+	appMiddleware "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/middleware"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -20,11 +21,12 @@ func Routes(app repository.DatabaseRepo) http.Handler {
 
 	// Register middleware
 	mux.Use(middleware.Recoverer)
-	mux.Use(app_middleware.AddIPToContext)
-	mux.Use(app_middleware.RequestMiddleware)
+	mux.Use(appMiddleware.AddIPToContext)
+	mux.Use(appMiddleware.RequestMiddleware)
 
 	// Authentication Routes
-	mux.Post("/login", handlers_auth.Login)
+	loginH := auth.New(app)
+	mux.Post("/login", utils.MakeHTTPHandler(loginH.Login))
 	mux.Get("/logout", handlers_auth.Logout)
 
 	// User Management Routes
