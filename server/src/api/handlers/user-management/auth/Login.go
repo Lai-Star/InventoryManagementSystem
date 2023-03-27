@@ -100,3 +100,33 @@ func (app application) Login(w http.ResponseWriter, req *http.Request) error {
 	// // dbEmail, _ := database.GetEmailByUsername(user.Username)
 	// // go utils.SMTP(user.Username, dbEmail, utils.Generate2FA())
 }
+
+func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	cookie, err := req.Cookie("leon-jwt-token")
+	if err != nil {
+		utils.WriteJSON(w, http.StatusUnauthorized, "Access Denied: You are unauthorized.")
+		return false
+	}
+
+	// Parses the cookie jwt claims using the secret key to verify
+	token, err := jwt.ParseWithClaims(cookie.Value, &jwt.RegisteredClaims{}, func(*jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("SECRET_KEY")), nil
+	})
+	if err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
+		log.Println("Internal Server Error in parsing cookie:", err)
+		return false
+	}
+
+	// To access the issuer, we need the token claims to be type RegisteredClaims
+	claims := token.Claims.(*jwt.RegisteredClaims)
+
+	// fmt.Println("Retrieved Issuer using claims.Issuer: ", claims.Issuer)
+	w.Header().Set("username", claims.Issuer)
+	// fmt.Println("Retrieved Issuer using w.Header().Get():" , w.Header().Get("username"))
+
+	return true
+}

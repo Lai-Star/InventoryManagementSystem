@@ -6,7 +6,6 @@ import (
 	products "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/products"
 	admin "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/admin"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
-	handlers_auth "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/user"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database/repository"
 	appMiddleware "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/middleware"
@@ -26,8 +25,9 @@ func Routes(app repository.DatabaseRepo) http.Handler {
 
 	// Authentication Routes
 	loginH := auth.New(app)
+	logoutH := auth.New(app)
 	mux.Post("/login", utils.MakeHTTPHandler(loginH.Login))
-	mux.Get("/logout", handlers_auth.Logout)
+	mux.Get("/logout", utils.MakeHTTPHandler(logoutH.Logout))
 
 	// User Management Routes
 	signUpH := user.New(app)

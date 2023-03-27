@@ -4,20 +4,16 @@ import (
 	"log"
 	"net/http"
 
-	auth_management "github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-func Logout(w http.ResponseWriter, req *http.Request) {
-	auth_management.RetrieveIssuer(w, req)
-	// fmt.Println("Retrieved Issuer from Logout", w.Header().Get("username"))
+func (app application) Logout(w http.ResponseWriter, req *http.Request) error {
+	RetrieveIssuer(w, req)
 
-	w.Header().Set("Content-Type", "application/json")
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
-		utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-		log.Println("Internal Server Error in retrieving cookie:", err)
-		return
+		log.Println("req.Cookie:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 	cookie.Value = ""
 
@@ -33,5 +29,5 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 
 	http.SetCookie(w, cookie)
 
-	utils.WriteJSON(w, http.StatusOK, "Successfully Logged Out!")
+	return utils.WriteJSON(w, http.StatusOK, "Successfully Logged Out!")
 }
