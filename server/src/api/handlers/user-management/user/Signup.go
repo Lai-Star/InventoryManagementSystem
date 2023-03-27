@@ -30,7 +30,7 @@ func (app application) SignUp(w http.ResponseWriter, req *http.Request) error {
 
 	// Setting timeout to follow SLA
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, time.Minute*2)
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
 	newUser.UserFieldsTrimSpaces()
@@ -42,13 +42,13 @@ func (app application) SignUp(w http.ResponseWriter, req *http.Request) error {
 	newUser.Password = utils.GenerateHash(newUser.Password)
 
 	// // Check if username already exists in database (duplicates not allowed)
-	userCount, _ := app.DB.GetCountByUsername(newUser.Username)
+	userCount, _ := app.DB.GetCountByUsername(ctx, newUser.Username)
 	if userCount == 1 {
 		return utils.ApiError{Err: "Username has already been taken. Please try again.", Status: http.StatusBadRequest}
 	}
 
 	// Check if email already exists in database (duplicates not allowed)
-	emailCount, _ := app.DB.GetCountByEmail(newUser.Email)
+	emailCount, _ := app.DB.GetCountByEmail(ctx, newUser.Email)
 	if emailCount == 1 {
 		return utils.ApiError{Err: "Email has already been taken. Please try again.", Status: http.StatusBadRequest}
 	}

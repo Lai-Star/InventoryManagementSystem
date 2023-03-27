@@ -38,9 +38,9 @@ var (
 							ORDER BY user_id ASC;`
 )
 
-func (m *PostgresDBRepo) GetCountByUsername(username string) (int, error) {
+func (m *PostgresDBRepo) GetCountByUsername(ctx context.Context, username string) (int, error) {
 	var count int
-	err := m.DB.QueryRow(context.Background(), SQL_GET_COUNT_BY_USERNAME, username).Scan(&count)
+	err := m.DB.QueryRow(ctx, SQL_GET_COUNT_BY_USERNAME, username).Scan(&count)
 	if err != nil {
 		log.Println("QueryRow failed at GetCountByUsername: ", err)
 		return 0, err
@@ -48,9 +48,9 @@ func (m *PostgresDBRepo) GetCountByUsername(username string) (int, error) {
 	return count, nil
 }
 
-func (m *PostgresDBRepo) GetCountByEmail(email string) (int, error) {
+func (m *PostgresDBRepo) GetCountByEmail(ctx context.Context, email string) (int, error) {
 	var count int
-	err := m.DB.QueryRow(context.Background(), SQL_GET_COUNT_BY_EMAIL, email).Scan(&count)
+	err := m.DB.QueryRow(ctx, SQL_GET_COUNT_BY_EMAIL, email).Scan(&count)
 	if err != nil {
 		log.Println("QueryRow failed at GetCountByEmail: ", err)
 		return 0, err
