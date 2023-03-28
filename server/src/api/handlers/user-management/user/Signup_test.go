@@ -13,7 +13,7 @@ import (
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-func Test_SignUpTransaction(t *testing.T) {
+func Test_SignUp(t *testing.T) {
 
 	app := application{}
 	app.DB = &dbrepo.TestDBRepo{}
@@ -47,6 +47,7 @@ func Test_SignUpTransaction(t *testing.T) {
 	}
 
 	for _, e := range tests {
+
 		jsonStr, err := json.Marshal(e.postedData)
 		if err != nil {
 			t.Fatal(err)

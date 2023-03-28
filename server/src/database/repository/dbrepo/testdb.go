@@ -14,6 +14,9 @@ func (m *TestDBRepo) Connection() *pgx.Conn {
 }
 
 func (m *TestDBRepo) GetCountByUsername(ctx context.Context, username string) (int, error) {
+	if username == "lowjiewei" {
+		return 1, nil
+	}
 	return 0, nil
 }
 
@@ -22,10 +25,16 @@ func (m *TestDBRepo) GetCountByEmail(ctx context.Context, email string) (int, er
 }
 
 func (m *TestDBRepo) GetPasswordByUsername(ctx context.Context, username string) (string, error) {
+	if username == "lowjiewei" {
+		return "$2a$10$dxMeJmuR2p2EhxhuZC8DIezEpjpzFG6tWI6IKzJczHSfwkbsYQaDm", nil
+	}
 	return "", nil
 }
 
 func (m *TestDBRepo) GetIsActiveByUsername(ctx context.Context, username string) (int, error) {
+	if username == "lowjiewei" {
+		return 1, nil
+	}
 	return 0, nil
 }
 
