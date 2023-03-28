@@ -1,23 +1,27 @@
 package user
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/database/repository/dbrepo"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/types"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-var app application
-
 func Test_SignUpTransaction(t *testing.T) {
+
+	app := application{}
+	app.DB = &dbrepo.TestDBRepo{}
 
 	var tests = []struct {
 		name               string
 		postedData         types.SignUpJSON
+		expectedBody       string
 		expectedStatusCode int
 	}{
 		{
@@ -27,7 +31,18 @@ func Test_SignUpTransaction(t *testing.T) {
 				Password: "Password0!",
 				Email:    "leonlow@email.com",
 			},
+			expectedBody:       `{"Success":"User leonlow was successfully created!","Status":201}`,
 			expectedStatusCode: 201,
+		},
+		{
+			name: "invalid signup",
+			postedData: types.SignUpJSON{
+				Username: "a",
+				Password: "Password",
+				Email:    "a@email.com",
+			},
+			expectedBody:       `{"Err":"Username must have a length of 5 - 50 characters. Please try again.","Status":400}`,
+			expectedStatusCode: 400,
 		},
 	}
 
@@ -38,18 +53,23 @@ func Test_SignUpTransaction(t *testing.T) {
 		}
 
 		// Setting a request for testing
-		req, _ := http.NewRequest(http.MethodPost, "/signup", strings.NewReader(string(jsonStr)))
+		reqBody := bytes.NewBuffer(jsonStr)
+		req, _ := http.NewRequest(http.MethodPost, "/signup", reqBody)
 		req.Header.Set("Content-Type", "application/json")
 
 		// Setting and recording the response
-		res := httptest.NewRecorder()
+		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(utils.MakeHTTPHandler(app.SignUp))
 
-		handler.ServeHTTP(res, req)
-		// SignUp(res, req)
+		handler.ServeHTTP(rr, req)
+		// SignUp(rr, req)
 
-		if res.Code != e.expectedStatusCode {
-			t.Errorf("%s: returned wrong status code; expected %d but got %d", e.name, e.expectedStatusCode, res.Code)
+		if rr.Code != e.expectedStatusCode {
+			t.Errorf("%s: returned wrong status code; expected %d but got %d", e.name, e.expectedStatusCode, rr.Code)
+		}
+
+		if strings.TrimSpace(rr.Body.String()) != e.expectedBody {
+			t.Errorf("Unexpected response body: expected %v, got %v", rr.Body.String(), e.expectedBody)
 		}
 	}
 }
