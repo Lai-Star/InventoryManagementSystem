@@ -29,5 +29,5 @@ func (app application) Logout(w http.ResponseWriter, req *http.Request) error {
 
 	http.SetCookie(w, cookie)
 
-	return utils.WriteJSON(w, http.StatusOK, "Successfully Logged Out!")
+	return utils.WriteJSON(w, http.StatusOK, utils.ApiSuccess{Success: "Successfully Logged out!", Status: http.StatusOK})
 }
