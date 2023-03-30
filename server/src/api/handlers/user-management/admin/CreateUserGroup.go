@@ -59,5 +59,5 @@ func (app application) AdminCreateUserGroup(w http.ResponseWriter, req *http.Req
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 
-	return utils.WriteJSON(w, http.StatusCreated, utils.ApiSuccess{Success: "Successfully created user group!", Status: http.StatusCreated})
+	return utils.WriteJSON(w, http.StatusCreated, utils.ApiSuccess{Success: "Successfully created user group '" + newUg.UserGroup + "' !", Status: http.StatusCreated})
 }
