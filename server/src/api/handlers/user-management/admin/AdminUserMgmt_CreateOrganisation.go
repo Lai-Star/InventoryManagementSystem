@@ -1,63 +1,66 @@
 package admin
 
 import (
+	"context"
+	"log"
 	"net/http"
+	"time"
+
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/types"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
 type AdminCreateOrganisationJson struct {
 	OrganisationName string `json:"organisation_name"`
 }
 
-func AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) {
-	// w.Header().Set("Content-Type", "application/json")
-	// var organisation AdminCreateOrganisationJson
+func (app application) AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) error {
 
-	// // Reading the request body and UnMarshal the body to the AdminCreateOrganisationJson struct
-	// bs, _ := io.ReadAll(req.Body)
-	// if err := json.Unmarshal(bs, &organisation); err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Internal Server Error in UnMarshal JSON body in AdminCreateUser route:", err)
-	// 	return
-	// }
+	if req.Method != http.MethodPost {
+		return utils.ApiError{Err: "Invalid Method", Status: http.StatusMethodNotAllowed}
+	}
 
-	// // Check User Group Admin
-	// if !auth_management.RetrieveIssuer(w, req) {
-	// 	return
-	// }
-	// if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {
-	// 	return
-	// }
+	var newOrg types.AdminCreateOrganisationJSON
 
-	// organisationName := organisation.OrganisationName
+	if err := newOrg.ReadJSON(req.Body); err != nil {
+		log.Println("newOrg.ReadJSON:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
 
-	// // trim organisation name
-	// organisationName = strings.TrimSpace(organisationName)
+	// Setting timeout to follow SLA
+	ctx := req.Context()
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
 
-	// // Organisation form validation
-	// isValidOrganisationName := auth_management.OrganisationFormValidation(w, organisationName, "CREATE_ORGANISATION")
-	// if !isValidOrganisationName {
-	// 	return
-	// }
+	newOrg.OrgFieldsTrimSpaces()
+	if err := newOrg.OrgFormValidation(w); err != nil {
+		return err
+	}
 
-	// // Check if organisation name already exists
-	// count, err := database.GetOrganisationNameCount(organisationName)
-	// if err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Internal server error in getting organisation count:", err)
-	// 	return
-	// }
-	// if count == 1 {
-	// 	utils.WriteJSON(w, http.StatusBadRequest, organisationName+" already exists. Please try again.")
-	// 	return
-	// }
+	// Check User Group Admin
+	if err := auth.RetrieveIssuer(w, req); err != nil {
+		return err
+	}
+	if err := app.DB.CheckUserGroup(ctx, w.Header().Get("username"), "Admin"); err != nil {
+		return err
+	}
 
-	// // Insert organisation name into organisations table
-	// err = database.InsertIntoOrganisations(organisationName)
-	// if err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Internal server error in inserting into organisations table:", err)
-	// 	return
-	// }
+	// Check if organisation name already exists
+	orgNameCount, err := app.DB.GetCountByOrganisationName(ctx, newOrg.OrganisationName)
+	if err != nil {
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+	if orgNameCount == 1 {
+		return utils.ApiError{Err: "Organisation Name already exists. Please try again.", Status: http.StatusBadRequest}
+	}
 
-	// utils.WriteJSON(w, http.StatusOK, "Successfully created a new organisation.")
+	// Insert organisation name into organisations table
+	err = app.DB.InsertIntoOrganisations(ctx, newOrg.OrganisationName)
+	if err != nil {
+		log.Println("app.DB.InsertIntoOrganisations:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+
+	return utils.WriteJSON(w, http.StatusCreated, utils.ApiSuccess{Success: "Successfully created a new organisation!", Status: http.StatusCreated})
 }

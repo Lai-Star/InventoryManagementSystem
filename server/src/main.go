@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -32,7 +31,7 @@ func main() {
 
 	// Close the database to prevent data leak
 	defer func() {
-		conn.Close(context.Background())
+		conn.Close()
 		fmt.Println("Closed database connection.")
 	}()
 

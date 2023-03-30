@@ -47,7 +47,6 @@ func (app application) SignUp(w http.ResponseWriter, req *http.Request) error {
 	// Check if username already exists in database (duplicates not allowed)
 	userCount, err := app.DB.GetCountByUsername(ctx, newUser.Username)
 	if err != nil {
-		log.Println("app.DB.GetCountByUsername:", err)
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 	if userCount == 1 {
@@ -57,7 +56,6 @@ func (app application) SignUp(w http.ResponseWriter, req *http.Request) error {
 	// Check if email already exists in database (duplicates not allowed)
 	emailCount, err := app.DB.GetCountByEmail(ctx, newUser.Email)
 	if err != nil {
-		log.Println("app.DB.GetCountByEmail:", err)
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 	if emailCount == 1 {
@@ -65,7 +63,6 @@ func (app application) SignUp(w http.ResponseWriter, req *http.Request) error {
 	}
 
 	if err := app.DB.SignUpTransaction(ctx, newUser.Username, newUser.Password, newUser.Email, organisationName, userGroup, isActive); err != nil {
-		log.Println("Internal Server Error in SignUpTransaction:", err)
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 

@@ -34,13 +34,14 @@ func Routes(app repository.DatabaseRepo) http.Handler {
 	mux.Post("/signup", utils.MakeHTTPHandler(signUpH.SignUp))
 
 	// Admin Management Routes
+	createOrgH := admin.New(app)
 	mux.Route("/admin", func(mux chi.Router) {
 		mux.Post("/create-user", admin.AdminCreateUser)
 		mux.Get("/users", admin.AdminGetUsers)
 		mux.Patch("/update-user", admin.AdminUpdateUser)
 		mux.Delete("/delete-user", admin.AdminDeleteUser)
 		mux.Post("/create-user-group", admin.AdminCreateUserGroup)
-		mux.Post("/create-organisation", admin.AdminCreateOrganisation)
+		mux.Post("/create-organisation", utils.MakeHTTPHandler(createOrgH.AdminCreateOrganisation))
 	})
 
 	// Product Routes

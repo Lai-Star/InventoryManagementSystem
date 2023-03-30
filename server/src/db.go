@@ -7,11 +7,11 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/joho/godotenv"
 )
 
-func (app *application) connectToDB() (*pgx.Conn, error) {
+func (app *application) connectToDB() (*pgxpool.Pool, error) {
 	// Loading the .env file in the config folder
 	if err := godotenv.Load("./config/.env"); err != nil {
 		log.Println("Error loading .env file when connecting to PostgreSQL: ", err)
@@ -30,7 +30,7 @@ func (app *application) connectToDB() (*pgx.Conn, error) {
 	dsn.RawQuery = q.Encode()
 
 	var err error
-	conn, err := pgx.Connect(context.Background(), dsn.String())
+	conn, err := pgxpool.Connect(context.Background(), dsn.String())
 	if err != nil {
 		return nil, fmt.Errorf("pgx.Connect %w", err)
 	}

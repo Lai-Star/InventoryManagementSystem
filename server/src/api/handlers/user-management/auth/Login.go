@@ -40,7 +40,6 @@ func (app application) Login(w http.ResponseWriter, req *http.Request) error {
 	// Check if username exists in database
 	userCount, err := app.DB.GetCountByUsername(ctx, authUser.Username)
 	if err != nil {
-		log.Println("app.DB.GetCountByUsername:", err)
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 	if userCount == 0 {
@@ -50,7 +49,6 @@ func (app application) Login(w http.ResponseWriter, req *http.Request) error {
 	// Compare password with hashed password in database
 	dbPassword, err := app.DB.GetPasswordByUsername(ctx, authUser.Username)
 	if err != nil {
-		log.Println("app.DB.GetPasswordByUsername:", err)
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 	if !utils.CompareHash(dbPassword, authUser.Password) {
@@ -60,7 +58,6 @@ func (app application) Login(w http.ResponseWriter, req *http.Request) error {
 	// Check User Account Status (active/inactive)
 	dbIsActive, err := app.DB.GetIsActiveByUsername(ctx, authUser.Username)
 	if err != nil {
-		log.Println("app.DB.GetIsActiveByUsername:", err)
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 	if dbIsActive == 0 {
@@ -101,14 +98,13 @@ func (app application) Login(w http.ResponseWriter, req *http.Request) error {
 	// // go utils.SMTP(user.Username, dbEmail, utils.Generate2FA())
 }
 
-func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
+func RetrieveIssuer(w http.ResponseWriter, req *http.Request) error {
 
 	w.Header().Set("Content-Type", "application/json")
 
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
-		utils.WriteJSON(w, http.StatusUnauthorized, "Access Denied: You are unauthorized.")
-		return false
+		return utils.WriteJSON(w, http.StatusUnauthorized, "Access Denied: You are unauthorized.")
 	}
 
 	// Parses the cookie jwt claims using the secret key to verify
@@ -116,9 +112,8 @@ func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
 	if err != nil {
-		utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
 		log.Println("Internal Server Error in parsing cookie:", err)
-		return false
+		return utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
 	}
 
 	// To access the issuer, we need the token claims to be type RegisteredClaims
@@ -128,5 +123,5 @@ func RetrieveIssuer(w http.ResponseWriter, req *http.Request) bool {
 	w.Header().Set("username", claims.Issuer)
 	// fmt.Println("Retrieved Issuer using w.Header().Get():" , w.Header().Get("username"))
 
-	return true
+	return nil
 }
