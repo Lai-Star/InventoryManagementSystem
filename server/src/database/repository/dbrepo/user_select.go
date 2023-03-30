@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -129,35 +128,4 @@ func (m *PostgresDBRepo) GetUserGroupCount(usergroup string) (int, error) {
 func (m *PostgresDBRepo) GetUsers() (pgx.Rows, error) {
 	rows, err := m.DB.Query(context.Background(), SQL_SELECT_ALL_USERS)
 	return rows, err
-}
-
-// Determines if a user has been assigned that usergroup
-func (m *PostgresDBRepo) CheckUserGroup(ctx context.Context, username string, userGroups ...string) error {
-
-	var count int
-	err := m.DB.QueryRow(ctx, SQL_GET_COUNT_BY_EMAIL, "lowjiewei@email.com").Scan(&count)
-	fmt.Println("count", count)
-
-	fmt.Println(username, userGroups)
-
-	rows, err := m.DB.Query(ctx, SQL_GET_USERGROUPS_BY_USERNAME, username)
-	if err != nil {
-		log.Println("Query failed at CheckUserGroup:", err)
-		return err
-	}
-
-	var userGroup string
-
-	for rows.Next() {
-		err = rows.Scan(&userGroup)
-		if err != nil {
-			return err
-		}
-
-		if utils.Contains(userGroups, userGroup) {
-			return nil
-		}
-	}
-
-	return nil
 }

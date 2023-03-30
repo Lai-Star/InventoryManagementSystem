@@ -14,10 +14,6 @@ func (m *TestDBRepo) Connection() *pgxpool.Pool {
 	return nil
 }
 
-func (m *TestDBRepo) CheckUserGroup(ctx context.Context, username string, userGroups ...string) error {
-	return nil
-}
-
 func (m *TestDBRepo) GetCountByUsername(ctx context.Context, username string) (int, error) {
 	if username == "lowjiewei" {
 		return 1, nil

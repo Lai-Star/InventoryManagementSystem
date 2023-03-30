@@ -42,7 +42,9 @@ func (app application) AdminCreateOrganisation(w http.ResponseWriter, req *http.
 	if err := auth.RetrieveIssuer(w, req); err != nil {
 		return err
 	}
-	if err := app.DB.CheckUserGroup(ctx, w.Header().Get("username"), "Admin"); err != nil {
+	utilsApp := utils.Application{DB: app.DB}
+	err := utils.InjectUG(utilsApp, ctx, w.Header().Get("username"), "Admin")
+	if err != nil {
 		return err
 	}
 

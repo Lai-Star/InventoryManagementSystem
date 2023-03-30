@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -42,7 +41,6 @@ func (app application) SignUp(w http.ResponseWriter, req *http.Request) error {
 	}
 
 	newUser.Password = utils.GenerateHash(newUser.Password)
-	fmt.Println(newUser.Password)
 
 	// Check if username already exists in database (duplicates not allowed)
 	userCount, err := app.DB.GetCountByUsername(ctx, newUser.Username)

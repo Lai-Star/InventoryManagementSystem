@@ -9,7 +9,6 @@ import (
 
 type DatabaseRepo interface {
 	Connection() *pgxpool.Pool
-	CheckUserGroup(ctx context.Context, username string, userGroups ...string) error
 
 	GetCountByUsername(ctx context.Context, username string) (int, error)
 	GetCountByEmail(ctx context.Context, email string) (int, error)

@@ -3,6 +3,7 @@ package dbrepo
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/jackc/pgx/v4"
@@ -69,7 +70,8 @@ func (m *PostgresDBRepo) SignUpTransaction(ctx context.Context, username, passwo
 
 	tx, err := m.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
-		return fmt.Errorf("error in SignUpTransaction conn.BeginTx: %w", err)
+		log.Println("BeginTx failed in SignUpTransaction:", err)
+		return err
 	}
 
 	defer func() {
@@ -79,19 +81,23 @@ func (m *PostgresDBRepo) SignUpTransaction(ctx context.Context, username, passwo
 	var userId int
 
 	if err := tx.QueryRow(ctx, SQL_INSERT_INTO_USERS, username, password, email, isActive, time.Now(), time.Now()).Scan(&userId); err != nil {
-		return fmt.Errorf("error in SignUpTransaction m.DB.QueryRow in InsertIntoUsers: %w", err)
+		log.Println("QueryRow failed in SignUpTransaction SQL_INSERT_INTO_USERS:", err)
+		return err
 	}
 
 	if _, err := tx.Exec(ctx, SQL_INSERT_INTO_USER_ORGANISATION_MAPPING, userId, organisationName); err != nil {
-		return fmt.Errorf("error in SignUpTransaction m.DB.Exec in InsertIntoUserOrganisationMapping: %w", err)
+		log.Println("Exec failed in SignUpTransaction SQL_INSERT_INTO_USER_ORGANISATION_MAPPING:", err)
+		return err
 	}
 
-	if _, err := m.DB.Exec(ctx, SQL_INSERT_INTO_USER_GROUP_MAPPING, userId, userGroup); err != nil {
-		return fmt.Errorf("error in SignUpTransaction m.DB.Exec in InsertIntoUserGroupMapping: %w", err)
+	if _, err := tx.Exec(ctx, SQL_INSERT_INTO_USER_GROUP_MAPPING, userId, userGroup); err != nil {
+		log.Println("Exec failed in SignUpTransaction SQL_INSERT_INTO_USER_GROUP_MAPPING:", err)
+		return err
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("tx.Commit: %w", err)
+		log.Println("Commit failed in SignUpTransaction:", err)
+		return err
 	}
 
 	return nil
