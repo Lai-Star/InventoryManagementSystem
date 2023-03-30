@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	SQL_GET_COUNT_BY_USERNAME = "SELECT COUNT(*) FROM users WHERE username = $1;"
-	SQL_GET_COUNT_BY_EMAIL    = "SELECT COUNT(*) FROM users WHERE email = $1;"
-	SQL_GET_COUNT_BY_ORG_NAME = "SELECT COUNT(*) FROM organisations WHERE organisation_name = $1;"
+	SQL_GET_COUNT_BY_USERNAME   = "SELECT COUNT(*) FROM users WHERE username = $1;"
+	SQL_GET_COUNT_BY_EMAIL      = "SELECT COUNT(*) FROM users WHERE email = $1;"
+	SQL_GET_COUNT_BY_ORG_NAME   = "SELECT COUNT(*) FROM organisations WHERE organisation_name = $1;"
+	SQL_GET_COUNT_BY_USER_GROUP = "SELECT COUNT(*) FROM user_groups WHERE user_group = $1;"
 
 	SQL_GET_PASSWORD_BY_USERNAME = "SELECT password FROM users WHERE username = $1;"
 	SQL_GET_ISACTIVE_BY_USERNAME = "SELECT is_active FROM users WHERE username = $1;"
@@ -22,8 +23,6 @@ var (
 	WHERE ugm.user_id = (SELECT user_id FROM users WHERE username = $1);`
 
 	SQL_SELECT_FROM_USERS = "SELECT %s FROM users WHERE %s = $1;"
-
-	SQL_SELECT_FROM_USERGROUPS = "SELECT COUNT(*) FROM user_groups WHERE %s = $1;"
 
 	SQL_SELECT_ORGANISATION_NAME_BY_USERNAME = `SELECT o.organisation_name, u.user_id FROM organisations o
 												INNER JOIN user_organisation_mapping uom
@@ -95,6 +94,15 @@ func (m *PostgresDBRepo) GetUserGroupsByUsername(ctx context.Context, username s
 	return rows, nil
 }
 
+func (m *PostgresDBRepo) GetCountByUserGroup(ctx context.Context, userGroup string) (int, error) {
+	var count int
+	if err := m.DB.QueryRow(ctx, SQL_GET_COUNT_BY_USER_GROUP, userGroup).Scan(&count); err != nil {
+		log.Println("Query failed at GetUserGroupCount:", err)
+		return 0, err
+	}
+	return count, nil
+}
+
 // func (m *PostgresDBRepo) GetOrganisationName(organisationName string) bool {
 // 	row := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "organisation_name", "organisation_name"), organisationName)
 // 	return row.Scan() != pgx.ErrNoRows
@@ -115,14 +123,6 @@ func (m *PostgresDBRepo) GetOrganisationNameAndUserIdByUsername(username string)
 		return "", 0, fmt.Errorf("m.DB.QueryRow in GetOrganisationNameAndUserIdByUsername: %w", err)
 	}
 	return organisationName, userId, nil
-}
-
-func (m *PostgresDBRepo) GetUserGroupCount(usergroup string) (int, error) {
-	var count int
-	if err := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERGROUPS, "user_group"), usergroup).Scan(&count); err != nil {
-		return 0, fmt.Errorf("m.DB.QueryRow in GetUserGroupCount: %w", err)
-	}
-	return count, nil
 }
 
 func (m *PostgresDBRepo) GetUsers() (pgx.Rows, error) {

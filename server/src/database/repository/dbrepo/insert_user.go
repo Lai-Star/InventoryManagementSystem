@@ -29,7 +29,16 @@ var (
 
 func (m *PostgresDBRepo) InsertIntoOrganisations(ctx context.Context, organisationName string) error {
 	if _, err := m.DB.Exec(ctx, SQL_INSERT_INTO_ORGANISATIONS, organisationName, time.Now(), time.Now()); err != nil {
-		return fmt.Errorf("m.DB.Exec in InsertIntoOrganisations: %w", err)
+		log.Println("Exec failed in InsertIntoOrganisations:", err)
+		return err
+	}
+	return nil
+}
+
+func (m *PostgresDBRepo) InsertIntoUserGroups(ctx context.Context, userGroup, description string) error {
+	if _, err := m.DB.Exec(ctx, SQL_INSERT_INTO_USER_GROUPS, userGroup, description); err != nil {
+		log.Println("Exec failed in InsertIntoUserGroups:", err)
+		return err
 	}
 	return nil
 }
@@ -52,13 +61,6 @@ func (m *PostgresDBRepo) InsertIntoUserOrganisationMapping(userId int, organisat
 func (m *PostgresDBRepo) InsertIntoUserGroupMapping(userId int, userGroup string) error {
 	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_USER_GROUP_MAPPING, userId, userGroup); err != nil {
 		return fmt.Errorf("m.DB.Exec in InsertIntoUserGroupMapping: %w", err)
-	}
-	return nil
-}
-
-func (m *PostgresDBRepo) InsertIntoUserGroups(userGroup, description string) error {
-	if _, err := m.DB.Exec(context.Background(), SQL_INSERT_INTO_USER_GROUPS, userGroup, description); err != nil {
-		return fmt.Errorf("m.DB.Exec in InsertIntoUserGroups: %w", err)
 	}
 	return nil
 }

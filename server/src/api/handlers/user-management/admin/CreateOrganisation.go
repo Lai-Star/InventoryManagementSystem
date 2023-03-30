@@ -11,10 +11,6 @@ import (
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-type AdminCreateOrganisationJson struct {
-	OrganisationName string `json:"organisation_name"`
-}
-
 func (app application) AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) error {
 
 	if req.Method != http.MethodPost {
@@ -33,19 +29,18 @@ func (app application) AdminCreateOrganisation(w http.ResponseWriter, req *http.
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
-	newOrg.OrgFieldsTrimSpaces()
-	if err := newOrg.OrgFormValidation(w); err != nil {
-		return err
-	}
-
 	// Check User Group Admin
 	if err := auth.RetrieveIssuer(w, req); err != nil {
 		return err
 	}
-	
 	utilsApp := utils.Application{DB: app.DB}
 	err := utils.InjectUG(utilsApp, ctx, w.Header().Get("username"), "Admin")
 	if err != nil {
+		return err
+	}
+
+	newOrg.OrgFieldsTrimSpaces()
+	if err := newOrg.OrgFormValidation(w); err != nil {
 		return err
 	}
 
@@ -55,13 +50,12 @@ func (app application) AdminCreateOrganisation(w http.ResponseWriter, req *http.
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 	if orgNameCount == 1 {
-		return utils.ApiError{Err: "Organisation Name already exists. Please try again.", Status: http.StatusBadRequest}
+		return utils.ApiError{Err: "Organisation Name " + newOrg.OrganisationName + " already exist. Please try again.", Status: http.StatusBadRequest}
 	}
 
 	// Insert organisation name into organisations table
 	err = app.DB.InsertIntoOrganisations(ctx, newOrg.OrganisationName)
 	if err != nil {
-		log.Println("app.DB.InsertIntoOrganisations:", err)
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 
