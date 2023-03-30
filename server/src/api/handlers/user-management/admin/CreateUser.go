@@ -1,92 +1,60 @@
 package admin
 
 import (
+	"context"
+	"log"
 	"net/http"
+	"time"
+
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/types"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-func AdminCreateUser(w http.ResponseWriter, req *http.Request) {
-	// // Set Headers
-	// w.Header().Set("Content-Type", "application/json")
-	// var adminNewUser auth_management.AdminUserMgmtJson
+func (app application) AdminCreateUser(w http.ResponseWriter, req *http.Request) error {
 
-	// // Reading the request body and UnMarshal the body to the AdminUserMgmt struct
-	// bs, _ := io.ReadAll(req.Body)
-	// if err := json.Unmarshal(bs, &adminNewUser); err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Internal Server Error in UnMarshal JSON body in AdminCreateUser route:", err)
-	// 	return
-	// }
+	if req.Method != http.MethodPost {
+		return utils.ApiError{Err: "Invalid Method", Status: http.StatusMethodNotAllowed}
+	}
 
-	// // Check User Group Admin
-	// if !auth_management.RetrieveIssuer(w, req) {
-	// 	return
-	// }
-	// if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {
-	// 	return
-	// }
+	var createUser types.AdminUserJSON
 
-	// // Trim white spaces (username, password, email, company name)
-	// adminNewUser = adminNewUser.AdminUserMgmtFieldsTrimSpaces()
+	if err := createUser.ReadJSON(req.Body); err != nil {
+		log.Println("createUser.ReadJSON:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
 
-	// // Validate form inputs
-	// if !auth_management.AdminUserMgmtFormValidation(w, adminNewUser, "CREATE_USER") {
-	// 	return
-	// }
+	// Setting timeout to follow SLA
+	ctx := req.Context()
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
 
-	// hashedPassword := utils.GenerateHash(adminNewUser.Password)
+	// Check User Group Admin
+	if err := auth.RetrieveIssuer(w, req); err != nil {
+		return err
+	}
+	utilsApp := utils.Application{DB: app.DB}
+	err := utils.InjectUG(utilsApp, ctx, w.Header().Get("username"), "Admin")
+	if err != nil {
+		return err
+	}
 
-	// // Check if username already exists in database (duplicates not allowed)
-	// isExistingUsername := database.GetUsername(adminNewUser.Username)
-	// if isExistingUsername {
-	// 	utils.WriteJSON(w, http.StatusBadRequest, "Username has already been taken. Please try again.")
-	// 	return
-	// }
+	createUser.CreateUserFieldsTrimSpaces()
+	if err := createUser.CreateUserFormValidation(w); err != nil {
+		return err
+	}
 
-	// // Check if email already exists in database (duplicates not allowed)
-	// isExistingEmail := database.GetEmail(adminNewUser.Email)
-	// if isExistingEmail {
-	// 	utils.WriteJSON(w, http.StatusBadRequest, "Email address has already been taken. Please try again.")
-	// 	return
-	// }
+	hashedPassword := utils.GenerateHash(createUser.Password)
 
-	// // Check if organisation exists in database
-	// isExistingOrganisation := database.GetOrganisationName(adminNewUser.OrganisationName)
-	// if !isExistingOrganisation {
-	// 	utils.WriteJSON(w, http.StatusNotFound, "Organisation name cannot be found. Please try again.")
-	// 	return
-	// }
+	// Check for duplicates (username, email) and existing fields (organisation, user group)
+	if err := app.DB.CheckDuplicatesAndExistingFieldsForCreateUser(ctx, createUser.Username, createUser.Email, createUser.OrganisationName, createUser.UserGroup...); err != nil {
+		return err
+	}
 
-	// // Check if user group is valid and trim user group
-	// isValidUserGroup := auth_management.UserGroupFormValidation(w, adminNewUser.UserGroup)
-	// if !isValidUserGroup {
-	// 	return
-	// }
+	if err := app.DB.CreateUserTransaction(ctx, createUser.Username, hashedPassword, createUser.Email, createUser.OrganisationName, createUser.IsActive, createUser.UserGroup...); err != nil {
+		return err
+	}
 
-	// // Insert users table
-	// userId, err := database.InsertNewUser(adminNewUser.Username, hashedPassword, adminNewUser.Email, adminNewUser.IsActive)
-	// if err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Error inserting new user via admin route:", err)
-	// 	return
-	// }
+	return utils.WriteJSON(w, http.StatusCreated, utils.ApiSuccess{Success: "[Admin] Successfully created '" + createUser.Username + "' user!", Status: http.StatusCreated})
 
-	// // Insert user_organisation_mapping table
-	// err = database.InsertIntoUserOrganisationMapping(userId, adminNewUser.OrganisationName)
-	// if err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Error inserting into user_organisation_mapping table:", err)
-	// 	return
-	// }
-
-	// // Insert multiple user groups to user_group_mapping table
-	// for _, ug := range adminNewUser.UserGroup {
-	// 	err = database.InsertIntoUserGroupMapping(userId, ug)
-	// 	if err != nil {
-	// 		utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 		log.Println("Error inserting into user_group_mapping table:", err)
-	// 		return
-	// 	}
-	// }
-
-	// utils.WriteJSON(w, http.StatusOK, "Admin Successfully Created User!")
 }

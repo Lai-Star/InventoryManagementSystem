@@ -52,3 +52,7 @@ func (m *TestDBRepo) GetUserGroupsByUsername(ctx context.Context, username strin
 	}
 	return false, nil
 }
+
+func (m *TestDBRepo) CheckDuplicatesAndExistingFieldsForCreateUser(ctx context.Context, username, email, organisationName string, userGroups ...string) error {
+	return nil
+}

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -28,6 +29,7 @@ func MakeHTTPHandler(f apiFunc) http.HandlerFunc {
 				WriteJSON(w, e.Status, e)
 				return
 			}
+			log.Println("Error in MakeHTTPHandler:", err)
 			WriteJSON(w, http.StatusInternalServerError, ApiError{Err: "Internal Serval Error", Status: http.StatusInternalServerError})
 		}
 	}

@@ -15,31 +15,39 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func Test_CreateOrganisation(t *testing.T) {
+func Test_CreateUser(t *testing.T) {
 
 	app := application{}
 	app.DB = &dbrepo.TestDBRepo{}
 
 	var tests = []struct {
 		name               string
-		postedData         types.AdminCreateOrganisationJSON
+		postedData         types.AdminUserJSON
 		expectedBody       string
 		expectedStatusCode int
 	}{
 		{
-			name: "valid create organisation",
-			postedData: types.AdminCreateOrganisationJSON{
+			name: "valid create user",
+			postedData: types.AdminUserJSON{
+				Username:         "lowjiewei",
+				Password:         "Password0!",
+				Email:            "lowjiewei@email.com",
 				OrganisationName: "Golang",
+				IsActive:         0,
 			},
-			expectedBody:       `{"Success":"Successfully created a new organisation 'Golang' !","Status":201}`,
+			expectedBody:       `{"Success":"[Admin] Successfully created 'lowjiewei' user!","Status":201}`,
 			expectedStatusCode: 201,
 		},
 		{
-			name: "invalid create organisation",
-			postedData: types.AdminCreateOrganisationJSON{
+			name: "blank fields",
+			postedData: types.AdminUserJSON{
+				Username:         "",
+				Password:         "",
+				Email:            "",
 				OrganisationName: "",
+				IsActive:         0,
 			},
-			expectedBody:       `{"Err":"Organisation name cannot be blank.","Status":400}`,
+			expectedBody:       `{"Err":"Username cannot be blank","Status":400}`,
 			expectedStatusCode: 400,
 		},
 	}
@@ -53,12 +61,12 @@ func Test_CreateOrganisation(t *testing.T) {
 
 		// Setting a request for testing
 		reqBody := bytes.NewBuffer(jsonStr)
-		req, _ := http.NewRequest(http.MethodPost, "/admin/create-organisation", reqBody)
+		req, _ := http.NewRequest(http.MethodPost, "/admin/create-user", reqBody)
 		req.Header.Set("Content-Type", "application/json")
 
 		// Setting and recording the response
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(utils.MakeHTTPHandler(app.AdminCreateOrganisation))
+		handler := http.HandlerFunc(utils.MakeHTTPHandler(app.AdminCreateUser))
 
 		// Create a mock request with a cookie that contains the JWT token
 		// Create a valid JWT token with an issuer claim

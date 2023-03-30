@@ -36,8 +36,9 @@ func Routes(app repository.DatabaseRepo) http.Handler {
 	// Admin Management Routes
 	createOrgH := admin.New(app)
 	createUgH := admin.New(app)
+	createUserH := admin.New(app)
 	mux.Route("/admin", func(mux chi.Router) {
-		mux.Post("/create-user", admin.AdminCreateUser)
+		mux.Post("/create-user", utils.MakeHTTPHandler(createUserH.AdminCreateUser))
 		mux.Get("/users", admin.AdminGetUsers)
 		mux.Patch("/update-user", admin.AdminUpdateUser)
 		mux.Delete("/delete-user", admin.AdminDeleteUser)

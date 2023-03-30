@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/jackc/pgx/v4"
@@ -115,6 +116,51 @@ func (m *PostgresDBRepo) GetCountByUserGroup(ctx context.Context, userGroup stri
 		return 0, err
 	}
 	return count, nil
+}
+
+// Checking for duplicates for CreateUser
+func (m *PostgresDBRepo) CheckDuplicatesAndExistingFieldsForCreateUser(ctx context.Context, username, email, organisationName string, userGroups ...string) error {
+
+	usernameCount, err := m.GetCountByUsername(ctx, username)
+	if err != nil {
+		log.Println("Error in m.GetCountByUsername:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+	if usernameCount == 1 {
+		return utils.ApiError{Err: "Username " + username + " has already been taken. Please try again", Status: http.StatusBadRequest}
+	}
+
+	emailCount, err := m.GetCountByEmail(ctx, email)
+	if err != nil {
+		log.Println("Error in m.GetCountByEmail:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+	if emailCount == 1 {
+		return utils.ApiError{Err: "Email address " + email + " has already been taken. Please try again", Status: http.StatusBadRequest}
+	}
+
+	organisationCount, err := m.GetCountByOrganisationName(ctx, organisationName)
+	if err != nil {
+		log.Println("Error in m.GetCountByOrganisationName:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+	if organisationCount != 1 {
+		return utils.ApiError{Err: "Organisation " + organisationName + " does not exist. Please try again", Status: http.StatusBadRequest}
+	}
+
+	for _, userGroup := range userGroups {
+		userGroupCount, err := m.GetCountByUserGroup(ctx, userGroup)
+		if err != nil {
+			log.Println("Error in m.GetCountByUserGroup:", err)
+			return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+		}
+		if userGroupCount != 1 {
+			return utils.ApiError{Err: "User Group " + userGroup + " does not exist. Please try again", Status: http.StatusBadRequest}
+		}
+	}
+
+	return nil
+
 }
 
 // func (m *PostgresDBRepo) GetOrganisationName(organisationName string) bool {

@@ -19,7 +19,10 @@ type DatabaseRepo interface {
 	GetUserGroupsByUsername(ctx context.Context, username string, userGroups ...string) (bool, error)
 
 	SignUpTransaction(ctx context.Context, username, password, email, organisationName, userGroup string, isActive int) error
+	CreateUserTransaction(ctx context.Context, username, password, email, organisationName string, isActive int, userGroups ...string) error
 
 	InsertIntoOrganisations(ctx context.Context, organisationName string) error
 	InsertIntoUserGroups(ctx context.Context, userGroup, description string) error
+
+	CheckDuplicatesAndExistingFieldsForCreateUser(ctx context.Context, username, email, organisationName string, userGroups ...string) error
 }
