@@ -3,13 +3,14 @@ package dbrepo
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type TestDBRepo struct{}
 
 // Mock Database (not an actual connection)
-func (m *TestDBRepo) Connection() *pgx.Conn {
+func (m *TestDBRepo) Connection() *pgxpool.Pool {
 	return nil
 }
 

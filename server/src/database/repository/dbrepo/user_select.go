@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v4"
 )
 
 var (

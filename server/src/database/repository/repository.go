@@ -3,11 +3,12 @@ package repository
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type DatabaseRepo interface {
-	Connection() *pgx.Conn
+	Connection() *pgxpool.Pool
 	CheckUserGroup(ctx context.Context, username string, userGroups ...string) error
 
 	GetCountByUsername(ctx context.Context, username string) (int, error)

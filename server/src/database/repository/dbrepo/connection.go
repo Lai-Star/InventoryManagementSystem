@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
 )
 
@@ -20,6 +19,6 @@ func New() *DB {
 	return &DB{}
 }
 
-func (m *PostgresDBRepo) Connection() *pgx.Conn {
+func (m *PostgresDBRepo) Connection() *pgxpool.Pool {
 	return m.DB
 }
