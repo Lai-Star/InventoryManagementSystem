@@ -2,7 +2,6 @@ package auth
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -20,7 +19,6 @@ func Test_Login(t *testing.T) {
 
 	app := application{}
 	app.DB = &dbrepo.TestDBRepo{}
-	app.DB.GetCountByUsername(context.Background(), "lowjiewei")
 
 	var tests = []struct {
 		name               string

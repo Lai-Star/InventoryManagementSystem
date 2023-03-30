@@ -42,6 +42,7 @@ func (app application) AdminCreateOrganisation(w http.ResponseWriter, req *http.
 	if err := auth.RetrieveIssuer(w, req); err != nil {
 		return err
 	}
+	
 	utilsApp := utils.Application{DB: app.DB}
 	err := utils.InjectUG(utilsApp, ctx, w.Header().Get("username"), "Admin")
 	if err != nil {

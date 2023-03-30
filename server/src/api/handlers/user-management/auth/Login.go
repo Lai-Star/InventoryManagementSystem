@@ -104,7 +104,8 @@ func RetrieveIssuer(w http.ResponseWriter, req *http.Request) error {
 
 	cookie, err := req.Cookie("leon-jwt-token")
 	if err != nil {
-		return utils.WriteJSON(w, http.StatusUnauthorized, "Access Denied: You are unauthorized.")
+		log.Println("req.Cookie:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 
 	// Parses the cookie jwt claims using the secret key to verify
@@ -113,15 +114,13 @@ func RetrieveIssuer(w http.ResponseWriter, req *http.Request) error {
 	})
 	if err != nil {
 		log.Println("Internal Server Error in parsing cookie:", err)
-		return utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 
 	// To access the issuer, we need the token claims to be type RegisteredClaims
 	claims := token.Claims.(*jwt.RegisteredClaims)
 
-	// fmt.Println("Retrieved Issuer using claims.Issuer: ", claims.Issuer)
 	w.Header().Set("username", claims.Issuer)
-	// fmt.Println("Retrieved Issuer using w.Header().Get():" , w.Header().Get("username"))
 
 	return nil
 }

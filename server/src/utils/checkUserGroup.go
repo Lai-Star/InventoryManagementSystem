@@ -27,14 +27,15 @@ func (app Application) CheckUserGroup(ctx context.Context, username string, user
 
 	var userGroup string
 
-	for rows.Next() {
-		err = rows.Scan(&userGroup)
-		if err != nil {
-			return err
-		}
+	if rows != nil {
+		for rows.Next() {
+			if err = rows.Scan(&userGroup); err != nil {
+				return err
+			}
 
-		if Contains(userGroups, userGroup) {
-			return nil
+			if Contains(userGroups, userGroup) {
+				return nil
+			}
 		}
 	}
 
