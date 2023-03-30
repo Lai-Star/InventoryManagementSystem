@@ -3,7 +3,6 @@ package dbrepo
 import (
 	"context"
 
-	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -47,6 +46,9 @@ func (m *TestDBRepo) GetIsActiveByUsername(ctx context.Context, username string)
 	return 0, nil
 }
 
-func (m *TestDBRepo) GetUserGroupsByUsername(ctx context.Context, username string) (pgx.Rows, error) {
-	return nil, nil
+func (m *TestDBRepo) GetUserGroupsByUsername(ctx context.Context, username string, userGroups ...string) (bool, error) {
+	if username == "lowjiewei" {
+		return true, nil
+	}
+	return false, nil
 }

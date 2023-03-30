@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 
-	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -17,7 +16,7 @@ type DatabaseRepo interface {
 
 	GetPasswordByUsername(ctx context.Context, username string) (string, error)
 	GetIsActiveByUsername(ctx context.Context, username string) (int, error)
-	GetUserGroupsByUsername(ctx context.Context, username string) (pgx.Rows, error)
+	GetUserGroupsByUsername(ctx context.Context, username string, userGroups ...string) (bool, error)
 
 	SignUpTransaction(ctx context.Context, username, password, email, organisationName, userGroup string, isActive int) error
 

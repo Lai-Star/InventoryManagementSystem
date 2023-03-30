@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -85,13 +86,26 @@ func (m *PostgresDBRepo) GetIsActiveByUsername(ctx context.Context, username str
 	return isActive, nil
 }
 
-func (m *PostgresDBRepo) GetUserGroupsByUsername(ctx context.Context, username string) (pgx.Rows, error) {
+func (m *PostgresDBRepo) GetUserGroupsByUsername(ctx context.Context, username string, userGroups ...string) (bool, error) {
 	rows, err := m.DB.Query(ctx, SQL_GET_USERGROUPS_BY_USERNAME, username)
 	if err != nil {
 		log.Println("Query failed at GetUserGroupsByUsername:", err)
-		return nil, err
+		return false, err
 	}
-	return rows, nil
+
+	var userGroup string
+	if rows != nil {
+		for rows.Next() {
+			if err = rows.Scan(&userGroup); err != nil {
+				return false, err
+			}
+
+			if utils.Contains(userGroups, userGroup) {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }
 
 func (m *PostgresDBRepo) GetCountByUserGroup(ctx context.Context, userGroup string) (int, error) {

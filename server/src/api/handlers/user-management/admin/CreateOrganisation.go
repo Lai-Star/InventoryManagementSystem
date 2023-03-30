@@ -59,5 +59,5 @@ func (app application) AdminCreateOrganisation(w http.ResponseWriter, req *http.
 		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
 
-	return utils.WriteJSON(w, http.StatusCreated, utils.ApiSuccess{Success: "Successfully created a new organisation!", Status: http.StatusCreated})
+	return utils.WriteJSON(w, http.StatusCreated, utils.ApiSuccess{Success: "Successfully created a new organisation '" + newOrg.OrganisationName + "' !", Status: http.StatusCreated})
 }

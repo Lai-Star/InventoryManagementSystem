@@ -31,15 +31,15 @@ func Test_CreateOrganisation(t *testing.T) {
 			postedData: types.AdminCreateOrganisationJSON{
 				OrganisationName: "Golang",
 			},
-			expectedBody:       `{"Err":"Access Denied: User does not have permission to access this resource","Status":403}`,
-			expectedStatusCode: 403,
+			expectedBody:       `{"Success":"Successfully created a new organisation 'Golang' !","Status":201}`,
+			expectedStatusCode: 201,
 		},
 		{
 			name: "invalid organisation",
 			postedData: types.AdminCreateOrganisationJSON{
 				OrganisationName: "",
 			},
-			expectedBody:       `{"Err":"Organisation name cannot be blank","Status":400}`,
+			expectedBody:       `{"Err":"Organisation name cannot be blank.","Status":400}`,
 			expectedStatusCode: 400,
 		},
 	}

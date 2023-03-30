@@ -20,23 +20,12 @@ func InjectUG(app Application, ctx context.Context, username string, userGroups 
 // Determines if a user has been assigned that usergroup
 func (app Application) CheckUserGroup(ctx context.Context, username string, userGroups ...string) error {
 
-	rows, err := app.DB.GetUserGroupsByUsername(ctx, username)
+	isAuthorizedUser, err := app.DB.GetUserGroupsByUsername(ctx, username, userGroups...)
 	if err != nil {
-		return err
+		return ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
 	}
-
-	var userGroup string
-
-	if rows != nil {
-		for rows.Next() {
-			if err = rows.Scan(&userGroup); err != nil {
-				return err
-			}
-
-			if Contains(userGroups, userGroup) {
-				return nil
-			}
-		}
+	if isAuthorizedUser {
+		return nil
 	}
 
 	return ApiError{Err: "Access Denied: User does not have permission to access this resource", Status: http.StatusForbidden}
