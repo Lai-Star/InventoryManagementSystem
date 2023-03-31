@@ -66,7 +66,7 @@ func Test_CreateUser(t *testing.T) {
 
 		// Setting and recording the response
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(utils.MakeHTTPHandler(app.AdminCreateUser))
+		handler := http.HandlerFunc(utils.MakeHTTPHandler(app.CreateUser))
 
 		// Create a mock request with a cookie that contains the JWT token
 		// Create a valid JWT token with an issuer claim

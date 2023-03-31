@@ -1,110 +1,62 @@
 package admin
 
 import (
+	"context"
+	"log"
 	"net/http"
+	"time"
+
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/types"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-func AdminUpdateUser(w http.ResponseWriter, req *http.Request) {
-	// // Set Headers
-	// w.Header().Set("Content-Type", "application/json")
-	// var adminUpdateUser auth_management.AdminUserMgmtJson
+func (app application) UpdateUser(w http.ResponseWriter, req *http.Request) error {
 
-	// // Reading the request body and UnMarshal the body to the AdminUserMgmt struct
-	// bs, _ := io.ReadAll(req.Body)
-	// if err := json.Unmarshal(bs, &adminUpdateUser); err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Internal Server Error in Unmarshal JSON body in AdminUpdateUser:", err)
-	// 	return
-	// }
+	if req.Method != http.MethodPatch {
+		return utils.ApiError{Err: "Invalid Method", Status: http.StatusMethodNotAllowed}
+	}
 
-	// // Check User Group Admin
-	// if !auth_management.RetrieveIssuer(w, req) {
-	// 	return
-	// }
-	// if !utils.CheckUserGroup(w, w.Header().Get("username"), "Admin") {
-	// 	return
-	// }
+	var updateUser types.AdminUserJSON
 
-	// // Trim whitespaces (username, password, email, organisation_name)
-	// adminUpdateUser = adminUpdateUser.AdminUserMgmtFieldsTrimSpaces()
+	if err := updateUser.ReadJSON(req.Body); err != nil {
+		log.Println("updateUser.ReadJSON:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
 
-	// // Check if username field is empty (mandatory field to update user, others can be empty)
-	// if utils.IsBlankField(adminUpdateUser.Username) {
-	// 	utils.WriteJSON(w, http.StatusBadRequest, "Please enter a username.")
-	// 	return
-	// }
+	// Setting timeout to follow SLA
+	ctx := req.Context()
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
 
-	// // Check if username exists in database
-	// isExistingUsername := database.GetUsername(adminUpdateUser.Username)
-	// if !isExistingUsername {
-	// 	utils.WriteJSON(w, http.StatusBadRequest, "Username does not exist. Please try again.")
-	// 	return
-	// }
+	// Check User Group Admin
+	if err := auth.RetrieveIssuer(w, req); err != nil {
+		return err
+	}
+	utilsApp := utils.Application{DB: app.DB}
+	err := utils.InjectUG(utilsApp, ctx, w.Header().Get("username"), "Admin")
+	if err != nil {
+		return err
+	}
 
-	// // Admin User Form Validation
-	// isValidAdminUserForm := auth_management.AdminUserMgmtFormValidation(w, adminUpdateUser, "UPDATE_USER")
-	// if !isValidAdminUserForm {
-	// 	return
-	// }
+	updateUser.UserFieldsTrimSpaces()
+	if err := updateUser.UpdateUserFormValidation(w); err != nil {
+		return err
+	}
 
-	// // Check if email exists
-	// isExistingEmail := database.GetEmail(adminUpdateUser.Email)
-	// userCurrentEmail, err := database.GetEmailByUsername(adminUpdateUser.Username)
-	// if err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Internal server error in getting email by username:", err)
-	// 	return
-	// }
-	// if isExistingEmail {
-	// 	if userCurrentEmail != adminUpdateUser.Email {
-	// 		utils.WriteJSON(w, http.StatusBadRequest, adminUpdateUser.Email+" already exists. Please try again.")
-	// 		return
-	// 	}
-	// }
+	if err := app.DB.CheckDuplicatesAndExistingFieldsForUpdateUser(ctx, updateUser.Username, updateUser.Email, updateUser.OrganisationName, updateUser.UserGroup...); err != nil {
+		return err
+	}
 
-	// // Check if organisation name exists
-	// isExistingOrganisation := database.GetOrganisationName(adminUpdateUser.OrganisationName)
-	// if !isExistingOrganisation && len(adminUpdateUser.OrganisationName) > 0 {
-	// 	utils.WriteJSON(w, http.StatusNotFound, "Organisation name cannot be found. Please try again.")
-	// 	return
-	// }
+	// Only generate hash if password is not empty
+	if len(updateUser.Password) > 0 {
+		updateUser.Password = utils.GenerateHash(updateUser.Password)
+	}
 
-	// // Perform user group validation and check if user group exists
-	// isValidUserGroup := auth_management.UserGroupFormValidation(w, adminUpdateUser.UserGroup)
-	// if !isValidUserGroup {
-	// 	return
-	// }
+	if err := app.DB.UpdateUserTransaction(ctx, updateUser.Username, updateUser.Password, updateUser.Email, updateUser.OrganisationName, updateUser.IsActive, updateUser.UserGroup); err != nil {
+		return err
+	}
 
-	// // Only generate hash if password is not empty
-	// if len(adminUpdateUser.Password) > 0 {
-	// 	adminUpdateUser.Password = utils.GenerateHash(adminUpdateUser.Password)
-	// }
+	return utils.WriteJSON(w, http.StatusOK, utils.ApiSuccess{Success: "[Admin] Successfully updated '" + updateUser.Username + "' user!", Status: http.StatusOK})
 
-	// // Update users table (get user_id)
-	// userId, err := database.UpdateUsers(adminUpdateUser.Username, adminUpdateUser.Password, adminUpdateUser.Email, adminUpdateUser.IsActive)
-	// if err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Internal server error in admin update users table:", err)
-	// 	return
-	// }
-
-	// // Update user_organisation_mapping table
-	// if len(adminUpdateUser.OrganisationName) > 0 {
-	// 	err = database.UpdateUserOrganisationMapping(userId, adminUpdateUser.OrganisationName)
-	// 	if err != nil {
-	// 		utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 		log.Println("Internal server error in admin update user_organisation_mapping table:", err)
-	// 		return
-	// 	}
-	// }
-
-	// // Update user_group_mapping table
-	// err = database.UpdateUserGroupMapping(userId, adminUpdateUser.UserGroup)
-	// if err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Internal server error in admin update user_group_mapping table:", err)
-	// 	return
-	// }
-
-	// utils.WriteJSON(w, http.StatusOK, "Successfully updated user!")
 }

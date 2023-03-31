@@ -11,7 +11,7 @@ import (
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-func (app application) AdminCreateUser(w http.ResponseWriter, req *http.Request) error {
+func (app application) CreateUser(w http.ResponseWriter, req *http.Request) error {
 
 	if req.Method != http.MethodPost {
 		return utils.ApiError{Err: "Invalid Method", Status: http.StatusMethodNotAllowed}
@@ -39,7 +39,7 @@ func (app application) AdminCreateUser(w http.ResponseWriter, req *http.Request)
 		return err
 	}
 
-	createUser.CreateUserFieldsTrimSpaces()
+	createUser.UserFieldsTrimSpaces()
 	if err := createUser.CreateUserFormValidation(w); err != nil {
 		return err
 	}

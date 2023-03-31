@@ -2,8 +2,12 @@ package dbrepo
 
 import (
 	"context"
-	"fmt"
+	"log"
+	"net/http"
+	"time"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
+	"github.com/jackc/pgx/v4"
 	"github.com/lib/pq"
 )
 
@@ -27,25 +31,73 @@ var (
 		"SELECT user_group_id FROM user_group_mapping ugm WHERE ugm.user_id = $1 AND ugm.user_group_id = ng.user_group_id);"
 )
 
-func (m *PostgresDBRepo) UpdateUsers(username, password, email string, isActive int) (int, error) {
+func (m *PostgresDBRepo) UpdateUsers(ctx context.Context, username, password, email string, isActive int) (int, error) {
 	var userId int
-	if err := m.DB.QueryRow(context.Background(), SQL_UPDATE_USERS, username, password, email, isActive).Scan(&userId); err != nil {
-		return 0, fmt.Errorf("m.DB.QueryRow in UpdateUsers: %w", err)
+	if err := m.DB.QueryRow(ctx, SQL_UPDATE_USERS, username, password, email, isActive).Scan(&userId); err != nil {
+		log.Println("QueryRow failed in UpdateUsers:", err)
+		return 0, err
 	}
 	return userId, nil
 }
 
-func (m *PostgresDBRepo) UpdateUserOrganisationMapping(userId int, organisationName string) error {
-	if _, err := m.DB.Exec(context.Background(), SQL_UPDATE_USER_ORGANISATION_MAPPING, userId, organisationName); err != nil {
-		return fmt.Errorf("m.DB.Exec in UpdateUserOrganisationMapping: %w", err)
+func (m *PostgresDBRepo) UpdateUserOrganisationMapping(ctx context.Context, userId int, organisationName string) error {
+	if _, err := m.DB.Exec(ctx, SQL_UPDATE_USER_ORGANISATION_MAPPING, userId, organisationName); err != nil {
+		log.Println("QueryRow failed in UpdateUserOrganisationMapping:", err)
+		return err
 	}
 	return nil
 }
 
-func (m *PostgresDBRepo) UpdateUserGroupMapping(userId int, userGroups []string) error {
+func (m *PostgresDBRepo) UpdateUserGroupMapping(ctx context.Context, userId int, userGroups []string) error {
 	args := []interface{}{userId, pq.Array(userGroups)}
-	if _, err := m.DB.Exec(context.Background(), SQL_UPDATE_USER_GROUP_MAPPING, args...); err != nil {
-		return fmt.Errorf("m.DB.Exec in UpdateUserGroupMapping: %w", err)
+	if _, err := m.DB.Exec(ctx, SQL_UPDATE_USER_GROUP_MAPPING, args...); err != nil {
+		log.Println("QueryRow failed in UpdateUserGroupMapping:", err)
+		return err
 	}
 	return nil
+}
+
+func (m *PostgresDBRepo) UpdateUserTransaction(ctx context.Context, username, password, email, organisationName string, isActive int, userGroups []string) error {
+
+	// Setting timeout context of 1 minutes
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
+	defer cancel()
+
+	tx, err := m.DB.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		log.Println("BeginTx failed in UpdateUserTransaction:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+
+	defer func() {
+		_ = tx.Rollback(ctx)
+	}()
+
+	var userId int
+
+	if err := tx.QueryRow(ctx, SQL_UPDATE_USERS, username, password, email, isActive).Scan(&userId); err != nil {
+		log.Println("QueryRow failed in UpdateUserTransaction SQL_UPDATE_USERS:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+
+	if _, err := tx.Exec(ctx, SQL_UPDATE_USER_ORGANISATION_MAPPING, userId, organisationName); err != nil {
+		log.Println("Exec failed in UpdateUserTransaction SQL_UPDATE_USER_ORGANISATION_MAPPING:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+
+	if len(userGroups) > 0 {
+		args := []interface{}{userId, pq.Array(userGroups)}
+		if _, err := tx.Exec(ctx, SQL_UPDATE_USER_GROUP_MAPPING, args...); err != nil {
+			log.Println("Exec failed in UpdateUserTransaction SQL_UPDATE_USERS:", err)
+			return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		log.Println("Commit failed in UpdateUserTransaction:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+
+	return nil
+
 }

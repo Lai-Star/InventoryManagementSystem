@@ -11,7 +11,7 @@ import (
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
-func (app application) AdminCreateOrganisation(w http.ResponseWriter, req *http.Request) error {
+func (app application) CreateOrganisation(w http.ResponseWriter, req *http.Request) error {
 
 	if req.Method != http.MethodPost {
 		return utils.ApiError{Err: "Invalid Method", Status: http.StatusMethodNotAllowed}

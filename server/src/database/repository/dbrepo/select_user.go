@@ -17,6 +17,7 @@ var (
 	SQL_GET_COUNT_BY_USER_GROUP = "SELECT COUNT(*) FROM user_groups WHERE user_group = $1;"
 
 	SQL_GET_PASSWORD_BY_USERNAME = "SELECT password FROM users WHERE username = $1;"
+	SQL_GET_EMAIL_BY_USERNAME    = "SELECT email FROM users WHERE username = $1;"
 	SQL_GET_ISACTIVE_BY_USERNAME = "SELECT is_active FROM users WHERE username = $1;"
 
 	SQL_GET_USERGROUPS_BY_USERNAME = `SELECT ug.user_group FROM user_groups ug
@@ -58,6 +59,7 @@ func (m *PostgresDBRepo) GetCountByEmail(ctx context.Context, email string) (int
 		log.Println("QueryRow failed at GetCountByEmail:", err)
 		return 0, err
 	}
+	fmt.Println("Email: ", email, "Count:", count)
 	return count, nil
 }
 
@@ -77,6 +79,15 @@ func (m *PostgresDBRepo) GetPasswordByUsername(ctx context.Context, username str
 		return "", err
 	}
 	return password, nil
+}
+
+func (m *PostgresDBRepo) GetEmailByUsername(ctx context.Context, username string) (string, error) {
+	var email string
+	if err := m.DB.QueryRow(ctx, SQL_GET_EMAIL_BY_USERNAME, username).Scan(&email); err != nil {
+		log.Println("QueryRow failed at GetEmailByUsername:", err)
+		return "", err
+	}
+	return email, nil
 }
 
 func (m *PostgresDBRepo) GetIsActiveByUsername(ctx context.Context, username string) (int, error) {
@@ -163,18 +174,58 @@ func (m *PostgresDBRepo) CheckDuplicatesAndExistingFieldsForCreateUser(ctx conte
 
 }
 
+// Checking for duplicates and existing fields for UpdateUser
+func (m *PostgresDBRepo) CheckDuplicatesAndExistingFieldsForUpdateUser(ctx context.Context, username, email, organisationName string, userGroups ...string) error {
+	usernameCount, err := m.GetCountByUsername(ctx, username)
+	if err != nil {
+		log.Println("Error in m.GetCountByUsername:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+	if usernameCount == 0 {
+		return utils.ApiError{Err: "Username " + username + " does not exist. Please try again", Status: http.StatusBadRequest}
+	}
+
+	if len(email) > 0 {
+		dbEmail, err := m.GetEmailByUsername(ctx, username)
+		if err != nil {
+			log.Println("Error in m.GetEmailByUsername:", err)
+			return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+		}
+		if dbEmail != email {
+			return utils.ApiError{Err: "Email address " + email + " has already been taken. Please try again", Status: http.StatusBadRequest}
+		}
+	}
+
+	if len(organisationName) > 0 {
+		organisationCount, err := m.GetCountByOrganisationName(ctx, organisationName)
+		if err != nil {
+			log.Println("Error in m.GetCountByOrganisationName:", err)
+			return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+		}
+		if organisationCount != 1 {
+			return utils.ApiError{Err: "Organisation " + organisationName + " does not exist. Please try again", Status: http.StatusBadRequest}
+		}
+	}
+
+	for _, userGroup := range userGroups {
+		userGroupCount, err := m.GetCountByUserGroup(ctx, userGroup)
+		if err != nil {
+			log.Println("Error in m.GetCountByUserGroup:", err)
+			return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+		}
+		if userGroupCount != 1 {
+			return utils.ApiError{Err: "User Group " + userGroup + " does not exist. Please try again", Status: http.StatusBadRequest}
+		}
+	}
+
+	return nil
+
+}
+
 // func (m *PostgresDBRepo) GetOrganisationName(organisationName string) bool {
 // 	row := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "organisation_name", "organisation_name"), organisationName)
 // 	return row.Scan() != pgx.ErrNoRows
 // }
-
-func (m *PostgresDBRepo) GetEmailByUsername(username string) (string, error) {
-	var email string
-	if err := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_USERS, "email", "username"), username).Scan(&email); err != nil {
-		return "", fmt.Errorf("m.DB.QueryRow in GetEmailByUsername: %w", err)
-	}
-	return email, nil
-}
 
 func (m *PostgresDBRepo) GetOrganisationNameAndUserIdByUsername(username string) (string, int, error) {
 	var organisationName string
