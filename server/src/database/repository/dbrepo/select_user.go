@@ -2,12 +2,14 @@ package dbrepo
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers"
 	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
-	"github.com/jackc/pgx/v4"
 )
 
 var (
@@ -34,7 +36,7 @@ var (
 												ON uom.user_id = u.user_id
 												WHERE u.username = $1;`
 
-	SQL_SELECT_ALL_USERS = `SELECT u.user_id, u.username, u.email, u.is_active, o.organisation_name, ug.user_group, u.added_date, u.updated_date FROM users u 
+	SQL_GET_ALL_USERS = `SELECT u.user_id, u.username, u.email, u.is_active, o.organisation_name, ug.user_group, u.added_date, u.updated_date FROM users u 
 							LEFT JOIN user_organisation_mapping uom ON u.user_id = uom.user_id
 							LEFT JOIN organisations o ON uom.organisation_id = o.organisation_id
 							LEFT JOIN user_group_mapping ugm ON u.user_id = ugm.user_id
@@ -222,6 +224,56 @@ func (m *PostgresDBRepo) CheckDuplicatesAndExistingFieldsForUpdateUser(ctx conte
 
 }
 
+func (m *PostgresDBRepo) GetAllUsers(ctx context.Context, data []handlers.User, users map[int]handlers.User) ([]handlers.User, error) {
+
+	// To handle nullable columns in a database table
+	var username, email, organisationName, userGroup, addedDate, updatedDate sql.NullString
+	var userId, isActive sql.NullInt16
+
+	rows, err := m.DB.Query(context.Background(), SQL_GET_ALL_USERS)
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&userId, &username, &email, &isActive, &organisationName, &userGroup, &addedDate, &updatedDate)
+		if err != nil {
+			log.Println("rows.Scan failed in GetAllUsers:", err)
+			return nil, utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+		}
+
+		// Check if user already exists in map
+		if user, ok := users[int(userId.Int16)]; ok {
+			// User already exists, append userGroup to UserGroup array
+			user.UserGroup = append(user.UserGroup, userGroup.String)
+			users[int(userId.Int16)] = user
+		} else {
+			// User does not exist in map, create a new User object
+			user := handlers.User{
+				UserId:           int(userId.Int16),
+				Username:         username.String,
+				Email:            email.String,
+				IsActive:         int(isActive.Int16),
+				OrganisationName: organisationName.String,
+				UserGroup:        []string{userGroup.String},
+				AddedDate:        addedDate.String,
+				UpdatedDate:      updatedDate.String,
+			}
+			users[int(userId.Int16)] = user
+		}
+	}
+
+	// Convert map to slice
+	for _, user := range users {
+		data = append(data, user)
+	}
+
+	// Sort users by UserId in ascending order
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].UserId < data[j].UserId
+	})
+
+	return data, err
+}
+
 // func (m *PostgresDBRepo) GetOrganisationName(organisationName string) bool {
 // 	row := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "organisation_name", "organisation_name"), organisationName)
 // 	return row.Scan() != pgx.ErrNoRows
@@ -234,9 +286,4 @@ func (m *PostgresDBRepo) GetOrganisationNameAndUserIdByUsername(username string)
 		return "", 0, fmt.Errorf("m.DB.QueryRow in GetOrganisationNameAndUserIdByUsername: %w", err)
 	}
 	return organisationName, userId, nil
-}
-
-func (m *PostgresDBRepo) GetUsers() (pgx.Rows, error) {
-	rows, err := m.DB.Query(context.Background(), SQL_SELECT_ALL_USERS)
-	return rows, err
 }

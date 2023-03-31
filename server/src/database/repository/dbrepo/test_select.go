@@ -3,6 +3,7 @@ package dbrepo
 import (
 	"context"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -59,4 +60,8 @@ func (m *TestDBRepo) CheckDuplicatesAndExistingFieldsForCreateUser(ctx context.C
 
 func (m *TestDBRepo) CheckDuplicatesAndExistingFieldsForUpdateUser(ctx context.Context, username, email, organisationName string, userGroups ...string) error {
 	return nil
+}
+
+func (m *TestDBRepo) GetAllUsers(ctx context.Context, data []handlers.User, users map[int]handlers.User) ([]handlers.User, error) {
+	return nil, nil
 }

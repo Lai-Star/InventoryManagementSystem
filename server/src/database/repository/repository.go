@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -17,6 +18,8 @@ type DatabaseRepo interface {
 	GetPasswordByUsername(ctx context.Context, username string) (string, error)
 	GetIsActiveByUsername(ctx context.Context, username string) (int, error)
 	GetUserGroupsByUsername(ctx context.Context, username string, userGroups ...string) (bool, error)
+
+	GetAllUsers(ctx context.Context, data []handlers.User, users map[int]handlers.User) ([]handlers.User, error)
 
 	SignUpTransaction(ctx context.Context, username, password, email, organisationName, userGroup string, isActive int) error
 	CreateUserTransaction(ctx context.Context, username, password, email, organisationName string, isActive int, userGroups ...string) error
