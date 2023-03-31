@@ -39,11 +39,12 @@ func Routes(app repository.DatabaseRepo) http.Handler {
 	createUserH := admin.New(app)
 	updateUserH := admin.New(app)
 	getUserH := admin.New(app)
+	deleteUserH := admin.New(app)
 	mux.Route("/admin", func(mux chi.Router) {
 		mux.Post("/create-user", utils.MakeHTTPHandler(createUserH.CreateUser))
 		mux.Get("/users", utils.MakeHTTPHandler(getUserH.GetUsers))
 		mux.Patch("/update-user", utils.MakeHTTPHandler(updateUserH.UpdateUser))
-		mux.Delete("/delete-user", admin.AdminDeleteUser)
+		mux.Delete("/delete-user", utils.MakeHTTPHandler(deleteUserH.DeleteUser))
 		mux.Post("/create-user-group", utils.MakeHTTPHandler(createUgH.CreateUserGroup))
 		mux.Post("/create-organisation", utils.MakeHTTPHandler(createOrgH.CreateOrganisation))
 	})

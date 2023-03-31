@@ -1,53 +1,67 @@
 package admin
 
 import (
+	"context"
+	"log"
 	"net/http"
+	"time"
+
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/api/handlers/user-management/auth"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/types"
+	"github.com/LeonLow97/inventory-management-system-golang-react-postgresql/utils"
 )
 
 type AdminDeleteUserMgmt struct {
 	Username string `json:"username"`
 }
 
-func AdminDeleteUser(w http.ResponseWriter, req *http.Request) {
-	// // Set Headers
-	// w.Header().Set("Content-Type", "application/json")
-	// var adminDeleteUser AdminDeleteUserMgmt
+func (app application) DeleteUser(w http.ResponseWriter, req *http.Request) error {
 
-	// // Reading the request body and UnMarshal the body to the AdminDeleteUserMgmt struct
-	// bs, _ := io.ReadAll(req.Body)
-	// if err := json.Unmarshal(bs, &adminDeleteUser); err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Internal Server Error in Unmarshal JSON body in AdminDeleteUser:", err)
-	// 	return
-	// }
+	if req.Method != http.MethodDelete {
+		return utils.ApiError{Err: "Invalid Method", Status: http.StatusMethodNotAllowed}
+	}
 
-	// // Check User Group Admin
-	// if !auth_management.RetrieveIssuer(w, req) {
-	// 	return
-	// }
-	// if !utils.CheckUserGroup(w, w.Header().Get("Username"), "Admin") {
-	// 	return
-	// }
+	var deleteUser types.AdminDeleteUserJSON
 
-	// username := adminDeleteUser.Username
+	if err := deleteUser.ReadJSON(req.Body); err != nil {
+		log.Println("deleteUser.ReadJSON:", err)
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
 
-	// // Check username format
-	// if !auth_management.UsernameFormValidation(w, username) {
-	// 	return
-	// }
+	// Setting timeout to follow SLA
+	ctx := req.Context()
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
 
-	// // // Check if username exists in the database
-	// if !database.GetUsername(username) {
-	// 	utils.WriteJSON(w, http.StatusNotFound, "Username does not exist. Please try again.")
-	// 	return
-	// }
+	// Check User Group Admin
+	if err := auth.RetrieveIssuer(w, req); err != nil {
+		return err
+	}
+	utilsApp := utils.Application{DB: app.DB}
+	err := utils.InjectUG(utilsApp, ctx, w.Header().Get("username"), "Admin")
+	if err != nil {
+		return err
+	}
 
-	// err := database.DeleteUserByID(username)
-	// if err != nil {
-	// 	utils.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error")
-	// 	log.Println("Internal Server Error in deleting user from accounts table:", err)
-	// 	return
-	// }
+	deleteUser.UserFieldsTrimSpaces()
+	if err := deleteUser.DeleteUserFormValidation(w); err != nil {
+		return err
+	}
 
-	// utils.WriteJSON(w, http.StatusOK, "Successfully Deleted User!")
+	// Check if username exists in the database
+	usernameCount, err := app.DB.GetCountByUsername(ctx, deleteUser.Username)
+	if err != nil {
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+	if usernameCount != 1 {
+		return utils.ApiError{Err: "User " + deleteUser.Username + " does not exist. Please try again!", Status: http.StatusNotFound}
+	}
+
+	// Delete the user
+	if err := app.DB.DeleteUserByID(ctx, deleteUser.Username); err != nil {
+		return utils.ApiError{Err: "Internal Server Error", Status: http.StatusInternalServerError}
+	}
+
+	return utils.WriteJSON(w, http.StatusOK, utils.ApiSuccess{Success: "Successfully deleted user " + deleteUser.Username + "!", Status: http.StatusOK})
+
 }

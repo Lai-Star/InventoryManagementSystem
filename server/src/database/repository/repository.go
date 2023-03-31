@@ -28,6 +28,8 @@ type DatabaseRepo interface {
 	InsertIntoOrganisations(ctx context.Context, organisationName string) error
 	InsertIntoUserGroups(ctx context.Context, userGroup, description string) error
 
+	DeleteUserByID(ctx context.Context, username string) error
+
 	CheckDuplicatesAndExistingFieldsForCreateUser(ctx context.Context, username, email, organisationName string, userGroups ...string) error
 	CheckDuplicatesAndExistingFieldsForUpdateUser(ctx context.Context, username, email, organisationName string, userGroups ...string) error
 }

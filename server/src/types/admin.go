@@ -31,6 +31,10 @@ type AdminCreateUserGroupJSON struct {
 	Description string `json:"description"`
 }
 
+type AdminDeleteUserJSON struct {
+	Username string `json:"username"`
+}
+
 func (u *AdminUserJSON) ReadJSON(r io.Reader) error {
 	e := json.NewDecoder(r)
 	return e.Decode(u)
@@ -42,6 +46,11 @@ func (ug *AdminCreateUserGroupJSON) ReadJSON(r io.Reader) error {
 }
 
 func (org *AdminCreateOrganisationJSON) ReadJSON(r io.Reader) error {
+	e := json.NewDecoder(r)
+	return e.Decode(org)
+}
+
+func (org *AdminDeleteUserJSON) ReadJSON(r io.Reader) error {
 	e := json.NewDecoder(r)
 	return e.Decode(org)
 }
@@ -67,6 +76,11 @@ func (ug *AdminCreateUserGroupJSON) UGFieldsTrimSpaces() *AdminCreateUserGroupJS
 func (org *AdminCreateOrganisationJSON) OrgFieldsTrimSpaces() *AdminCreateOrganisationJSON {
 	org.OrganisationName = strings.TrimSpace(org.OrganisationName)
 	return org
+}
+
+func (user *AdminDeleteUserJSON) UserFieldsTrimSpaces() *AdminDeleteUserJSON {
+	user.Username = strings.TrimSpace(user.Username)
+	return user
 }
 
 func (u *AdminUserJSON) CreateUserFormValidation(w http.ResponseWriter) error {
@@ -170,6 +184,21 @@ func (u *AdminUserJSON) UpdateUserFormValidation(w http.ResponseWriter) error {
 				return utils.ApiError{Err: "User Group cannot have a length of more than 255 characters. Please try again.", Status: http.StatusBadRequest}
 			}
 		}
+	}
+
+	return nil
+}
+
+func (u *AdminDeleteUserJSON) DeleteUserFormValidation(w http.ResponseWriter) error {
+
+	// Username Validation
+	switch {
+	case utils.IsBlankField(u.Username):
+		return utils.ApiError{Err: "Username cannot be blank", Status: http.StatusBadRequest}
+	case !utils.CheckLengthRange(u.Username, 5, 50):
+		return utils.ApiError{Err: "Username must have a length of 5 - 50 characters. Please try again.", Status: http.StatusBadRequest}
+	case !utils.CheckUsernameSpecialChar(u.Username):
+		return utils.ApiError{Err: "Username cannot contain special characters except 'underscore'", Status: http.StatusBadRequest}
 	}
 
 	return nil

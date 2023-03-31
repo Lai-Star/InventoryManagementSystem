@@ -121,16 +121,6 @@ func OrganisationFormValidation(w http.ResponseWriter, organisationName, action 
 	return true
 }
 
-// Trim Spaces for fields in the Admin User Management JSON
-func (user AdminUserMgmtJson) AdminUserMgmtFieldsTrimSpaces() AdminUserMgmtJson {
-	user.Username = strings.TrimSpace(user.Username)
-	user.Password = strings.TrimSpace(user.Password)
-	user.Email = strings.TrimSpace(user.Email)
-	user.OrganisationName = strings.TrimSpace(user.OrganisationName)
-
-	return user
-}
-
 func AdminUserMgmtFormValidation(w http.ResponseWriter, user AdminUserMgmtJson, action string) bool {
 
 	// Username form validation
