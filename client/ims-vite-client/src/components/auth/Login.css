@@ -6,6 +6,7 @@
     transform: translate(-50%, -50%);
 
     display: flex;
+    width: 30%;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -54,4 +55,12 @@ button:active {
 
 .login-title {
     margin-bottom: 30px;
+}
+
+.error-message {
+    width: 100%;
+    overflow: hidden;
+    /* text-overflow; */
+    white-space: nowrap;
+    color: red;
 }
