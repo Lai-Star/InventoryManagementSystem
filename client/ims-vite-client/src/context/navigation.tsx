@@ -1,5 +1,4 @@
-import { createContext, useState, useEffect } from "react";
-import PropTypes from "prop-types";
+import { createContext, useState, useEffect } from 'react';
 
 const NavigationContext = createContext();
 
@@ -12,22 +11,18 @@ function NavigationProvider({ children }) {
       setCurrentPath(window.location.pathname);
     };
 
-    window.addEventListener("popstate", handler);
+    window.addEventListener('popstate', handler);
 
     // cleanup
     return () => {
-      window.removeEventListener("popstate", handler);
+      window.removeEventListener('popstate', handler);
     };
   }, []);
 
   // for link navigation
   const navigate = (to) => {
-    window.history.pushState({}, "", to);
+    window.history.pushState({}, '', to);
     setCurrentPath(to);
-  };
-
-  NavigationProvider.propTypes = {
-    children: PropTypes.node.isRequired,
   };
 
   return (
