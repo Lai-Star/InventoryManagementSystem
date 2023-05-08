@@ -1,13 +1,24 @@
-import { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 
-const NavigationContext = createContext();
+export type NavigationContextType = {
+  currentPath: string;
+  navigate: (to: string) => void;
+};
 
-function NavigationProvider({ children }) {
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+interface Props {
+  children: React.ReactNode;
+}
+
+const NavigationContext = createContext<NavigationContextType | null>(null);
+
+const NavigationProvider: React.FC<Props> = ({ children }) => {
+  const [currentPath, setCurrentPath] = useState<string>(
+    window.location.pathname
+  );
 
   useEffect(() => {
     // to handle users clicking forward and back buttons on browser
-    const handler = () => {
+    const handler = (): void => {
       setCurrentPath(window.location.pathname);
     };
 
@@ -20,17 +31,22 @@ function NavigationProvider({ children }) {
   }, []);
 
   // for link navigation
-  const navigate = (to) => {
+  const navigate = (to: string): void => {
     window.history.pushState({}, '', to);
     setCurrentPath(to);
   };
 
+  const contextValue: NavigationContextType = {
+    currentPath,
+    navigate,
+  };
+
   return (
-    <NavigationProvider value={{ currentPath, navigate }}>
+    <NavigationContext.Provider value={contextValue}>
       {children}
-    </NavigationProvider>
+    </NavigationContext.Provider>
   );
-}
+};
 
 export { NavigationProvider };
 export default NavigationContext;

@@ -7,15 +7,15 @@ function Login() {
   const [password, setPassword] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
 
-  const handleUsernameChange = (event) => {
+  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setUsername(event.target.value);
   };
 
-  const handlePasswordChange = (event) => {
+  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     try {
@@ -23,8 +23,8 @@ function Login() {
       setUsername('');
       setPassword('');
       setErrorMsg('');
-      console.log(response.data.Success);
-    } catch (error) {
+      console.log(response);
+    } catch (error: any) {
       console.log(error.response.data.Err);
       setErrorMsg(error.response.data.Err);
     }
