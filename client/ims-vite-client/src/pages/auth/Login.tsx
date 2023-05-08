@@ -7,7 +7,9 @@ function Login() {
   const [password, setPassword] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
 
-  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleUsernameChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     setUsername(event.target.value);
   };
 
@@ -23,9 +25,10 @@ function Login() {
       setUsername('');
       setPassword('');
       setErrorMsg('');
-      console.log(response);
+      console.log(response.data);
     } catch (error: any) {
-      console.log(error.response.data.Err);
+      setUsername('');
+      setPassword('');
       setErrorMsg(error.response.data.Err);
     }
   };

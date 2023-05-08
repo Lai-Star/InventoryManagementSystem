@@ -1,13 +1,27 @@
 import axios, { AxiosResponse } from 'axios';
 
-// const loginRoute = async (
-//   username: string,
-//   password: string
-// ) => {
-//   return await axios.post('http://localhost:8080/login', {
-//     username,
-//     password,
-//   });
-// };
+type LoginData = {
+  status: number;
+  data: string;
+};
+
+type LoginPayload = {
+  username: string;
+  password: string;
+};
+
+const loginRoute = async (
+  username: string,
+  password: string
+): Promise<AxiosResponse<LoginData>> => {
+  const response = await axios.post<LoginPayload, AxiosResponse<LoginData>>(
+    'http://localhost:8080/login',
+    {
+      username,
+      password,
+    }
+  );
+  return response;
+};
 
 export default loginRoute;
