@@ -106,6 +106,7 @@ func (m *PostgresDBRepo) GetUserGroupsByUsername(ctx context.Context, username s
 		log.Println("Query failed at GetUserGroupsByUsername:", err)
 		return false, err
 	}
+	defer rows.Close()
 
 	var userGroup string
 	if rows != nil {
@@ -119,7 +120,7 @@ func (m *PostgresDBRepo) GetUserGroupsByUsername(ctx context.Context, username s
 			}
 		}
 	}
-	return false, nil
+	return true, nil
 }
 
 func (m *PostgresDBRepo) GetCountByUserGroup(ctx context.Context, userGroup string) (int, error) {
@@ -231,6 +232,9 @@ func (m *PostgresDBRepo) GetAllUsers(ctx context.Context, data []handlers.User, 
 	var userId, isActive sql.NullInt16
 
 	rows, err := m.DB.Query(context.Background(), SQL_GET_ALL_USERS)
+	if err != nil {
+		log.Println("Query failed on GetAllUsers: ", err)
+	}
 	defer rows.Close()
 
 	for rows.Next() {
@@ -273,11 +277,6 @@ func (m *PostgresDBRepo) GetAllUsers(ctx context.Context, data []handlers.User, 
 
 	return data, err
 }
-
-// func (m *PostgresDBRepo) GetOrganisationName(organisationName string) bool {
-// 	row := m.DB.QueryRow(context.Background(), fmt.Sprintf(SQL_SELECT_FROM_ORGANISATIONS, "organisation_name", "organisation_name"), organisationName)
-// 	return row.Scan() != pgx.ErrNoRows
-// }
 
 func (m *PostgresDBRepo) GetOrganisationNameAndUserIdByUsername(username string) (string, int, error) {
 	var organisationName string
