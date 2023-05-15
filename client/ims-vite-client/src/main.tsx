@@ -6,7 +6,9 @@ import { NavigationProvider } from './context/navigation.tsx';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <NavigationProvider>
+      <App />
+    </NavigationProvider>
   </React.StrictMode>
 );
 

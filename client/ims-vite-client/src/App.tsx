@@ -1,15 +1,18 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
 import './App.css';
-import Login from './pages/auth/Login';
-import { NavigationProvider } from './context/navigation';
+import Route from './component/Route';
+import Login from './pages/auth/LoginPage';
+import SignUp from './pages/auth/SignUpPage';
 
 function App() {
   return (
-    <NavigationProvider>
-      <Login />
-    </NavigationProvider>
+    <div>
+      <Route path='/'>
+        <Login />
+      </Route>
+      <Route path='/signup'>
+        <SignUp />
+      </Route>
+    </div>
   );
 }
 

@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import './Login.css';
 import loginRoute from '../../golang-api/auth';
+import { AxiosError } from 'axios';
+import useNavigation from '../../hooks/use-navigation';
 
-function Login() {
+function LoginPage() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
+
+  const { navigate } = useNavigation()!;
 
   const handleUsernameChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -25,11 +29,17 @@ function Login() {
       setUsername('');
       setPassword('');
       setErrorMsg('');
-      console.log(response.data);
-    } catch (error: any) {
-      setUsername('');
-      setPassword('');
-      setErrorMsg(error.response.data.Err);
+      if (response.data.Status) {
+        navigate('/signup');
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setUsername('');
+        setPassword('');
+        setErrorMsg(error.response?.data?.Err || 'An unknown error occurred.');
+      } else {
+        setErrorMsg('An unknown error occurred.');
+      }
     }
   };
 
@@ -56,4 +66,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default LoginPage;

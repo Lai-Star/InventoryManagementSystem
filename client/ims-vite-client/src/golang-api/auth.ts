@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
 
 type LoginData = {
-  status: number;
-  data: string;
+  Success: string;
+  Status: number;
 };
 
 type LoginPayload = {

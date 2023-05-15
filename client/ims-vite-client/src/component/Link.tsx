@@ -1,23 +1,41 @@
-// import React from 'react';
-// import useNavigation from '../hooks/use-navigation';
+import React from 'react';
+import useNavigation from '../hooks/use-navigation';
+import classNames from 'classnames';
+import styles from './Link.module.css';
 
-// function Link({ to, children, className, activeClassName }) {
-//   const { navigate, currentPath } = useNavigation();
+interface Props {
+  to: string;
+  children: React.ReactNode;
+  className: string;
+  activeClassName: string;
+}
 
-//   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-//     // to open up new window with CTRL + Enter
-//     if (event.metaKey || event.ctrlKey) {
-//       return;
-//     }
+function Link({ to, children, className, activeClassName }: Props) {
+  const { navigate, currentPath } = useNavigation()!;
 
-//     event.preventDefault();
+  const classes = classNames(
+    styles.link_blue,
+    styles.link_size,
+    className,
+    currentPath === to && activeClassName
+  );
 
-//     navigate(to);
-//   };
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    // to open up new window with CTRL + Enter
+    if (event.metaKey || event.ctrlKey) {
+      return;
+    }
 
-//   return (
-//     <a className={classes} href={to} onClick={handleClick}>
-//       {children}
-//     </a>
-//   );
-// }
+    event.preventDefault();
+
+    navigate(to);
+  };
+
+  return (
+    <a className={classes} href={to} onClick={handleClick}>
+      {children}
+    </a>
+  );
+}
+
+export default Link;
