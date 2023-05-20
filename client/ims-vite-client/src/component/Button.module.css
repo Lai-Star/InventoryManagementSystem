@@ -1,0 +1,146 @@
+button {
+    padding: 0.5rem 1rem;
+    margin-top: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.primary,
+.secondary,
+.success,
+.danger,
+.dark {
+    color: #fff;
+}
+
+.warning,
+.info,
+.light {
+    color: #000
+}
+
+/* BUTTON COLOR */
+.primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.primary:hover {
+    background-color: #0d5ed7;
+    border-color: #0a58ca;
+}
+
+.secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.secondary:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+}
+
+.success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.success:hover {
+    background-color: #157347;
+    border-color: #146c43;
+}
+
+.warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.warning:hover {
+    background-color: #ffca2c;
+    border-color: #ffc720;
+    color: #000;
+}
+
+.danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.danger:hover {
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+}
+
+.info {
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+}
+
+.info:hover {
+    background-color: #31d2f2;
+    border-color: #25cff2;
+    color: #000;
+}
+
+.light {
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+}
+
+.light:hover {
+    background-color: #d3d4d5;
+    border-color: #c6c7c8;
+    color: #000;
+}
+
+.dark {
+    background-color: #212529;
+    border-color: #212529;
+}
+
+.dark:hover {
+    background-color: #424549;
+    border-color: #373b3e;
+}
+
+/* rounded and outline */
+.rounded {
+    border-radius: 0.5rem;
+}
+
+.outline {
+    background-color: #fff;
+}
+
+/* outline and color */
+.primary_text {
+    color: #0d6efd;
+}
+
+.secondary_text {
+    color: #6c757d
+}
+
+.success_text {
+    color: #198754
+}
+
+.warning_text {
+    color: #ffc107;
+}
+
+.danger_text {
+    color: #dc3545;
+}
+
+.info_text {
+    color: #0dcaf0
+}
+
+.light-text {
+    color: #f8f9fa;
+}
+
+.dark_text {
+    color: #212529;
+}

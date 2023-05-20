@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-type LoginData = {
+type LoginResponse = {
   Success: string;
   Status: number;
 };
@@ -10,11 +10,22 @@ type LoginPayload = {
   password: string;
 };
 
-const loginRoute = async (
+interface SignUpPayload {
+  username: string;
+  password: string;
+  email: string;
+}
+
+interface SignUpResponse {
+  Success: string;
+  Status: number;
+}
+
+export const loginRoute = async (
   username: string,
   password: string
-): Promise<AxiosResponse<LoginData>> => {
-  const response = await axios.post<LoginPayload, AxiosResponse<LoginData>>(
+): Promise<AxiosResponse<LoginResponse>> => {
+  const response = await axios.post<LoginPayload, AxiosResponse<LoginResponse>>(
     'http://localhost:8080/login',
     {
       username,
@@ -24,4 +35,19 @@ const loginRoute = async (
   return response;
 };
 
-export default loginRoute;
+export const signUpRoute = async (
+  username: string,
+  password: string,
+  email: string
+): Promise<AxiosResponse<SignUpResponse>> => {
+  const response = await axios.post<
+    SignUpPayload,
+    AxiosResponse<SignUpResponse>
+  >('http://localhost:8080/signup', {
+    username,
+    password,
+    email,
+  });
+
+  return response;
+};

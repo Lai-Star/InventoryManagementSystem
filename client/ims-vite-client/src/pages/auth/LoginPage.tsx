@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import './Login.css';
-import loginRoute from '../../golang-api/auth';
+import { loginRoute } from '../../golang-api/auth';
 import { AxiosError } from 'axios';
 import useNavigation from '../../hooks/use-navigation';
+import Link from '../../component/Link';
 
 function LoginPage() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const SIGN_UP_PATH = '/signup';
 
   const { navigate } = useNavigation()!;
 
@@ -21,7 +23,7 @@ function LoginPage() {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
 
     try {
@@ -30,7 +32,7 @@ function LoginPage() {
       setPassword('');
       setErrorMsg('');
       if (response.data.Status) {
-        navigate('/signup');
+        navigate('/home');
       }
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -62,6 +64,9 @@ function LoginPage() {
         {errorMsg && <div className="error-message">{errorMsg}</div>}
         <button type="submit">Login</button>
       </form>
+      <Link to={SIGN_UP_PATH} className="" activeClassName="">
+        Don't have an account? Click here to sign up!
+      </Link>
     </div>
   );
 }

@@ -31,18 +31,7 @@ input:focus {
     border-bottom: 2px solid #3f51b5;
 }
 
-button {
-    background-color: #fff;
-    color: #333333;
-    border: 1px solid #ddd;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
-    margin-top: 30px;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-button:hover {
+/* button:hover {
     background-color: #333;
     color: #fff;
 }
@@ -50,7 +39,7 @@ button:hover {
 button:active {
     background-color: #555;
     border-color: #555;
-}
+} */
 
 
 .login-title {
