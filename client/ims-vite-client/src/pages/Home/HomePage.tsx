@@ -1,5 +1,11 @@
+import NavigationBar from './NavigationBar';
+
 function HomePage() {
-    return <div>Home Page</div>
+  return (
+    <div>
+      <NavigationBar />
+    </div>
+  );
 }
 
-export default HomePage
+export default HomePage;

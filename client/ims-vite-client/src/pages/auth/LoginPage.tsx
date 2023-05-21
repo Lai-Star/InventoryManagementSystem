@@ -4,6 +4,7 @@ import { loginRoute } from '../../golang-api/auth';
 import { AxiosError } from 'axios';
 import useNavigation from '../../hooks/use-navigation';
 import Link from '../../component/Link';
+import Button from '../../component/Button';
 
 function LoginPage() {
   const [username, setUsername] = useState<string>('');
@@ -46,7 +47,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="login-container">
+    <div className="centered-container">
       <form onSubmit={handleSubmit}>
         <h2 className="login-title">Login</h2>
         <div>
@@ -62,7 +63,9 @@ function LoginPage() {
           />
         </div>
         {errorMsg && <div className="error-message">{errorMsg}</div>}
-        <button type="submit">Login</button>
+        <Button success rounded type="submit">
+          Login
+        </Button>
       </form>
       <Link to={SIGN_UP_PATH} className="" activeClassName="">
         Don't have an account? Click here to sign up!

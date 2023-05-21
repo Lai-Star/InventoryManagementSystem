@@ -35,7 +35,7 @@ function SignUpPage() {
   const handleClick = () => [navigate('/')];
 
   return (
-    <div>
+    <div className="centered-container">
       <h2>Register Account</h2>
       <form onSubmit={handleSubmit}>
         <div>
@@ -66,11 +66,13 @@ function SignUpPage() {
           />
         </div>
         {errorMsg && <div>{errorMsg}</div>}
-        <Button outline warning type="submit">
+        <Button success rounded type="submit">
           Create Account
         </Button>
       </form>
-      <button onClick={handleClick}>Back to Login Page</button>
+      <Button light rounded onClick={handleClick}>
+        Back to Login Page
+      </Button>
     </div>
   );
 }

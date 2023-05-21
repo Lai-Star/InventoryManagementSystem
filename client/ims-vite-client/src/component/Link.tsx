@@ -6,8 +6,8 @@ import styles from './Link.module.css';
 interface Props {
   to: string;
   children: React.ReactNode;
-  className: string;
-  activeClassName: string;
+  className?: string;
+  activeClassName?: string;
 }
 
 function Link({ to, children, className, activeClassName }: Props) {
