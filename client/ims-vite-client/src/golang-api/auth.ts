@@ -30,6 +30,9 @@ export const loginRoute = async (
     {
       username,
       password,
+    },
+    {
+      withCredentials: true, // Include credentials (cookies) in the request
     }
   );
   return response;
