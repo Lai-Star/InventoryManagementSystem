@@ -11,6 +11,7 @@ function LoginPage() {
   const [password, setPassword] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
   const SIGN_UP_PATH = '/signup';
+  const HOME_PATH = '/home';
 
   const { navigate } = useNavigation()!;
 
@@ -33,7 +34,7 @@ function LoginPage() {
       setPassword('');
       setErrorMsg('');
       if (response.data.Status) {
-        navigate('/home');
+        navigate(HOME_PATH);
       }
     } catch (error) {
       if (error instanceof AxiosError) {

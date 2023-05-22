@@ -1,15 +1,27 @@
-// import { Fragment } from "react"
 
-// interface Props {
-    
-// }
+function Table({ config, data, keyFn }: any) {
+  // Table Headers
+  const renderedHeaders = config.map((column: any) => {
+    return <th key={column.label}>{column.label}</th>;
+  });
 
-// function Table({data, config, keyFn}) {
-//     // Table headers
-//     const renderedHeaders = config.map((column) => {
+  // Table Rows
+  const renderedRows = data.map((rowData: any) => {
+    const renderedCells = config.map((column: any) => {
+      return <td key={column.label}>{column.render(rowData)}</td>;
+    });
 
-//     })
+    return <tr key={keyFn(rowData)}>{renderedCells}</tr>;
+  });
 
-// }
+  return (
+    <table>
+      <thead>
+        <tr>{renderedHeaders}</tr>
+      </thead>
+      <tbody>{renderedRows}</tbody>
+    </table>
+  );
+}
 
-// export default Table
+export default Table;
