@@ -7,6 +7,9 @@ import Home from './pages/Home/HomePage';
 import NavigationBar from './pages/Home/NavigationBar';
 
 function App() {
+  // FOR DEV ONLY!!
+  // SHIFTED NAVIGATION BAR HERE TEMPORARILY!!
+
   return (
     <div>
       <NavigationBar />

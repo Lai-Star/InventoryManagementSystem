@@ -1,21 +1,9 @@
 import { useState, useEffect } from 'react';
 import { getAccountsRoute } from '../../golang-api/accounts';
+import { Data, ConfigItem } from '../../models/table-model';
 import Table from '../../component/Table';
 
-type Data = {
-  UserId: number;
-  Username: string;
-  Email: string;
-  IsActive: number;
-  OrganisationName: string;
-};
-
-type ConfigItem = {
-  label: string;
-  render: (account: Data) => React.ReactNode;
-};
-
-function Accounts() {
+function Accounts(): React.ReactElement {
   const [data, setData] = useState<Data[]>([]);
 
   useEffect(() => {
@@ -30,28 +18,28 @@ function Accounts() {
   const config: ConfigItem[] = [
     {
       label: 'User ID',
-      render: (account) => account.UserId,
+      render: (account: Data): number => account.UserId,
     },
     {
       label: 'Username',
-      render: (account) => account.Username,
+      render: (account: Data): string => account.Username,
     },
     {
       label: 'Email',
-      render: (account) => account.Email,
+      render: (account: Data): string => account.Email,
     },
     {
       label: 'IsActive',
-      render: (account) => account.IsActive,
+      render: (account: Data): number => account.IsActive,
     },
     {
       label: 'Organisation Name',
-      render: (account) => account.OrganisationName,
+      render: (account: Data): string => account.OrganisationName,
     },
   ];
 
   // Function used to generate key for mapping function in rows in Table component
-  const keyFn = (account: any) => {
+  const keyFn = (account: Data): number => {
     return account.UserId;
   };
 
