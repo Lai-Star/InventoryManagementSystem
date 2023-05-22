@@ -1,11 +1,12 @@
-import Button from '../../component/Button';
 import Link from '../../component/Link';
 import './NavigationBar.css';
 
 const NavigationBar = () => {
   return (
     <header>
-      <h4 className="logo">IMS</h4>
+      <h4 className="logo">
+        <Link to={'/home'}>IMS</Link>
+      </h4>
       <nav>
         <ul className="nav__links">
           <li>

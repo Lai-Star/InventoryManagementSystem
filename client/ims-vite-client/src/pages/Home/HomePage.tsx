@@ -3,7 +3,7 @@ import NavigationBar from './NavigationBar';
 function HomePage() {
   return (
     <div>
-      <NavigationBar />
+      Home
     </div>
   );
 }

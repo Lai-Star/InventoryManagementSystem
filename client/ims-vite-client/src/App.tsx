@@ -4,10 +4,12 @@ import Accounts from './pages/accounts/AccountsPage';
 import Login from './pages/auth/LoginPage';
 import SignUp from './pages/auth/SignUpPage';
 import Home from './pages/Home/HomePage';
+import NavigationBar from './pages/Home/NavigationBar';
 
 function App() {
   return (
     <div>
+      <NavigationBar />
       <Route path="/">
         <Login />
       </Route>
