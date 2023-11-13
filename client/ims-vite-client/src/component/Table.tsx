@@ -1,10 +1,10 @@
 import styles from './Table.module.css';
-import { Data, ConfigItem, TableProps } from '../models/table-model';
+import { ConfigItem, TableProps } from '../models/table-model';
 
-function Table({ config, data, keyFn }: TableProps): React.ReactElement {
+function Table<Data>({ config, data, keyFn }: TableProps<Data>): React.ReactElement {
   // Table Headers
   const renderedHeaders = config.map(
-    (column: ConfigItem): React.ReactElement => {
+    (column: ConfigItem<Data>): React.ReactElement => {
       return (
         <th key={column.label} className={styles.table_header}>
           {column.label}
@@ -16,7 +16,7 @@ function Table({ config, data, keyFn }: TableProps): React.ReactElement {
   // Table Rows
   const renderedRows = data.map((rowData: Data): React.ReactElement => {
     const renderedCells = config.map(
-      (column: ConfigItem): React.ReactElement => {
+      (column: ConfigItem<Data>): React.ReactElement => {
         return (
           <td key={column.label} className={styles.table_cell}>
             {column.render(rowData)}

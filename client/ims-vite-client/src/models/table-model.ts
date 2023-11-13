@@ -1,20 +1,18 @@
-type Data = {
-  UserId: number;
-  Username: string;
-  Email: string;
-  IsActive: number;
-  OrganisationName: string;
-};
-
-type TableProps = {
-  config: ConfigItem[];
+type TableProps<Data> = {
+  config: ConfigItem<Data>[];
   data: Data[];
   keyFn: (rowData: Data) => number;
 };
 
-interface ConfigItem {
+interface ConfigItem<Data> {
   label: string;
   render: (account: Data) => React.ReactNode;
+  sortValue?: (account: Data) => string | number;
 }
 
-export type { Data, ConfigItem, TableProps };
+type SortProps<Data> = {
+  config: ConfigItem<Data>[];
+  data: Data[];
+};
+
+export type { ConfigItem, TableProps, SortProps };
