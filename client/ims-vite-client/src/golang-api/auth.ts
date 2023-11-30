@@ -38,6 +38,7 @@ export const loginRoute = async (
   return response;
 };
 
+// Export const
 export const signUpRoute = async (
   username: string,
   password: string,
