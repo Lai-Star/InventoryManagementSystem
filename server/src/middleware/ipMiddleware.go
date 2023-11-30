@@ -36,7 +36,7 @@ func AddIPToContext(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
-
+// ee
 func GetIP(r *http.Request) (string, error) {
 	// split to the specific ip and port (but don't need the port number)
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
