@@ -53,7 +53,7 @@
 - In the **Generate2FA()** function, the OTP was generated in the format of 5 alphabets (lower and upper case) and 6 numbers separated by a hyphen "-" to provide a high level of randomness.
 
 ## Unit Testing - Test Driven Development (TDD)
-
+- The Main Purpose
 - The main purpose of unit testing is to test the functionality of individual units of code to ensure that they are working as intended.
 - Unit testing can also be used to establish a foundation for automated testing and continuous integration, which helps to maintain the quality and reliability of the software over time.
 - The following steps were implemented in the process of TDD:
